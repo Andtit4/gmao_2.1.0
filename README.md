@@ -1,4 +1,4 @@
-# gmao_2.1.0
+# gmao
 
 ## Project setup
 ```

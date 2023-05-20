@@ -4,15 +4,21 @@ import { BootstrapVue, IconsPlugin } from  'bootstrap-vue'
 import Vuesax from 'vuesax'
 
 import 'vuesax/dist/vuesax.css'
-
-// Importation des fichiers CSS Bootstrap et BootstrapVue (l'ordre est important) 
 import  'bootstrap/dist/css/bootstrap.css' 
 import  'bootstrap-vue/dist/bootstrap-vue.css' 
+import './assets/fonts/global-font.css'
 
-// Rendre BootstrapVue disponible dans tout votre projet 
-Vue.use(BootstrapVue) // Installer éventuellement le plugin de composants d'icône BootstrapVue 
+Vue.use(BootstrapVue) 
 Vue.use(IconsPlugin)
-Vue.use(Vuesax)
+Vue.use(Vuesax, {
+  colors: {
+    primary:'#facb13',
+    success:'#6ca749',
+    danger:'rgb(242, 19, 93)',
+    warning:'rgb(255, 130, 0)',
+    dark:'rgb(36, 33, 69)'
+  }
+})
 Vue.config.productionTip = false
 
 new Vue({

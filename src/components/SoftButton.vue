@@ -1,11 +1,11 @@
 <template>
-  <vs-button
+  <button
     class="btn mb-0"
     style="border: 0; color: #f1f1f1; background-color: orange"
     :class="getClasses(variant, color, size, fullWidth, active)"
   >
     <slot />
-  </vs-button>
+  </button>
 </template>
 
 <script>

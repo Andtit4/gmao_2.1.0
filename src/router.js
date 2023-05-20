@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Sign from '@/pages/sign.vue'
 import About from '@/pages/about.vue'
+import Dash from '@/pages/dash.vue'
 
 Vue.use(VueRouter)
 
@@ -15,7 +16,12 @@ const routes = [
     path: '/about',
     name: 'About',
     component: About
-  }
+  },
+  {
+    path: '/dash',
+    name: 'Dash',
+    component: Dash
+  },
   // Définissez vos routes ici
 ]
 

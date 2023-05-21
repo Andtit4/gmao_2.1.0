@@ -4,6 +4,9 @@
 
 <script>
 import L from "leaflet";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import customMarker from "@/assets/marker_.png";
 
 export default {
   mounted() {
@@ -11,9 +14,19 @@ export default {
   },
   methods: {
     initMap() {
-        console.log('Init Map')
+      console.log("Init Map");
       // Coordonnées du centre de la carte
       const center = [8.6195, 0.8248];
+      const lome = [6.4267 , 1.2136];
+      const iconDefault = L.icon({
+        iconUrl: markerIcon,
+        shadowUrl: markerShadow,
+      });
+
+      const iconActive = L.icon({
+        iconUrl: customMarker,
+        iconSize: [32, 32],
+      });
 
       // Créer une instance de carte
       const map = L.map("map").setView(center, 7.4);
@@ -25,7 +38,15 @@ export default {
       }).addTo(map);
 
       // Ajouter un marqueur pour le Togo
-      L.marker(center).addTo(map).bindPopup("<b>Togo</b>").openPopup();
+      L.marker(center, { icon: iconDefault })
+        .addTo(map)
+        .bindPopup("<b>Togo</b>")
+        .openPopup();
+
+        L.marker(lome, { icon: iconActive })
+        .addTo(map)
+        .bindPopup("<b>Tsévié</b>")
+        .openPopup();
     },
   },
 };
@@ -34,9 +55,9 @@ export default {
 
 <style>
 .map-container {
-    position: relative;
-    top: -40%;
-    width: 400px;
-    height: 600px;
+  position: relative;
+  top: -40%;
+  width: 400px;
+  height: 600px;
 }
 </style>

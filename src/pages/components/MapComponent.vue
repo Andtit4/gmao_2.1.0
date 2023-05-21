@@ -18,6 +18,9 @@ export default {
       // Coordonnées du centre de la carte
       const center = [8.6195, 0.8248];
       const lome = [6.4267 , 1.2136];
+      const atakpame = [7.5350, 1.1263];
+      const kara = [9.5510, 1.1861];
+
       const iconDefault = L.icon({
         iconUrl: markerIcon,
         shadowUrl: markerShadow,
@@ -25,7 +28,7 @@ export default {
 
       const iconActive = L.icon({
         iconUrl: customMarker,
-        iconSize: [32, 32],
+        iconSize: [25, 25],
       });
 
       // Créer une instance de carte
@@ -47,6 +50,16 @@ export default {
         .addTo(map)
         .bindPopup("<b>Tsévié</b>")
         .openPopup();
+
+        L.marker(atakpame, { icon: iconActive })
+        .addTo(map)
+        .bindPopup("<b>Atakpamé</b>")
+        .openPopup();
+
+        L.marker(kara, { icon: iconActive })
+        .addTo(map)
+        .bindPopup("<b>Kara</b>")
+        .openPopup();
     },
   },
 };
@@ -58,6 +71,6 @@ export default {
   position: relative;
   top: -40%;
   width: 400px;
-  height: 600px;
+  height: 700px;
 }
 </style>

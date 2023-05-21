@@ -30,7 +30,7 @@
 
 <script>
 export default {
-  name: "breadcrumbs",
+  name: "breadCrumbs",
   props: {
     currentPage: {
       required: true,

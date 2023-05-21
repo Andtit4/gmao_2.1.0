@@ -25,7 +25,7 @@ import logo from "@/assets/img/logo-ct.png";
 import { mapState } from "vuex";
 
 export default {
-  name: "index",
+  name: "indexS",
   components: {
     SidenavList,
   },

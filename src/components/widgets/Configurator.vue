@@ -111,7 +111,7 @@
 <script>
 import { mapMutations, mapActions } from "vuex";
 export default {
-  name: "configurator",
+  name: "configuratorS",
   props: ["toggle"],
   data() {
     return {

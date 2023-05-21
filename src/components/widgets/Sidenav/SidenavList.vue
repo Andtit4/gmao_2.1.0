@@ -30,8 +30,9 @@
 </template>
 <script>
 import SidenavCollapse from "./SidenavCollapse.vue";
-import Shop from "../../components/Icon/Shop.vue";
-import Office from "../../components/Icon/Office.vue";
+import Shop from "../../../components/Icon/Shop.vue"
+// import Shop from "../../components/Icon/Shop.vue";
+import Office from "../../../components/Icon/Office.vue";
 
 export default {
   name: "SidenavList",

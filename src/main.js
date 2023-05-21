@@ -8,6 +8,7 @@ import 'vuesax/dist/vuesax.css'
 import  'bootstrap/dist/css/bootstrap.css' 
 import  'bootstrap-vue/dist/bootstrap-vue.css' 
 import './assets/fonts/global-font.css'
+import 'leaflet/dist/leaflet.css'
 import Soft from "./soft-ui";
 import Vuex from 'vuex';
 

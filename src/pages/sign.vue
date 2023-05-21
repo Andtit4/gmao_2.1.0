@@ -115,7 +115,7 @@ import SoftButton from "@/components/SoftButton.vue";
 // const body = document.getElementsByTagName("body")[0];
 // require("dotenv").config();
 
-import { mapMutations } from "vuex";
+// import { mapMutations } from "vuex";
 
 export default {
   name: "SignIn",
@@ -138,20 +138,20 @@ export default {
     // SoftProgress,
   },
 
-  created() {
-    this.toggleEveryDisplay();
-    this.toggleHideConfig();
-    // body.classList.remove("bg-gray-100");
-  },
-  beforeUnmount() {
-    this.toggleEveryDisplay();
-    this.toggleHideConfig();
-    // body.classList.add("bg-gray-100");
-  },
+  // created() {
+  //   this.toggleEveryDisplay();
+  //   this.toggleHideConfig();
+  //   // body.classList.remove("bg-gray-100");
+  // },
+  // beforeUnmount() {
+  //   this.toggleEveryDisplay();
+  //   this.toggleHideConfig();
+  //   // body.classList.add("bg-gray-100");
+  // },
 
 
   methods: {
-    ...mapMutations(["toggleEveryDisplay", "toggleHideConfig"]),
+    // ...mapMutations(["toggleEveryDisplay", "toggleHideConfig"]),
 
     auth: function () {
       this.$router.push({ path: "/dash" });

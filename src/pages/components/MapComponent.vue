@@ -7,19 +7,27 @@ import L from "leaflet";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import customMarker from "@/assets/marker_.png";
+// import axios from 'axios';
+import axios from "axios";
 
 export default {
+  data(){
+    return {
+      nb: 0
+    }
+  },
   mounted() {
     this.initMap();
   },
   methods: {
     initMap() {
       console.log("Init Map");
+
       // Coordonnées du centre de la carte
       const center = [8.6195, 0.8248];
-      const lome = [6.4267 , 1.2136];
-      const atakpame = [7.5350, 1.1263];
-      const kara = [9.5510, 1.1861];
+      // const lome = [6.4267 , 1.2136];
+      // const atakpame = [7.5350, 1.1263];
+      // const kara = [9.5510, 1.1861];
 
       const iconDefault = L.icon({
         iconUrl: markerIcon,
@@ -40,13 +48,45 @@ export default {
           'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
       }).addTo(map);
 
+      axios({
+        url: "http://localhost:3000/api/site/nb",
+        method: "GET"
+      }).then((response) => {
+        this.nb = response.data[0].nb;
+      })
+
+      axios({
+        url: "http://localhost:3000/api/site",
+        method: "GET",
+      })
+        .then((response) => {
+          console.log("__the_response", response.data[1].nom_site);
+        console.log('__nb_site_:' + this.nb)
+
+        for (var i =0; i < this.nb; i++) {
+
+          const site = [
+            response.data[i].latitude,
+            response.data[i].longitude,
+          ];
+          L.marker(site, { icon: iconActive })
+            .addTo(map)
+            .bindPopup("<b>" + response.data[i].nom_site + "</b>")
+            .openPopup();
+        }
+        })
+        .catch((e) => {
+          console.log("__the_error", e);
+        });
+      console.log("Init");
+
       // Ajouter un marqueur pour le Togo
       L.marker(center, { icon: iconDefault })
         .addTo(map)
         .bindPopup("<b>Togo</b>")
         .openPopup();
 
-        L.marker(lome, { icon: iconActive })
+      /*  L.marker(lome, { icon: iconActive })
         .addTo(map)
         .bindPopup("<b>Tsévié</b>")
         .openPopup();
@@ -59,7 +99,7 @@ export default {
         L.marker(kara, { icon: iconActive })
         .addTo(map)
         .bindPopup("<b>Kara</b>")
-        .openPopup();
+        .openPopup(); */
     },
   },
 };

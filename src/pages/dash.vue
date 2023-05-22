@@ -6,7 +6,7 @@
       <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
         <mini-statistics-card
           title="DR1"
-          :value="nbtraiter"
+          :value="nbdr1"
           :percentage="{
             value: '+3%',
             color: 'text-warning',
@@ -24,9 +24,9 @@
       <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
         <mini-statistics-card
           title="DR2"
-          value="0"
+          :value="nbdr2"
           :percentage="{
-            value: '-2%',
+            value: 'nbdr2',
             color: 'text-danger',
           }"
           :icon="{
@@ -142,7 +142,7 @@ import SoftProgress from "@/components/SoftProgress";
 
 import AuthorsTable from "./components/AuthorsTable";
 import ProjectsTable from "./components/ProjectsTable";
-// import axios from "axios";
+import axios from "axios";
 
 import { mapGetters, mapActions, mapState } from "vuex";
 
@@ -165,6 +165,8 @@ export default {
   data() {
     return {
       // nb: 0,
+      nbdr1: 0,
+      nbdr2: 0,
       nbtraiter: 0,
       iconBackground: "bg-gradient-success",
       iconBackgroundDanger: "bg-gradient-danger",
@@ -223,20 +225,37 @@ export default {
   },
   created() {
     this.getNbOffline();
+    this.getData();
   },
   computed: {
     ...mapGetters(["nb"]),
     count(){
       return this.nb;
     },
+    
     ...mapState(["setSiteHsCount"])
   },
   methods: {
     ...mapActions(["getNbOffline"]),
     ...mapActions(["getInsertionCount"]),
     getData(){
-      this.$store.dispatch('getInsertionCount')
+      // this.$store.dispatch('getInsertionCount')
+      axios({
+        url: "http://localhost:3000/api/site/nb/state?state=DR1",
+        method: "GET",
+      }).then((response) => {
+        this.nbdr1 = response.data[0].nb;
+        console.log('__get_data_' + this.nbdr1)
+      });
+
+      axios({
+        url: "http://localhost:3000/api/site/nb/state?state=DR2",
+        method: "GET",
+      }).then((response) => {
+        this.nbdr2 = response.data[0].nb;
+      })
     }
+
   },
 
   mounted() {

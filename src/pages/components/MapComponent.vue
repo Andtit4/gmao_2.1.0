@@ -6,9 +6,9 @@
 import L from "leaflet";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-import customMarker from "@/assets/marker_.png";
-import MarkerDr1 from "@/assets/marker_dr1.png";
-import MarkerDr2 from "@/assets/marker_dr2.png";
+import customMarker from "@/assets/marker__2.png";
+import MarkerDr1 from "@/assets/marker__.png";
+import MarkerDr2 from "@/assets/marker__1.png";
 import axios from "axios";
 
 export default {
@@ -35,7 +35,7 @@ export default {
       // Customized markers
       const iconActive = L.icon({
         iconUrl: customMarker,
-        iconSize: [25, 25],
+        iconSize: [20, 20],
       });
       const iconDri = L.icon({
         iconUrl: MarkerDr1,

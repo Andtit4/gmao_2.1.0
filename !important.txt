@@ -1,0 +1,7 @@
+1- incident (Ticket noc) directement sur la carte 
+
+2- Après 1h les markers passent en orange
+
+3- Après 2h ils passent en rouge
+
+4- Assigner au technicien puis l'afficher dans la tooltip de la map

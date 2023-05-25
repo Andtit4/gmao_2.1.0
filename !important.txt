@@ -2,6 +2,6 @@
 
 2- Après 1h les markers passent en orange
 
-3- Après 2h ils passent en rouge
+3-  Ils passent en rouge compte tenu des SLA (1, 1h30)
 
 4- Assigner au technicien puis l'afficher dans la tooltip de la map

@@ -3,6 +3,7 @@ import App from './App.vue'
 import Vuesax from 'vuesax'
 import { BootstrapVue, IconsPlugin } from  'bootstrap-vue' 
 import router from './router'
+import store from'./store/store.js'
 
 import 'vuesax/dist/vuesax.css'
 import  'bootstrap/dist/css/bootstrap.css' 
@@ -24,5 +25,6 @@ Vue.config.productionTip = false
 
 new Vue({
   router,
+  store,
   render: h => h(App),
 }).$mount('#app')

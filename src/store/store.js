@@ -1,30 +1,15 @@
 import { createStore } from "vuex";
-import bootstrap from "bootstrap/dist/js/bootstrap.min.js";
-import store from "./data";
+// import bootstrap from "bootstrap/dist/js/bootstrap.min.js";
+// import store from "./data";
 import axios from "axios";
 
 export default createStore({
   modules: {
-    store,
+    // store,
   },
   state: {
-    hideConfigButton: false,
-    isPinned: true,
-    showConfig: false,
-    isTransparent: "",
-    isRTL: false,
-    color: "",
-    isNavFixed: false,
-    isAbsolute: false,
-    showNavs: true,
-    showSidenav: true,
-    showNavbar: true,
-    showFooter: true,
-    showMain: true,
-    navbarFixed:
-      "position-sticky blur shadow-blur left-auto top-1 z-index-sticky px-0 mx-4",
-    absolute: "position-absolute px-4 mx-0 w-100 z-index-2",
-    bootstrap,
+    totalDr1:0,
+    DR1: [],
     countdown: 5400, // 1h30 en secondes
     hour: 1,
     minute: 29,
@@ -32,10 +17,15 @@ export default createStore({
     percent: 0,
     count: 0,
     maxcount: 5400,
-    host: "https://creepy-overalls-yak.cyclic.app",
+    // host: "https://creepy-overalls-yak.cyclic.app",
+    host: "localhost:3000",
     nb: 0,
   },
   mutations: {
+    SET_DR1(state, DR1) {
+      state.DR1 = DR1,
+      state.totalDr1 = DR1.length
+    },
     decrementCountdown(state) {
       state.countdown--;
       state.count++;
@@ -58,37 +48,12 @@ export default createStore({
         });
     }, */
 
-    getNbOffline(state) {
-      console.log("__INIT___DEMANDE__SITE__HS");
-      let url = `${state.host}/api/demande/site/nb/hs`;
-      console.log("hours: ", this.hours);
+    
 
-      // this.onStart();
-      axios({
-        url: url,
-        method: "GET",
-      })
-        .then((response) => {
-          state.nb = response.data[0].nb;
-          if (state.nb == state.nb) {
-            state.nb = response.data[0].nb;
-            console.log("this.nb.refresh", response.data[0].nb);
-          }
-          console.log("this.nb", response.data[0].nb);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-
-    setSiteHsCount(state, countSites) {
-      state.nb = countSites;
-    },
-
-    toggleConfigurator(state) {
+/*     toggleConfigurator(state) {
       state.showConfig = !state.showConfig;
-    },
-    navbarMinimize(state) {
+    }, */
+/*     navbarMinimize(state) {
       const sidenav_show = document.querySelector(".g-sidenav-show");
       if (sidenav_show.classList.contains("g-sidenav-hidden")) {
         sidenav_show.classList.remove("g-sidenav-hidden");
@@ -105,8 +70,8 @@ export default createStore({
     },
     cardBackground(state, payload) {
       state.color = payload;
-    },
-    navbarFixed(state) {
+    }, */
+/*     navbarFixed(state) {
       if (state.isNavFixed === false) {
         state.isNavFixed = true;
       } else {
@@ -120,9 +85,19 @@ export default createStore({
     },
     toggleHideConfig(state) {
       state.hideConfigButton = !state.hideConfigButton;
-    },
+    }, */
   },
   actions: {
+    fetchDr1({ commit }) {
+      // Effectuer une requête pour obtenir la liste des étudiants depuis l'API
+      axios.get(`${this.state.host}/api/demande/?state=DR1s`)
+        .then(response => {
+          commit('SET_DR1', response.data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
     startCountdown({ commit }) {
       setInterval(() => {
         commit("decrementCountdown");
@@ -139,18 +114,16 @@ export default createStore({
         console.log(e);
       }
     },
-    toggleSidebarColor({ commit }, payload) {
+    /* toggleSidebarColor({ commit }, payload) {
       commit("sidebarType", payload);
     },
     setCardBackground({ commit }, payload) {
       commit("cardBackground", payload);
     },
-/*     getDemandes({ commit }, payload) {
-      commit("getDemandes", payload);
+
+    getNbDr1({ commit }, payload) {
+      commit("getNbDr1", payload);
     }, */
-    getNbOffline({ commit }, payload) {
-      commit("getNbOffline", payload);
-    },
   },
   getters: {
     /* hour: state => state.hour,

@@ -144,21 +144,16 @@ import AuthorsTable from "./components/AuthorsTable";
 import ProjectsTable from "./components/ProjectsTable";
 import axios from "axios";
 
-import { mapGetters, mapActions, mapState } from "vuex";
-
-import US from "../assets/img/icons/flags/US.png";
-import DE from "../assets/img/icons/flags/DE.png";
-import GB from "../assets/img/icons/flags/GB.png";
-import BR from "../assets/img/icons/flags/BR.png";
+// import { mapActions, mapState } from "vuex";
 import MapComponent from "../pages/components/MapComponent"
 // import L from 'leaflet';
 // import { LMap, LTileLayer, LMarker } from 'vue2-leaflet';
 import {
-  faHandPointer,
+  /* faHandPointer,
   faUsers,
   faCreditCard,
   faScrewdriverWrench,
-  faMapMarker,
+  faMapMarker, */
 } from "@fortawesome/free-solid-svg-icons";
 export default {
   name: "dashboard-default",
@@ -167,48 +162,19 @@ export default {
       // nb: 0,
       nbdr1: 0,
       nbdr2: 0,
-      nbtraiter: 0,
       iconBackground: "bg-gradient-success",
       iconBackgroundDanger: "bg-gradient-danger",
       iconBackgroundWarning: "bg-gradient-warning",
+      /* nbtraiter: 0,
       faCreditCard,
       faScrewdriverWrench,
       faUsers,
       faHandPointer,
-      faMapMarker,
-      host: "https://creepy-overalls-yak.cyclic.app",
-      // host: "localhost:3000",
+      faMapMarker, */
+      // host: "https://creepy-overalls-yak.cyclic.app",
+      host: "localhost:3000",
 
-      sales: {
-        us: {
-          country: "United States",
-          sales: 2500,
-          value: "$230,900",
-          bounce: "29.9%",
-          flag: US,
-        },
-        germany: {
-          country: "Germany",
-          sales: "3.900",
-          value: "$440,000",
-          bounce: "40.22%",
-          flag: DE,
-        },
-        britain: {
-          country: "Great Britain",
-          sales: "1.400",
-          value: "$190,700",
-          bounce: "23.44%",
-          flag: GB,
-        },
-        brasil: {
-          country: "Brasil",
-          sales: "562",
-          value: "$143,960",
-          bounce: "32.14%",
-          flag: BR,
-        },
-      },
+      
     };
   },
   components: {
@@ -224,21 +190,42 @@ export default {
     LMarker, */
   },
   created() {
-    this.getNbOffline();
-    this.getData();
+    // this.getNbDr1();
+    // this.getData();
+    // this.getDr1()
+    // this.fetchDr1();
   },
   computed: {
-    ...mapGetters(["nb"]),
+    /* ...mapGetters(["nb"]),
     count(){
       return this.nb;
-    },
+    }, */
     
-    ...mapState(["setSiteHsCount"])
+    // ...mapState(["DR1", "totalDr1"])
   },
   methods: {
-    ...mapActions(["getNbOffline"]),
-    ...mapActions(["getInsertionCount"]),
-    getData(){
+    // ...mapActions(["fetchDr1"]),
+    getDr1() {
+      axios({
+        url: "http://localhost:3000/api/site/nb/state?state=DR1",
+        method: "GET",
+      }).then((response) => {
+        this.nbdr1 = response.data[0].nb;
+        console.log('__get_data_dr1' + this.nbdr1)
+      });
+    },
+
+    getDr2() {
+      axios({
+        url: "http://localhost:3000/api/site/nb/state?state=DR2",
+        method: "GET",
+      }).then((response) => {
+        this.nbdr2 = response.data[0].nb;
+        console.log('__get_data_dr2' + this.nbdr2)
+      });
+    }
+    // ...mapActions(["getInsertionCount"]),
+   /*  getData(){
       // this.$store.dispatch('getInsertionCount')
       axios({
         url: "http://localhost:3000/api/site/nb/state?state=DR1",
@@ -254,13 +241,26 @@ export default {
       }).then((response) => {
         this.nbdr2 = response.data[0].nb;
       })
-    }
+    }, */
+
+   /*  getDr1() {
+      console.log('Loading dr1 function'),
+      axios({
+        url: this.host + "/api/demande/?state=DR1",
+        method: "GET",
+      }).then((response) => {
+        this.nbdr2 = response.data[0].nb;
+      })
+    } */
 
   },
 
   mounted() {
-    this.getNbOffline()
-    this.getInsertionCount()
+    this.getDr1()
+    this.getDr2()
+    // this.getNbDr1()
+    // this.getInsertionCount()
+    // this.getDr1()
   },
 };
 </script>

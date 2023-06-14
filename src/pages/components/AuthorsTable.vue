@@ -78,7 +78,7 @@
               </td>
               <td class="align-middle text-center text-sm">
                 <soft-badge color="danger" variant="gradient" size="sm"
-                  >Offline</soft-badge
+                  >DR1</soft-badge
                 >
               </td>
               <td class="align-middle text-center">
@@ -129,15 +129,15 @@ import SoftAvatar from "@/components/SoftAvatar.vue";
 import SoftBadge from "@/components/SoftBadge.vue";
 import SoftProgress from "@/components/SoftProgress";
 // import {  } from "../../store/data";
-import { mapGetters, mapActions } from "vuex";
-import { store } from "@/store/data.js";
+// import { mapGetters, mapActions } from "vuex";
+// import { store } from "@/store/data.js";
 
-import img1 from "../../assets/img/team-2.jpg";
+/* import img1 from "../../assets/img/team-2.jpg";
 import img2 from "../../assets/img/team-3.jpg";
 import img3 from "../../assets/img/team-4.jpg";
 import img4 from "../../assets/img/team-3.jpg";
 import img5 from "../../assets/img/team-2.jpg";
-import img6 from "../../assets/img/team-4.jpg";
+import img6 from "../../assets/img/team-4.jpg"; */
 import axios from "axios";
 // import { mapGetters } from "vuex";
 // import { store } from "@/store/data.js";
@@ -152,16 +152,16 @@ export default {
       state: {
         countdown : 0
       },
-      img1,
+/*       img1,
       img2,
       img3,
       img4,
       img5,
-      img6,
+      img6, */
       host: "http://localhost:3000",
       demandes: [],
       // timer: 0,
-      useCount: store,
+      // useCount: store,
    /*    hour: state.hour,
         mimute: state.minute,
         second: state.countdown, */
@@ -198,18 +198,32 @@ export default {
   },
 
   created() {
-    this.startCountdown()
+    // this.startCountdown()
     console.log('created');
   },
   computed: {
-    ...mapGetters(['hour', 'minute', 'second', 'percent']),
+    // ...mapGetters(['hour', 'minute', 'second', 'percent']),
   },
   methods: {
-    ...mapActions(['startCountdown'])
+    // ...mapActions(['startCountdown'])
+    getAllDr(){
+      let url = `${this.host}/api/demande/site/hs`;
+      axios({
+        url: url,
+        method: "GET",
+      }).then((response) => {
+        this.demandes = response.data;
+        console.log(response.data);
+      }).catch((err) => {
+        console.log(err);
+        
+      });
+    }
   },
 
   mounted() {
-    console.log("__INIT___DEMANDE__SITE__HS");
+    this.getAllDr()
+    /* console.log("__INIT___DEMANDE__SITE__HS");
     let url = `${this.host}/api/demande/site/hs`;
     console.log('hours: ', this.hours)
 
@@ -238,7 +252,7 @@ export default {
       })
       .catch((error) => {
         console.log(error);
-      });
+      }); */
   },
 };
 </script>

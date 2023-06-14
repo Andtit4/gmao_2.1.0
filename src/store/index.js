@@ -131,7 +131,7 @@ export default createStore({
     getInsertionCount: async ({ commit }) => {
       try {
         const response = await axios.get(
-          `https://creepy-overalls-yak.cyclic.app/api/demande/site/nb/hs`
+          `http://localhost:3000/api/demande/site/nb/hs`
         );
         commit("setSiteHsCount", response.data[0].nb);
         console.log('Get_success', response.data[0].nb)

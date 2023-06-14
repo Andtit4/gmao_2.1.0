@@ -70,6 +70,9 @@ export default {
       type: Boolean,
       default: false,
     },
+    vmodel: {
+
+    }
   },
   methods: {
     getClasses: (size, success, error) => {

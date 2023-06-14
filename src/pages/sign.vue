@@ -39,6 +39,7 @@
                     id="email"
                     type="email"
                     placeholder="Email"
+                    v-model="email"
                     :value="email"
                     @input="(event) => (email = event.target.value)"
                   />
@@ -48,6 +49,7 @@
                     id="password"
                     type="password"
                     placeholder="Password"
+                    v-model="pass"
                     :value="pass"
                     @input="(event) => (pass == event.target.value)"
                   />
@@ -101,7 +103,7 @@
   margin-top: 15px;
 }
 </style>
-<script>
+<script lang="js">
 // import Navbar from "@/examples/PageLayout/Navbar.vue";
 // import AppFooter from "@/examples/PageLayout/Footer.vue";
 import SoftInput from "@/components/SoftInput.vue";
@@ -123,7 +125,7 @@ export default {
     return {
       email: "",
       pass: "",
-      host: "https://energy-allf.onrender.com",
+      host: "http://localhost:3000",
       // host: "10.229.10.101:3000",
       // host: "localhost:3000",
       // Login,

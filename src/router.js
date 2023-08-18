@@ -18,9 +18,10 @@ const routes = [
     component: About
   },
   {
-    path: '/dash',
+    path: '/dash/:id',
     name: 'Dash',
-    component: Dash
+    component: Dash,
+    props: true
   },
   // Définissez vos routes ici
 ]

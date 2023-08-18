@@ -88,7 +88,7 @@
                 >
               </td>
               <td class="align-middle text-center">
-                <p class="text-xs font-weight-bold mb-0">1h30</p>
+                <p class="text-xs font-weight-bold mb-0">{{ demande.sla }}</p>
               </td>
               <td class="align-middle text-center">
                 <!-- <p class="text-xs font-weight-bold mb-0">{{ percent }} %</p> -->

@@ -35,26 +35,31 @@
                   @submit.prevent="auth"
                 >
                   <label>Email</label>
-                  <soft-input
-                    id="email"
+                  <input
+                    id=""
                     type="email"
+                    name=""
                     placeholder="Email"
+                    class="form-control form-control-default"
                     v-model="email"
-                    :value="email"
-                    @input="(event) => (email = event.target.value)"
+                    style="
+                      border: 0px none;
+                      background-color: rgb(241, 241, 241);
+                    "
                   />
-                  {{  email }}
                   <label>Mot de passe</label>
-                  <soft-input
-                    id="password"
+                  <input
+                    id=""
                     type="password"
-                    placeholder="Password"
+                    name=""
+                    placeholder="Mot de passe"
+                    class="form-control form-control-default"
                     v-model="pass"
-                    :value="pass"
-                    @input="(event) => (pass == event.target.value)"
+                    style="
+                      border: 0px none;
+                      background-color: rgb(241, 241, 241);
+                    "
                   />
-                  {{  pass }}
-
                   <soft-switch id="rememberMe" name="rememberMe" checked>
                     Se rappeler de moi
                   </soft-switch>
@@ -66,7 +71,7 @@
                       full-width
                       >Sign in
                     </soft-button>
-                  <!-- <soft-progress variant="gradient" ></soft-progress> -->
+                    <!-- <soft-progress variant="gradient" ></soft-progress> -->
                   </div>
                 </form>
               </div>
@@ -103,21 +108,12 @@
   margin-top: 15px;
 }
 </style>
-<script lang="js">
-// import Navbar from "@/examples/PageLayout/Navbar.vue";
-// import AppFooter from "@/examples/PageLayout/Footer.vue";
-import SoftInput from "@/components/SoftInput.vue";
+<script>
+// import SoftInput from "@/components/SoftInput.vue";
 import SoftSwitch from "@/components/SoftSwitch.vue";
 import SoftButton from "@/components/SoftButton.vue";
-// import SoftProgress from "@/components/SoftProgress.vue";
-
-// import router from "@/router.js";
-// import axios from "axios";
-// import Login from "@/api/auth/auth.js";
-// const body = document.getElementsByTagName("body")[0];
-// require("dotenv").config();
-
-// import { mapMutations } from "vuex";
+import CryptoJS from "crypto-js";
+import axios from "axios";
 
 export default {
   name: "SignIn",
@@ -125,7 +121,8 @@ export default {
     return {
       email: "",
       pass: "",
-      host: "http://localhost:3000",
+      // host: "http://localhost:3000",
+      host: "https://burgundy-deer-gear.cyclic.app"
       // host: "10.229.10.101:3000",
       // host: "localhost:3000",
       // Login,
@@ -134,96 +131,92 @@ export default {
   components: {
     // Navbar,
     // AppFooter,
-    SoftInput,
+    // SoftInput,
     SoftSwitch,
     SoftButton,
-    // SoftProgress,
   },
 
-  // created() {
-  //   this.toggleEveryDisplay();
-  //   this.toggleHideConfig();
-  //   // body.classList.remove("bg-gray-100");
-  // },
-  // beforeUnmount() {
-  //   this.toggleEveryDisplay();
-  //   this.toggleHideConfig();
-  //   // body.classList.add("bg-gray-100");
-  // },
-
-
   methods: {
-    // ...mapMutations(["toggleEveryDisplay", "toggleHideConfig"]),
-
     auth: function () {
-      this.$router.push({ path: "/dash" });
+      const hashPassword = CryptoJS.SHA256(this.pass).toString();
+      console.log("hash == " + hashPassword);
 
-      /* var alert = document.getElementById("alert");
-      let url = `${this.host}/api/noc/auth?email_noc=${this.email}&password_noc=${this.pass}`;
-      console.log('Email ', this.email);
-      console.log(url);
-
-      console.log(url);
       axios({
-        url: url,
+        url: this.host + "/admin/auth/" + this.email + "/" + hashPassword,
         method: "GET",
       })
         .then((response) => {
-          if (response.data.noc[0].error) {
-            console.log("Error");
-            alert.style.display = "block";
+          console.log("Response ==> " + response.data._id);
+
+          if (response.data.email == undefined) {
+            console.log("Undefinied");
+            this.createNotification(
+              "Erreur de connexion",
+              "Email ou mot de passe incorrect"
+            );
           } else {
-            console.log("first");
-            router.push({ path: "/dashboard" });
+            const userAgent = navigator.userAgent;
+            console.log("Device: " + userAgent);
+            axios({
+              url: this.host + "/logs",
+              method: "POST",
+              data: {
+                email: response.data.email,
+                device: userAgent,
+              },
+            })
+              .then((res) => {
+                console.log("log insert for " + res);
+                this.$router.push({
+                  name: "Dash",
+                  params: { id: response.data._id },
+                });
+              })
+              .catch((err) => {
+                console.log("An error occured while insert log == " + err);
+              });
           }
-
-          // console.log(response.data.noc[0]);
         })
-        .catch((err) => {
-          console.log(err);
-        }); */
-      // let url = "http://localhost:3000/api/noc/auth";
-      // Login(this.email, this.pass, url);
-    },
-  },
-  /* created() {
-    this.toggleEveryDisplay();
-    this.toggleHideConfig();
-    body.classList.remove("bg-gray-100");
-  },
-  beforeUnmount() {
-    this.toggleEveryDisplay();
-    this.toggleHideConfig();
-    body.classList.add("bg-gray-100");
-  },
-  methods: {
-    ...mapMutations(["toggleEveryDisplay", "toggleHideConfig"]),
-
-    auth: function () {
-      var alert = document.getElementById("alert");
-      let url = `${this.host}/api/noc/auth?email_noc=${this.email}&password_noc=${this.pass}`;
-      console.log(url);
-      axios({
-        url: url,
-        method: "GET",
-      })
-        .then((response) => {
-          if (response.data.noc[0].error) {
-            console.log("Error");
-            alert.style.display = "block";
-          } else {
-            console.log("first");
-            router.push({ path: "/dashboard" });
-          }
-
-          // console.log(response.data.noc[0]);
-        })
-        .catch((err) => {
-          console.log(err);
+        .catch((e) => {
+          console.log("An error occured ==> " + e);
         });
-      // let url = "http://localhost:3000/api/noc/auth";
-      // Login(this.email, this.pass, url);
+
+      // this.$router.push({ path: "/dash" });
     },
-  }, */
+
+    createNotification(titre, text) {
+      if (Notification.permission === "granted") {
+        const options = {
+          body: text,
+          // icon: "path/to/icon.png", // Chemin vers une icône pour la notification
+        };
+        // eslint-disable-next-line no-unused-vars
+        const notification = new Notification(titre, options);
+      } else {
+        this.requestNotificationPermission();
+        console.log("La permission de notification n'est pas accordée");
+      }
+    },
+
+    requestNotificationPermission() {
+      if (Notification.permission !== "granted") {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            console.log("Permission de notification accordée");
+          }
+        });
+      } else {
+        console.log("La permission de notification est déjà accordée");
+      }
+    },
+  },
+
+  created() {
+    this.requestNotificationPermission();
+  },
+
+  mounted() {
+    this.requestNotificationPermission();
+  },
 };
 </script>

@@ -136,42 +136,23 @@
 <script lang="js">
 import MiniStatisticsCard from "@/components/widgets/Cards/MiniStatisticsCard.vue";
 import SoftProgress from "@/components/SoftProgress";
-// import SoftInput from "@/components/SoftInput.vue";
-
-// import ReportsBarChart from "@/examples/Charts/line.vue";
-
 import AuthorsTable from "./components/AuthorsTable";
 import ProjectsTable from "./components/ProjectsTable";
-import axios from "axios";
-
-// import { mapActions, mapState } from "vuex";
 import MapComponent from "../pages/components/MapComponent"
-// import L from 'leaflet';
-// import { LMap, LTileLayer, LMarker } from 'vue2-leaflet';
+
 import {
-  /* faHandPointer,
-  faUsers,
-  faCreditCard,
-  faScrewdriverWrench,
-  faMapMarker, */
 } from "@fortawesome/free-solid-svg-icons";
 export default {
   name: "dashboard-default",
   data() {
     return {
+      props: ['id'],
       // nb: 0,
       nbdr1: 0,
       nbdr2: 0,
       iconBackground: "bg-gradient-success",
       iconBackgroundDanger: "bg-gradient-danger",
       iconBackgroundWarning: "bg-gradient-warning",
-      /* nbtraiter: 0,
-      faCreditCard,
-      faScrewdriverWrench,
-      faUsers,
-      faHandPointer,
-      faMapMarker, */
-      // host: "https://creepy-overalls-yak.cyclic.app",
       host: "localhost:3000",
 
       
@@ -205,7 +186,7 @@ export default {
   },
   methods: {
     // ...mapActions(["fetchDr1"]),
-    getDr1() {
+    /* getDr1() {
       axios({
         url: "http://localhost:3000/api/site/nb/state?state=DR1",
         method: "GET",
@@ -223,7 +204,7 @@ export default {
         this.nbdr2 = response.data[0].nb;
         console.log('__get_data_dr2' + this.nbdr2)
       });
-    }
+    } */
     // ...mapActions(["getInsertionCount"]),
    /*  getData(){
       // this.$store.dispatch('getInsertionCount')
@@ -256,8 +237,8 @@ export default {
   },
 
   mounted() {
-    this.getDr1()
-    this.getDr2()
+   /*  this.getDr1()
+    this.getDr2() */
     // this.getNbDr1()
     // this.getInsertionCount()
     // this.getDr1()

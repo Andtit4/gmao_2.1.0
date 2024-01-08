@@ -1,7 +1,26 @@
 /* eslint-disable */
 
 <template>
+  
   <div class="py-4 container-fluid">
+    <Nav></Nav>
+    
+    <!-- <div class="row">
+      <div class="col-sm-1">
+        <img
+          src="@/assets/logo1.png"
+          class="img-fluid float-rigth"
+          width="40px"
+          height="40px"
+        />
+      </div>
+      <div class="col-sm-2">
+        <h3 class="font-weight-bolder text-success text-gradient mt-0">
+          Energy eye
+        </h3>
+      </div>
+    </div> -->
+    <br /><br />
     <div class="row">
       <div class="col-sm-3">
         <BarChart title="DR1"></BarChart>
@@ -160,6 +179,8 @@
 <style></style>
 <script lang="js">
 import BarChart from "@/components/widgets/Charts/Barchat.vue";
+import Nav from "@/components/widgets/Navbars/nav.vue";
+
 import BarChartDR2 from "@/components/widgets/Charts/dr2/Barchat.vue";
 
 import SoftProgress from "@/components/SoftProgress";
@@ -181,8 +202,6 @@ export default {
       iconBackgroundDanger: "bg-gradient-danger",
       iconBackgroundWarning: "bg-gradient-warning",
       host: "localhost:3000",
-
-
     };
   },
   components: {
@@ -193,6 +212,7 @@ export default {
     MapComponent,
     BarChart,
     BarChartDR2,
+    Nav,
 
 /*     LMap,
     LTileLayer,

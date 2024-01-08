@@ -21,7 +21,6 @@ export default {
   font-family: 'Poppins', sans-serif;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 label, button, p, span, h5, h6 {
   font-family: 'Poppins', sans-serif;

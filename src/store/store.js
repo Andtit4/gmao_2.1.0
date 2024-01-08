@@ -18,7 +18,7 @@ export default createStore({
     count: 0,
     maxcount: 5400,
     // host: "https://creepy-overalls-yak.cyclic.app",
-    host: "localhost:3000",
+    host: "https://burgundy-deer-gear.cyclic.app",
     nb: 0,
   },
   mutations: {

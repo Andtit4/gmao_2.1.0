@@ -1,8 +1,19 @@
-/* eslint-disable */ 
+/* eslint-disable */
 
 <template>
   <div class="py-4 container-fluid">
     <div class="row">
+      <div class="col-sm-3">
+        <BarChart title="DR1"></BarChart>
+      </div>
+      <div class="col-sm-3">
+        <BarChartDR2 title="DR1"></BarChartDR2>
+      </div>
+    </div>
+    <!-- <div class="col">
+      
+      <BarChart title="DR1" items="[]"></BarChart>
+      <div class="row">
       <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
         <mini-statistics-card
           title="DR1"
@@ -37,6 +48,8 @@
         />
       </div>
     </div>
+  </div> -->
+
     <div class="mt-4 row">
       <div class="mb-4 col-lg-8 mb-lg-0">
         <div class="p-3 card-body">
@@ -56,10 +69,12 @@
                       <tr>
                         <td>
                           <div class="d-flex px-2 py-1">
-                            <div class="d-flex flex-column justify-content-center">
+                            <div
+                              class="d-flex flex-column justify-content-center"
+                            >
                               <h6 class="mb-0 text-sm">Lomé</h6>
                               <p></p>
-      
+
                               <p class="text-xs text-secondary mb-0"></p>
                               <soft-progress color="dark" :percentage="0" />
                             </div>
@@ -67,7 +82,9 @@
                         </td>
                         <td>
                           <div class="d-flex px-2 py-1">
-                            <div class="d-flex flex-column justify-content-center">
+                            <div
+                              class="d-flex flex-column justify-content-center"
+                            >
                               <h6 class="mb-0 text-sm">Maritime</h6>
                               <p></p>
                               <p class="text-xs text-secondary mb-0"></p>
@@ -77,7 +94,9 @@
                         </td>
                         <td>
                           <div class="d-flex px-2 py-1">
-                            <div class="d-flex flex-column justify-content-center">
+                            <div
+                              class="d-flex flex-column justify-content-center"
+                            >
                               <h6 class="mb-0 text-sm">Centrale</h6>
                               <p></p>
                               <p class="text-xs text-secondary mb-0"></p>
@@ -85,10 +104,12 @@
                             </div>
                           </div>
                         </td>
-      
+
                         <td>
                           <div class="d-flex px-2 py-1">
-                            <div class="d-flex flex-column justify-content-center">
+                            <div
+                              class="d-flex flex-column justify-content-center"
+                            >
                               <h6 class="mb-0 text-sm">Plateau</h6>
                               <p></p>
                               <p class="text-xs text-secondary mb-0"></p>
@@ -98,7 +119,9 @@
                         </td>
                         <td>
                           <div class="d-flex px-2 py-1">
-                            <div class="d-flex flex-column justify-content-center">
+                            <div
+                              class="d-flex flex-column justify-content-center"
+                            >
                               <h6 class="mb-0 text-sm">Kara</h6>
                               <p></p>
                               <p class="text-xs text-secondary mb-0"></p>
@@ -108,7 +131,9 @@
                         </td>
                         <td>
                           <div class="d-flex px-2 py-1">
-                            <div class="d-flex flex-column justify-content-center">
+                            <div
+                              class="d-flex flex-column justify-content-center"
+                            >
                               <h6 class="mb-0 text-sm">Savane</h6>
                               <p></p>
                               <p class="text-xs text-secondary mb-0"></p>
@@ -134,7 +159,9 @@
 
 <style></style>
 <script lang="js">
-import MiniStatisticsCard from "@/components/widgets/Cards/MiniStatisticsCard.vue";
+import BarChart from "@/components/widgets/Charts/Barchat.vue";
+import BarChartDR2 from "@/components/widgets/Charts/dr2/Barchat.vue";
+
 import SoftProgress from "@/components/SoftProgress";
 import AuthorsTable from "./components/AuthorsTable";
 import ProjectsTable from "./components/ProjectsTable";
@@ -155,16 +182,17 @@ export default {
       iconBackgroundWarning: "bg-gradient-warning",
       host: "localhost:3000",
 
-      
+
     };
   },
   components: {
-    MiniStatisticsCard,
     AuthorsTable,
     ProjectsTable,
     SoftProgress,
     // SoftInput,
     MapComponent,
+    BarChart,
+    BarChartDR2,
 
 /*     LMap,
     LTileLayer,
@@ -181,7 +209,7 @@ export default {
     count(){
       return this.nb;
     }, */
-    
+
     // ...mapState(["DR1", "totalDr1"])
   },
   methods: {

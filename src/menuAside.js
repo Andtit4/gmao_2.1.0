@@ -28,7 +28,20 @@ export default [
     label: 'Sites',
     icon: mdiTable
   },
- /*  {
+  {
+    label: 'Intervenants',
+    icon: mdiViewList,
+    menu: [
+      {
+        label: 'Ajouter',
+        to: '/intervenant/' + type + '/' + pass
+      },
+      {
+        label: 'Liste'
+      }
+    ]
+  }
+  /*  {
     to: '/tables',
     label: 'Tables',
     icon: mdiTable

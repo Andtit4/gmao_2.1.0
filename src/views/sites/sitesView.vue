@@ -12,6 +12,8 @@ import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.
 import BaseButton from '@/components/BaseButton.vue'
 import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
 import siteList from '@/views/sites/siteList.vue'
+import axios from 'axios'
+import apiService from '@/services/apiService'
 
 const form = reactive({
   site_id: '',
@@ -41,11 +43,27 @@ const selectOptions = [
   { id: 17, label: 'BASSAR' },
   { id: 18, label: 'KANTE' },
   { id: 19, label: 'MANGO' },
-  { id: 20, label: 'DAPAONG' },
-
-
-
+  { id: 20, label: 'DAPAONG' }
 ]
+
+const submit = () => {
+  axios({
+    url: apiService.getUrl() + '/site',
+    method: 'POST',
+    data: {
+      site_id: form.site_id,
+      nom_site: form.nom_site,
+      longitude: form.longitude,
+      latitude: form.latitude,
+      zone: form.zone.label
+    }
+  }).then((repsonse) => {
+    console.log('Success ' + repsonse)
+    setTimeout(() => {
+      location.reload()
+    }, 1000)
+  })
+}
 </script>
 
 <template>

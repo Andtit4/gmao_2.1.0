@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import apiService from '@/services/apiService'
 
 export const useMainStore = defineStore('main', () => {
   const userName = ref('John Doe')
@@ -18,6 +19,7 @@ export const useMainStore = defineStore('main', () => {
 
   const clients = ref([])
   const history = ref([])
+  const sites = ref([])
 
   function setUser(payload) {
     if (payload.name) {
@@ -38,6 +40,18 @@ export const useMainStore = defineStore('main', () => {
         alert(error.message)
       })
   }
+  function fetchSites() {
+    axios({
+      url: apiService.getUrl() + '/site',
+      method: 'GET'
+    })
+      .then((response) => {
+        sites.value = response.data
+      })
+      .catch((e) => {
+        console.log('An error occured ' + e)
+      })
+  }
 
   function fetchSampleHistory() {
     axios
@@ -56,9 +70,11 @@ export const useMainStore = defineStore('main', () => {
     userAvatar,
     isFieldFocusRegistered,
     clients,
+    sites,
     history,
     setUser,
     fetchSampleClients,
-    fetchSampleHistory
+    fetchSampleHistory,
+    fetchSites
   }
 })

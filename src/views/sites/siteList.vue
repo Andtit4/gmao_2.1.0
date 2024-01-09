@@ -1,22 +1,52 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
-import { useMainStore } from "@/stores/main";
-import { mdiEye, mdiTrashCan } from "@mdi/js";
-import CardBoxModal from "@/components/CardBoxModal.vue";
-import TableCheckboxCell from "@/components/TableCheckboxCell.vue";
-import BaseLevel from "@/components/BaseLevel.vue";
-import BaseButtons from "@/components/BaseButtons.vue";
-import BaseButton from "@/components/BaseButton.vue";
-import UserAvatar from "@/components/UserAvatar.vue";
-import axios from "axios";
-import { useRouter } from "vue-router";
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useMainStore } from '@/stores/main'
+import { mdiEye, mdiTrashCan } from '@mdi/js'
+import CardBoxModal from '@/components/CardBoxModal.vue'
+import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
+import BaseLevel from '@/components/BaseLevel.vue'
+import BaseButtons from '@/components/BaseButtons.vue'
+import BaseButton from '@/components/BaseButton.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
+import apiService from '@/services/apiService'
 
 defineProps({
-  checkable: Boolean,
-});
+  checkable: Boolean
+})
 
-const categories = reactive({ list: [] });
-const router = useRouter();
+const sites = reactive({ list: [] })
+const router = useRouter()
+
+const getAllSite = () => {
+  axios({
+    url: apiService.getUrl() + '/site',
+    method: 'GET'
+  })
+    .then((response) => {
+      sites.list = response.data
+    })
+    .catch((e) => {
+      console.log('An error occured ' + e)
+    })
+}
+
+const deleteSite = (_id) => {
+  axios({
+    url: apiService.getUrl() + '/site/'  + _id,
+    method: "DELETE",
+  })
+    .then((response) => {
+      console.log(response);
+      setTimeout(() => {
+        location.reload();
+      }, 1000);
+    })
+    .catch((e) => {
+      console.log("An error occured " + e);
+    });
+};
 
 
 /* const getAllCategorie = () => {
@@ -55,65 +85,59 @@ setTimeout(() => {
   console.log("lkdlfkg");
 }, 2000); */
 
-const mainStore = useMainStore();
+const mainStore = useMainStore()
 
-const items = computed(() => mainStore.clients);
+const items = computed(() => mainStore.clients)
 
-const isModalActive = ref(false);
+const isModalActive = ref(false)
 
-const isModalDangerActive = ref(false);
+const isModalDangerActive = ref(false)
 
-const perPage = ref(5);
+const perPage = ref(5)
 
-const currentPage = ref(0);
+const currentPage = ref(0)
 
-const checkedRows = ref([]);
+const checkedRows = ref([])
 
 const itemsPaginated = computed(() =>
-  items.value.slice(
-    perPage.value * currentPage.value,
-    perPage.value * (currentPage.value + 1)
-  )
-);
+  items.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
+)
 
-const numPages = computed(() => Math.ceil(items.value.length / perPage.value));
+const numPages = computed(() => Math.ceil(items.value.length / perPage.value))
 
-const currentPageHuman = computed(() => currentPage.value + 1);
+const currentPageHuman = computed(() => currentPage.value + 1)
 
 const pagesList = computed(() => {
-  const pagesList = [];
-  // getAllCategorie();
-
+  const pagesList = []
+  getAllSite()
   for (let i = 0; i < numPages.value; i++) {
-    pagesList.push(i);
+    pagesList.push(i)
   }
 
-  return pagesList;
-});
+  return pagesList
+})
 
 const remove = (arr, cb) => {
-  const newArr = [];
+  const newArr = []
 
   arr.forEach((item) => {
     if (!cb(item)) {
-      newArr.push(item);
+      newArr.push(item)
     }
-  });
+  })
 
-  return newArr;
-};
+  return newArr
+}
+
 const checked = (isChecked, client) => {
   if (isChecked) {
-    checkedRows.value.push(client);
+    checkedRows.value.push(client)
   } else {
-    checkedRows.value = remove(
-      checkedRows.value,
-      (row) => row.id === client.id
-    );
+    checkedRows.value = remove(checkedRows.value, (row) => row.id === client.id)
   }
-};
+}
 
-onMounted(() => {});
+onMounted(() => {})
 </script>
 
 <template>
@@ -144,39 +168,28 @@ onMounted(() => {});
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(categorie, index) in categories.list" :key="index">
-        <TableCheckboxCell
-          v-if="checkable"
-          @checked="checked($event, categorie)"
-        />
+      <tr v-for="(site, index) in sites.list" :key="index">
+        <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
         <td class="border-b-0 lg:w-6 before:hidden">
-          <UserAvatar
-            :username="categorie.titre"
-            class="w-24 h-24 mx-auto lg:w-6 lg:h-6"
-          />
+          <UserAvatar :username="site.nom_site" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
         </td>
-        <td data-label="Titre">
-          {{ categorie.titre }}
+        <td data-label="Site Id">
+          {{ site.site_id }}
         </td>
-        <td data-label="Description">
-          {{ categorie.description }}
+        <td data-label="Nom site">
+          {{ site.nom_site }}
         </td>
-        <td data-label="Commentaire">
-          {{ categorie.commentaire }}
+        <td data-label="Zone">
+          {{ site.zone }}
         </td>
         <td class="before:hidden lg:w-1 whitespace-nowrap">
           <BaseButtons type="justify-start lg:justify-end" no-wrap>
-            <BaseButton
-              color="info"
-              :icon="mdiEye"
-              small
-              @click="isModalActive = true"
-            />
+            <BaseButton color="info" :icon="mdiEye" small @click="isModalActive = true" />
             <BaseButton
               color="danger"
               :icon="mdiTrashCan"
               small
-              @click="deleteCategorie(categorie._id)"
+              @click="deleteSite(site._id)"
             />
           </BaseButtons>
         </td>

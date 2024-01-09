@@ -10,17 +10,47 @@ import FormControl from '@/components/FormControl.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import LayoutGuest from '@/layouts/LayoutGuest.vue'
+import axios from 'axios'
+import apiService from '@/services/apiService'
+import CryptoJS from 'crypto-js'
+import Cookies from 'js-cookie'
 
 const form = reactive({
-  login: 'john.doe',
-  pass: 'highly-secure-password-fYjUw-',
+  login: '',
+  pass: '',
   remember: true
 })
 
 const router = useRouter()
 
 const submit = () => {
-  router.push('/dashboard')
+  // router.push('/dashboard')
+  const hash = CryptoJS.SHA256(form.pass)
+  const url = apiService.getUrl() + `/admin/auth/${form.login}/${hash}`
+  console.log(url)
+  axios({
+    url: apiService.getUrl() + `/admin/auth/${form.login}/${hash}`,
+    method: 'GET'
+  }).then((response) => {
+    if (response.data._id == undefined) {
+      console.log('User not exist')
+    } else {
+      const id = response.data._id
+      const email = response.data.email
+      const nom = response.data.nom
+      const prenom = response.data.prenom
+      Cookies.set('id', id)
+      Cookies.set('email', email)
+      Cookies.set('nom', nom)
+      Cookies.set('prenom', prenom)
+
+      router.push({
+        // path: "/partner/dashboard/",
+        name: 'Dashboard',
+        params: { type: 'admin', pass: hash }
+      })
+    }
+  })
 }
 </script>
 
@@ -28,6 +58,7 @@ const submit = () => {
   <LayoutGuest>
     <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
       <CardBox :class="cardClass" is-form @submit.prevent="submit">
+        <img src="@/assets/logo.png" alt="" width="40px" />
         <FormField label="Login" help="Please enter your login">
           <FormControl
             v-model="form.login"

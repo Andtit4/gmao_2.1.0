@@ -4,7 +4,7 @@ import Home from '@/views/HomeView.vue'
 import Login from '@/views/LoginView.vue'
 
 const routes = [
- /*  {
+  /*  {
     meta: {
       title: 'Select style'
     },
@@ -17,7 +17,7 @@ const routes = [
       title: 'Login'
     },
     path: '/',
-    name: 'style',
+    name: 'Login',
     component: Login
   },
   {
@@ -26,8 +26,8 @@ const routes = [
     meta: {
       title: 'Dashboard'
     },
-    path: '/dashboard',
-    name: 'dashboard',
+    path: '/dashboard/:type/:pass',
+    name: 'Dashboard',
     component: Home
   },
   {

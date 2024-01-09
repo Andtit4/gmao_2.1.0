@@ -4,7 +4,7 @@ import Home from '@/views/HomeView.vue'
 import Login from '@/views/LoginView.vue'
 import Site from '@/views/sites/sitesView.vue'
 import Intervenant from "@/views/intervenant/IntervenantView.vue"
-import IntervenantList from '@/views/intervenant/IntervenantList.vue'
+import IntervenantList from '@/views/intervenant/intervenantList.vue'
 
 const routes = [
   /*  {

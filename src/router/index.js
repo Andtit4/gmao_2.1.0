@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 // import Style from '@/views/StyleView.vue'
 import Home from '@/views/HomeView.vue'
 import Login from '@/views/LoginView.vue'
+import Site from '@/views/sites/sitesView.vue'
 
 const routes = [
   /*  {
@@ -32,11 +33,19 @@ const routes = [
   },
   {
     meta: {
+      title: 'Sites'
+    },
+    path: '/site/:type/:pass',
+    name: 'sites',
+    component: Site
+  },
+  {
+    meta: {
       title: 'Tables'
     },
     path: '/tables',
     name: 'tables',
-    component: () => import('@/views/TablesView.vue')
+    component: Site
   },
   {
     meta: {

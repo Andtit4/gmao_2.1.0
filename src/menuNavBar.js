@@ -1,19 +1,19 @@
 import {
-  mdiMenu,
-  mdiClockOutline,
-  mdiCloud,
-  mdiCrop,
+  // mdiMenu,
+  // mdiClockOutline,
+  // mdiCloud,
+  // mdiCrop,
   mdiAccount,
   mdiCogOutline,
   mdiEmail,
   mdiLogout,
   mdiThemeLightDark,
-  mdiGithub,
-  mdiReact
+  // mdiGithub,
+  // mdiReact
 } from '@mdi/js'
 
 export default [
-  
+
   {
     isCurrentUser: true,
     menu: [

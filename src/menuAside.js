@@ -24,6 +24,11 @@ export default [
     label: 'Dashboard'
   },
   {
+    to: '/site/' + type + '/' + pass,
+    label: 'Sites',
+    icon: mdiTable
+  },
+  {
     to: '/tables',
     label: 'Tables',
     icon: mdiTable

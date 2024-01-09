@@ -28,7 +28,7 @@ export default [
     label: 'Sites',
     icon: mdiTable
   },
-  {
+ /*  {
     to: '/tables',
     label: 'Tables',
     icon: mdiTable
@@ -91,5 +91,5 @@ export default [
     label: 'React version',
     icon: mdiReact,
     target: '_blank'
-  }
+  } */
 ]

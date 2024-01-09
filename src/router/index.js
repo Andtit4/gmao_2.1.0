@@ -3,7 +3,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import Home from '@/views/HomeView.vue'
 import Login from '@/views/LoginView.vue'
 import Site from '@/views/sites/sitesView.vue'
-import Intervenant from "@/views/intervenant/intervenantView.vue"
+import Intervenant from "@/views/intervenant/IntervenantView.vue"
 
 const routes = [
   /*  {

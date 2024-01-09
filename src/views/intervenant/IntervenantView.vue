@@ -11,12 +11,12 @@ import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
-import siteList from '@/views/sites/siteList.vue'
+// import siteList from '@/views/sites/siteList.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
 import generatePassword from '@/services/generatePassword.js';
 // import sendMail
-import sendMail from '@/services/sendMail'
+// import sendMail from '@/services/sendMail'
 
 
 const form = reactive({

@@ -37,7 +37,8 @@ export default [
         to: '/intervenant/' + type + '/' + pass
       },
       {
-        label: 'Liste'
+        label: 'Liste',
+        to: '/intervenant/list/' + type + '/' + pass
       }
     ]
   }

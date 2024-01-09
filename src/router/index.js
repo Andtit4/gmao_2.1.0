@@ -4,6 +4,7 @@ import Home from '@/views/HomeView.vue'
 import Login from '@/views/LoginView.vue'
 import Site from '@/views/sites/sitesView.vue'
 import Intervenant from "@/views/intervenant/IntervenantView.vue"
+import IntervenantList from '@/views/intervenant/IntervenantList.vue'
 
 const routes = [
   /*  {
@@ -45,8 +46,16 @@ const routes = [
       title: 'Intervenants'
     },
     path: '/intervenant/:type/:pass',
-    name: 'intervenants',
+    name: 'intervenant',
     component: Intervenant
+  },
+  {
+    meta: {
+      title: 'Intervenants'
+    },
+    path: '/intervenant/list/:type/:pass',
+    name: 'intervenants',
+    component: IntervenantList
   },
   {
     meta: {

@@ -1,30 +1,44 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+
 import App from './App.vue'
-import Vuesax from 'vuesax'
-import { BootstrapVue, IconsPlugin } from  'bootstrap-vue' 
 import router from './router'
-import store from'./store/store.js'
+import { useMainStore } from '@/stores/main.js'
 
-import 'vuesax/dist/vuesax.css'
-import  'bootstrap/dist/css/bootstrap.css' 
-import  'bootstrap-vue/dist/bootstrap-vue.css' 
-import './assets/fonts/global-font.css'
-import 'leaflet/dist/leaflet.css'
+import './css/main.css'
 
-import Soft from "./soft-ui";
-import Vuex from 'vuex';
+// Init Pinia
+const pinia = createPinia()
 
-// import './assets/bootstrap/scss/_variables.scss'
+// Create Vue app
+createApp(App).use(router).use(pinia).mount('#app')
 
-Vue.use(Vuex);
-Vue.use(BootstrapVue) 
-Vue.use(IconsPlugin)
-Vue.use(Soft)
-Vue.use(Vuesax)
-Vue.config.productionTip = false
+// Init main store
+const mainStore = useMainStore(pinia)
 
-new Vue({
-  router,
-  store,
-  render: h => h(App),
-}).$mount('#app')
+// Fetch sample data
+mainStore.fetchSampleClients()
+mainStore.fetchSampleHistory()
+
+// Dark mode
+// Uncomment, if you'd like to restore persisted darkMode setting, or use `prefers-color-scheme: dark`. Make sure to uncomment localStorage block in src/stores/darkMode.js
+// import { useDarkModeStore } from './stores/darkMode'
+
+// const darkModeStore = useDarkModeStore(pinia)
+
+// if (
+//   (!localStorage['darkMode'] && window.matchMedia('(prefers-color-scheme: dark)').matches) ||
+//   localStorage['darkMode'] === '1'
+// ) {
+//   darkModeStore.set(true)
+// }
+
+// Default title tag
+const defaultDocumentTitle = 'Admin One Vue 3 Tailwind'
+
+// Set document title from route meta
+router.afterEach((to) => {
+  document.title = to.meta?.title
+    ? `${to.meta.title} — ${defaultDocumentTitle}`
+    : defaultDocumentTitle
+})

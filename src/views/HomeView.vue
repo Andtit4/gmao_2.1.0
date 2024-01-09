@@ -15,7 +15,7 @@ import LineChart from '@/components/Charts/LineChart.vue'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBoxWidget from '@/components/CardBoxWidget.vue'
 import CardBox from '@/components/CardBox.vue'
-import TableSampleClients from '@/components/TableSampleClients.vue'
+import TableSampleClients from '@/views/sites/down/siteDown.vue'
 // import NotificationBar from '@/components/NotificationBar.vue'
 import BaseButton from '@/components/BaseButton.vue'
 // import CardBoxTransaction from '@/components/CardBoxTransaction.vue'
@@ -70,7 +70,7 @@ onMounted(() => {
           trend-type="alert"
           color="text-red-500"
           :icon="mdiChartTimelineVariant"
-          :number="7770"
+          :number="100"
           label="DR2"
         />
         <!-- <CardBoxWidget

@@ -34,18 +34,18 @@ onMounted(() => {
   fillChartData()
 })
 
-const mainStore = useMainStore()
+// const mainStore = useMainStore()
 
-const clientBarItems = computed(() => mainStore.clients.slice(0, 4))
+// const clientBarItems = computed(() => mainStore.clients.slice(0, 4))
 
-const transactionBarItems = computed(() => mainStore.history)
+// const transactionBarItems = computed(() => mainStore.history)
 </script>
 
 <template>
   <LayoutAuthenticated>
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" title="Overview" main>
-        <BaseButton
+      <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" title="Tableau de bord" main>
+        <!--  <BaseButton
           href="https://github.com/justboil/admin-one-vue-tailwind"
           target="_blank"
           :icon="mdiGithub"
@@ -53,7 +53,7 @@ const transactionBarItems = computed(() => mainStore.history)
           color="contrast"
           rounded-full
           small
-        />
+        /> -->
       </SectionTitleLineWithButton>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
@@ -61,20 +61,19 @@ const transactionBarItems = computed(() => mainStore.history)
           trend="12%"
           trend-type="up"
           color="text-emerald-500"
-          :icon="mdiAccountMultiple"
+          :icon="mdiChartTimelineVariant"
           :number="512"
-          label="Clients"
+          label="DR1"
         />
         <CardBoxWidget
           trend="12%"
-          trend-type="down"
-          color="text-blue-500"
-          :icon="mdiCartOutline"
+          trend-type="alert"
+          color="text-red-500"
+          :icon="mdiChartTimelineVariant"
           :number="7770"
-          prefix="$"
-          label="Sales"
+          label="DR2"
         />
-        <CardBoxWidget
+        <!-- <CardBoxWidget
           trend="Overflow"
           trend-type="alert"
           color="text-red-500"
@@ -82,10 +81,10 @@ const transactionBarItems = computed(() => mainStore.history)
           :number="256"
           suffix="%"
           label="Performance"
-        />
+        /> -->
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <!-- <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div class="flex flex-col justify-between">
           <CardBoxTransaction
             v-for="(transaction, index) in transactionBarItems"
@@ -108,11 +107,11 @@ const transactionBarItems = computed(() => mainStore.history)
             :progress="client.progress"
           />
         </div>
-      </div>
+      </div> -->
 
-      <SectionBannerStarOnGitHub class="mt-6 mb-6" />
+      <!-- <SectionBannerStarOnGitHub class="mt-6 mb-6" /> -->
 
-      <SectionTitleLineWithButton :icon="mdiChartPie" title="Trends overview">
+      <SectionTitleLineWithButton :icon="mdiChartPie" title="Statistiques">
         <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
       </SectionTitleLineWithButton>
 
@@ -122,11 +121,11 @@ const transactionBarItems = computed(() => mainStore.history)
         </div>
       </CardBox>
 
-      <SectionTitleLineWithButton :icon="mdiAccountMultiple" title="Clients" />
+      <SectionTitleLineWithButton :icon="mdiAccountMultiple" title="Sites Down" />
 
-      <NotificationBar color="info" :icon="mdiMonitorCellphone">
+      <!--       <NotificationBar color="info" :icon="mdiMonitorCellphone">
         <b>Responsive table.</b> Collapses on mobile
-      </NotificationBar>
+      </NotificationBar> -->
 
       <CardBox has-table>
         <TableSampleClients />

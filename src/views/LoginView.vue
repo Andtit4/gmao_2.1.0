@@ -39,11 +39,18 @@ const submit = () => {
       const email = response.data.email
       const nom = response.data.nom
       const prenom = response.data.prenom
+      /* Cookies.remove('id', id)
+      Cookies.remove('email', email)
+      Cookies.remove('nom', nom)
+      Cookies.remove('prenom', prenom)
+      Cookies.remove('pass', hash)
+      Cookies.remove('type', 'admin') */
       Cookies.set('id', id)
       Cookies.set('email', email)
       Cookies.set('nom', nom)
       Cookies.set('prenom', prenom)
-
+      Cookies.set('pass', hash)
+      Cookies.set('type', 'admin')
       router.push({
         // path: "/partner/dashboard/",
         name: 'Dashboard',

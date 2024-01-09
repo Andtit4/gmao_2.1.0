@@ -12,10 +12,14 @@ import {
   mdiPalette,
   mdiReact
 } from '@mdi/js'
+import Cookies from 'js-cookie'
+
+let type = Cookies.get('type')
+let pass = Cookies.get('pass')
 
 export default [
   {
-    to: '/dashboard',
+    to: '/dashboard/' + type + '/' + pass,
     icon: mdiMonitor,
     label: 'Dashboard'
   },

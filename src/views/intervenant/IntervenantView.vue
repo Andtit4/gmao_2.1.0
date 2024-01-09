@@ -15,8 +15,7 @@ import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
 import generatePassword from '@/services/generatePassword.js';
-// import sendMail
-// import sendMail from '@/services/sendMail'
+
 
 
 const form = reactive({
@@ -67,7 +66,6 @@ const submit = () => {
     }
   }).then((repsonse) => {
     console.log('Success ' + repsonse)
-    // sendMail.sendMail(gen, form.email);
     setTimeout(() => {
       location.reload()
     }, 1000)

@@ -14,61 +14,80 @@ import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
 import siteList from '@/views/sites/siteList.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
+import * as XLSX from 'xlsx'
 
-const form = reactive({
-  site_id: '',
-  nom_site: '',
-  longitude: '',
-  latitude: '',
-  zone: ''
-})
+const getAllsite = async () => {
+  const response = await axios.get(apiService.getUrl() + '/site')
+  return response.data
+}
 
-const selectOptions = [
-  { id: 1, label: 'LOME-EST' },
-  { id: 2, label: 'LOME-OUEST' },
-  { id: 3, label: 'LOME-SUD' },
-  { id: 4, label: 'LOME-NORD' },
-  { id: 5, label: 'LOME-VIP' },
-  { id: 6, label: 'ANEHO' },
-  { id: 7, label: 'TSEVIE' },
-  { id: 8, label: 'NOTSE' },
-  { id: 9, label: 'BADOU' },
-  { id: 10, label: 'KPALIME' },
-  { id: 11, label: 'ATAKPAME' },
-  { id: 12, label: 'BLITTA' },
-  { id: 13, label: 'SOKODE' },
-  { id: 14, label: 'TCHAMBA' },
-  { id: 15, label: 'KARA-OUEST' },
-  { id: 16, label: 'KARA-EST' },
-  { id: 17, label: 'BASSAR' },
-  { id: 18, label: 'KANTE' },
-  { id: 19, label: 'MANGO' },
-  { id: 20, label: 'DAPAONG' }
-]
+const exportxlx = async () => {
+  // Votre logique pour récupérer les données à exporter
+  const apiData = await getAllsite()
 
-const submit = () => {
-  axios({
-    url: apiService.getUrl() + '/site',
-    method: 'POST',
-    data: {
-      site_id: form.site_id,
-      nom_site: form.nom_site,
-      longitude: form.longitude,
-      latitude: form.latitude,
-      zone: form.zone.label
-    }
-  }).then((repsonse) => {
-    console.log('Success ' + repsonse)
-    setTimeout(() => {
-      location.reload()
-    }, 1000)
-  })
+  const data = [
+    [
+      'Site Id',
+      'Nom Site',
+      'Longitude',
+      'Latitude',
+      'Zone',
+      'Config du Site',
+      'Technologie',
+      'Nombre de dépendance',
+      'Classe',
+      'Typologie Energie',
+      'GE',
+      'Type de batterie',
+      'Nombre',
+      'Puissance batterie'
+    ],
+    ...apiData.map((item) => [
+      item.site_id,
+      item.nom_site,
+      item.longitude,
+      item.latitude,
+      item.zone,
+      item.config_du_site,
+      item.technologie,
+      item.nombre_de_dependance,
+      item.classe_technique,
+      item.typologie_energie,
+      item.ge,
+      item.type_batterie,
+      item.nombre,
+      item.puissance_batteries
+    ])
+    // ... Ajoutez vos données ici
+  ]
+
+  // Créez un objet workbook
+  const wb = XLSX.utils.book_new()
+
+  // Créez une feuille avec vos données
+  const ws = XLSX.utils.aoa_to_sheet(data)
+
+  // Ajoutez la feuille au workbook
+  XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
+
+  // Générez le fichier Excel et téléchargez-le
+  XLSX.writeFile(wb, 'site.xlsx')
 }
 </script>
 
 <template>
   <LayoutAuthenticated>
     <SectionMain>
+      <BaseButton
+        target="_blank"
+        :icon="midExcel"
+        label="Export"
+        color="success"
+        rounded-full
+        small
+        @click="exportxlx()"
+      />
+      <br />
       <CardBox has-table>
         <siteList />
       </CardBox>

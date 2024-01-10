@@ -50,6 +50,20 @@ export default [
         to: '/intervenant/list/' + type + '/' + pass
       }
     ]
+  },
+  {
+    label: 'Equipements',
+    icon: mdiViewList,
+    menu: [
+      {
+        label: 'Ajouter',
+        to: '/equipement/' + type + '/' + pass
+      },
+      {
+        label: 'Liste',
+        // to: '/equipement/list/' + type + '/' + pass
+      }
+    ]
   }
   /*  {
     to: '/tables',

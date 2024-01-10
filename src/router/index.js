@@ -8,6 +8,7 @@ import IntervenantList from '@/views/intervenant/intervenantList.vue'
 import Equipement from '@/views/equipement/equipementView.vue'
 import EquipementList from '@/views/equipement/equipementList.vue'
 import HistoriqueEquipement from '@/views/equipement/historique/historiqueEquipement.vue'
+import SortiEquipement from '@/views/equipement/sortis/sortiView.vue'
 import SiteList from '@/views/sites/list.vue';
 
 const routes = [
@@ -92,6 +93,14 @@ const routes = [
     path: '/historique/:type/:pass',
     name: 'historique list',
     component: HistoriqueEquipement
+  },
+  {
+    meta: {
+      title: 'Sortie'
+    },
+    path: '/sorti/:type/:pass',
+    name: 'sorti list',
+    component: SortiEquipement
   },
   {
     meta: {

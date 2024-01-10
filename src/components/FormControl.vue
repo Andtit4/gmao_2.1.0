@@ -59,6 +59,8 @@ const computedValue = computed({
   }
 })
 
+const readonly = false;
+
 const inputElClass = computed(() => {
   const base = [
     'px-3 py-2 max-w-full focus:ring focus:outline-none border-gray-700 rounded w-full',
@@ -145,6 +147,7 @@ if (props.ctrlKFocus) {
       :maxlength="maxlength"
       :placeholder="placeholder"
       :required="required"
+      :readonly="readonly"
     />
     <input
       v-else
@@ -159,6 +162,7 @@ if (props.ctrlKFocus) {
       :placeholder="placeholder"
       :type="computedType"
       :class="inputElClass"
+      :readonly="readonly"
     />
     <FormControlIcon v-if="icon" :icon="icon" :h="controlIconH" />
   </div>

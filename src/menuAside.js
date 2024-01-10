@@ -60,6 +60,10 @@ export default [
         to: '/equipement/' + type + '/' + pass
       },
       {
+        label: 'Sortie',
+        to: '/sorti/' + type + '/' + pass
+      },
+      {
         label: 'Historique',
         to: '/historique/' + type + '/' + pass
       },

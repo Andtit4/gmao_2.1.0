@@ -40,17 +40,20 @@ const selectOptions = [
 ]
 
 const submit = () => {
-  const gen = generatePassword.generatePassword()
   // console.log(gen)
   axios({
-    url: apiService.getLocal() + '/equipement/create',
+    url: apiService.getUrl() + '/equipement/create',
     method: 'POST',
+    headers: {
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+      'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
+      'Access-Control-Allow-Credentials': true
+    },
     data: {
       type_equipement: form.type_equipement.label,
       numero_de_serie: form.numero_de_serie,
       intitule: form.intitule,
       total: form.total,
-      img: '',
       ajouter_le: form.ajouter_le
     }
   }).then((repsonse) => {

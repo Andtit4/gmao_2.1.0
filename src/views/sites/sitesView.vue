@@ -20,8 +20,113 @@ const form = reactive({
   nom_site: '',
   longitude: '',
   latitude: '',
-  zone: ''
+  zone: '',
+  config_du_site: '',
+  technologie: '',
+  nombre_de_dependance: '',
+  classe_technique: '',
+  typologie_energie: '',
+  ge: '',
+  type_batterie: '',
+  nombre: '',
+  puissance_batteries: ''
 })
+const classeOptions = [
+  { id: 1, label: 'BRONZE' },
+  { id: 2, label: 'GOLD' },
+  { id: 3, label: 'PLATINUM' },
+  { id: 4, label: 'BRONZE' },
+  { id: 5, label: 'SILVER' }
+]
+
+const geOptions = [
+  { id: 3, label: 'ADIYO' },
+  { id: 4, label: 'CAT' },
+  { id: 5, label: 'COELMO' },
+  { id: 3, label: 'CUMMINS' },
+  { id: 4, label: 'GENELEC' },
+  { id: 5, label: 'OLYMPIAN' }
+]
+
+const typologieOptions = [
+  { id: 1, label: 'GE' },
+  { id: 2, label: 'GRID' },
+  { id: 3, label: 'GRID MOOV+GE' },
+  { id: 4, label: 'GRID+GE' },
+  { id: 6, label: 'GRID+2GE' },
+  { id: 1, label: 'SOLAIRE+GRID' },
+  { id: 2, label: 'PRIMAIRE/ETAT-MAJOR + GE' },
+  { id: 3, label: 'PRIMAIRE/FUSEC' },
+  { id: 4, label: 'PRIMAIRE/MOOV' },
+  { id: 5, label: 'PRIMAIRE GTA' },
+  { id: 3, label: 'PRIMAIRE SIEGE' },
+  { id: 4, label: 'PRIMAIRE/AEROGARE' },
+  { id: 5, label: 'PRIMAIRE/LONATO' },
+  { id: 3, label: 'PRIMAIRE/PAL' },
+  { id: 4, label: 'PRIMAIRE/PALAIS CONGRES + GE' },
+  { id: 5, label: 'PRIMAIRE/PRESIDENCE' },
+  { id: 3, label: 'PRIMAIRE/T-OIL' },
+  { id: 4, label: 'PRIMAIRE/UTB' },
+  { id: 5, label: 'PRIMAIRE + GE' },
+  { id: 3, label: 'SOLAIRE' },
+  { id: 4, label: 'SOLAIRE+GE' },
+  { id: 5, label: 'SOLAIRE+GE+GRID' }
+]
+
+const configOptions = [
+  {
+    id: 1,
+    label: 'Config 1'
+  },
+  {
+    id: 2,
+    label: 'Config 2'
+  },
+  {
+    id: 3,
+    label: 'Config 3'
+  },
+  {
+    id: 4,
+    label: 'Config 4'
+  },
+  {
+    id: 5,
+    label: 'Config 5'
+  },
+  {
+    id: 6,
+    label: 'Config 7'
+  },
+  {
+    id: 7,
+    label: 'IBS Config Type 1'
+  },
+  {
+    id: 8,
+    label: 'IBS Config Type 2'
+  },
+  {
+    id: 9,
+    label: 'IBS Config Type 5'
+  },
+  {
+    id: 10,
+    label: 'IBS-G1800'
+  },
+  {
+    id: 7,
+    label: 'sSmall Cell U2100'
+  }
+]
+
+const technologieOptions = [
+  { id: 1, label: '2G' },
+  { id: 2, label: '3G' },
+  { id: 3, label: '4G' },
+  { id: 4, label: '2G/3G' },
+  { id: 1, label: '2G/3G/4G' }
+]
 
 const selectOptions = [
   { id: 1, label: 'LOME-EST' },
@@ -55,7 +160,16 @@ const submit = () => {
       nom_site: form.nom_site,
       longitude: form.longitude,
       latitude: form.latitude,
-      zone: form.zone.label
+      zone: form.zone.label,
+      config_du_site: form.config_du_site.label,
+      technologie: form.technologie.label,
+      nombre_de_dependance: form.nombre_de_dependance,
+      classe_technique: form.classe_technique.label,
+      typologie_energie: form.typologie_energie.label,
+      ge: form.ge.label,
+      type_batterie: form.type_batterie,
+      nombre: form.nombre,
+      puissance_batteries: form.puissance_batteries
     }
   }).then((repsonse) => {
     console.log('Success ' + repsonse)
@@ -79,6 +193,17 @@ const submit = () => {
           <FormControl v-model="form.latitude" placeholder="Latitude" />
           <FormField label="Zone">
             <FormControl v-model="form.zone" :options="selectOptions" />
+            <FormControl v-model="form.config_du_site" :options="configOptions" />
+          </FormField>
+          <FormField label="Technologie">
+            <FormControl v-model="form.technologie" :options="technologieOptions" />
+            <FormControl v-model="form.nombre_de_dependance" placeholder="Nombre de dépendance" />
+            <FormControl v-model="form.classe_technique" :options="classeOptions" />
+            <FormControl v-model="form.typologie_energie" :options="typologieOptions" />
+            <FormControl v-model="form.ge" :options="geOptions" />
+            <FormControl v-model="form.type_batterie" placeholder="Type de batteries" />
+            <FormControl v-model="form.nombre" placeholder="Nombre" />
+            <FormControl v-model="form.puissance_batteries" placeholder="Puissance de batterie" />
           </FormField>
         </FormField>
         <BaseDivider />
@@ -93,9 +218,9 @@ const submit = () => {
     </SectionMain>
 
     <SectionMain>
-      <CardBox has-table>
+      <!--  <CardBox has-table>
         <siteList />
-      </CardBox>
+      </CardBox> -->
     </SectionMain>
   </LayoutAuthenticated>
 </template>

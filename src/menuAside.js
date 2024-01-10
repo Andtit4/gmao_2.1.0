@@ -24,9 +24,18 @@ export default [
     label: 'Dashboard'
   },
   {
-    to: '/site/' + type + '/' + pass,
     label: 'Sites',
-    icon: mdiTable
+    icon: mdiTable,
+    menu: [
+      {
+        label: 'Ajouter',
+        to: '/site/' + type + '/' + pass
+      },
+      {
+        label: 'Liste',
+        to: '/site/list/' + type + '/' + pass
+      }
+    ]
   },
   {
     label: 'Intervenants',

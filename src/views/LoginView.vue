@@ -65,7 +65,12 @@ const submit = () => {
   <LayoutGuest>
     <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
       <CardBox :class="cardClass" is-form @submit.prevent="submit">
-        <img src="@/assets/logo.png" alt="" width="40px" />
+        <div class="row">
+          <div class="col-md-4">
+            <img src="@/assets/logo.png" alt="" width="40" />
+          </div>
+        </div>
+        <br /><br />
         <FormField label="Login" help="Please enter your login">
           <FormControl
             v-model="form.login"

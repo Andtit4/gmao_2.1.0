@@ -5,6 +5,7 @@ import Login from '@/views/LoginView.vue'
 import Site from '@/views/sites/sitesView.vue'
 import Intervenant from "@/views/intervenant/IntervenantView.vue"
 import IntervenantList from '@/views/intervenant/intervenantList.vue'
+import SiteList from '@/views/sites/list.vue';
 
 const routes = [
   /*  {
@@ -40,6 +41,14 @@ const routes = [
     path: '/site/:type/:pass',
     name: 'sites',
     component: Site
+  },
+  {
+    meta: {
+      title: 'Sites'
+    },
+    path: '/site/list/:type/:pass',
+    name: 'List',
+    component: SiteList
   },
   {
     meta: {

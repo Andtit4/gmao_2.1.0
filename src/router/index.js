@@ -6,6 +6,8 @@ import Site from '@/views/sites/sitesView.vue'
 import Intervenant from "@/views/intervenant/IntervenantView.vue"
 import IntervenantList from '@/views/intervenant/intervenantList.vue'
 import Equipement from '@/views/equipement/equipementView.vue'
+import EquipementList from '@/views/equipement/equipementList.vue'
+import HistoriqueEquipement from '@/views/equipement/historique/historiqueEquipement.vue'
 import SiteList from '@/views/sites/list.vue';
 
 const routes = [
@@ -74,6 +76,22 @@ const routes = [
     path: '/equipement/:type/:pass',
     name: 'equipement',
     component: Equipement
+  },
+  {
+    meta: {
+      title: 'Equipements'
+    },
+    path: '/equipement/list/:type/:pass',
+    name: 'equipement list',
+    component: EquipementList
+  },
+  {
+    meta: {
+      title: 'Historiques'
+    },
+    path: '/historique/:type/:pass',
+    name: 'historique list',
+    component: HistoriqueEquipement
   },
   {
     meta: {

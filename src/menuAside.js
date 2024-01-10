@@ -60,8 +60,12 @@ export default [
         to: '/equipement/' + type + '/' + pass
       },
       {
+        label: 'Historique',
+        to: '/historique/' + type + '/' + pass
+      },
+      {
         label: 'Liste',
-        // to: '/equipement/list/' + type + '/' + pass
+        to: '/equipement/list/' + type + '/' + pass
       }
     ]
   }

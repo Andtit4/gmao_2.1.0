@@ -58,6 +58,27 @@ const submit = () => {
     }
   }).then((repsonse) => {
     console.log('Success ' + repsonse)
+
+    axios({
+      url: apiService.getUrl() + '/historique/create',
+      method: 'POST',
+      headers: {
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+        'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
+        'Access-Control-Allow-Credentials': true
+      },
+      data: {
+        type_equipement: form.type_equipement.label,
+        numero_de_serie: form.numero_de_serie,
+        intitule: form.intitule,
+        total: form.total,
+        ajouter_le: form.ajouter_le,
+        action: 'Entré'
+      }
+    }).then((res) => {
+      console.log('Success ' + res)
+    })
+
     setTimeout(() => {
       location.reload()
     }, 1000)

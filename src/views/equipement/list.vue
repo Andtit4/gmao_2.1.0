@@ -17,25 +17,25 @@ defineProps({
   checkable: Boolean
 })
 
-const intervenants = reactive({ list: [] })
+const equipements = reactive({ list: [] })
 // const router = useRouter()
 
-const getAllIntervenant = () => {
+const getAllEquipement = () => {
   axios({
-    url: apiService.getUrl() + '/intervenant',
+    url: apiService.getUrl() + '/equipement',
     method: 'GET'
   })
     .then((response) => {
-      intervenants.list = response.data
+      equipements.list = response.data
     })
     .catch((e) => {
       console.log('An error occured ' + e)
     })
 }
 
-const deleteIntervenant = (_id) => {
+const deleteEquipement = (_id) => {
   axios({
-    url: apiService.getUrl() + '/intervenant/'  + _id,
+    url: apiService.getUrl() + '/equipement/'  + _id,
     method: "DELETE",
   })
     .then((response) => {
@@ -50,41 +50,7 @@ const deleteIntervenant = (_id) => {
 };
 
 
-/* const getAllCategorie = () => {
-  axios({
-    // url: 'https://good-crow-flannel-nightgown.cyclic.app/partenaire/',
-    url: "http://localhost:3000/categorie/",
-    method: "GET",
-  })
-    .then((response) => {
-      categories.list = response.data;
-    })
-    .catch((e) => {
-      console.log("An error occured " + e);
-    });
-}; */
-/*
-const deleteCategorie = (_id) => {
-  axios({
-    url: "http://localhost:3000/categorie/" + _id,
-    // url: "https://good-crow-flannel-nightgown.cyclic.app/partenaire/" + _id,
-    method: "DELETE",
-  })
-    .then((response) => {
-      console.log(response);
-      setTimeout(() => {
-        location.reload();
-      }, 1000);
-    })
-    .catch((e) => {
-      console.log("An error occured " + e);
-    });
-};
 
-setTimeout(() => {
-  categories.list;
-  console.log("lkdlfkg");
-}, 2000); */
 
 const mainStore = useMainStore()
 
@@ -110,7 +76,7 @@ const currentPageHuman = computed(() => currentPage.value + 1)
 
 const pagesList = computed(() => {
   const pagesList = []
-  getAllIntervenant()
+  getAllEquipement()
   for (let i = 0; i < numPages.value; i++) {
     pagesList.push(i)
   }
@@ -162,34 +128,34 @@ onMounted(() => {})
       <tr>
         <th v-if="checkable" />
         <th />
-        <th>Matricule</th>
-        <th>Nom</th>
-        <th>Prénom</th>
-        <th>Email</th>
-        <th>Mot de passe</th>
+        <th>Type d'équipement</th>
+        <th>Numero de série</th>
+        <th>Intitulé</th>
+        <th>Total</th>
+        <th>Ajouté le</th>
         <th />
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(intervenant, index) in intervenants.list" :key="index">
-        <TableCheckboxCell v-if="checkable" @checked="checked($event, intervenant)" />
+      <tr v-for="(equipement, index) in equipements.list" :key="index">
+        <TableCheckboxCell v-if="checkable" @checked="checked($event, equipement)" />
         <td class="border-b-0 lg:w-6 before:hidden">
-          <UserAvatar :username="intervenant.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
+          <UserAvatar :username="equipement.type_equipement" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
         </td>
-        <td data-label="Matricule">
-          {{ intervenant.matricule }}
+        <td data-label="Type d'équipement">
+          {{ equipement.type_equipement }}
         </td>
-        <td data-label="Nom ">
-          {{ intervenant.nom }}
+        <td data-label="Numero de série ">
+          {{ equipement.numero_de_serie }}
         </td>
-        <td data-label="Prénom">
-          {{ intervenant.prenom }}
+        <td data-label="Intitulé">
+          {{ equipement.intitule }}
         </td>
-        <td data-label="Email">
-          {{ intervenant.email }}
+        <td data-label="Total">
+          {{ equipement.total }}
         </td>
-        <td data-label="Mot de passe">
-          {{ intervenant.mot_de_passe }}
+        <td data-label="Ajouté le">
+          {{ equipement.ajouter_le }}
         </td>
         <td class="before:hidden lg:w-1 whitespace-nowrap">
           <BaseButtons type="justify-start lg:justify-end" no-wrap>
@@ -198,7 +164,7 @@ onMounted(() => {})
               color="danger"
               :icon="mdiTrashCan"
               small
-              @click="deleteIntervenant(intervenant._id)"
+              @click="deleteEquipement(equipement._id)"
             />
           </BaseButtons>
         </td>

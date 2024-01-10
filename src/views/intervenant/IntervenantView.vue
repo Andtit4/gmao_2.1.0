@@ -54,7 +54,7 @@ const submit = () => {
   const gen = generatePassword.generatePassword();
   // console.log(gen)
   axios({
-    url: apiService.getUrl() + '/intervenant/create',
+    url: apiService.getLocal() + '/intervenant/create',
     method: 'POST',
     data: {
       matricule: form.matricule,

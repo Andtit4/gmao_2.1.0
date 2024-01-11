@@ -45,7 +45,7 @@ const materielOptions = reactive({ list: [] })
 
 const form1 = reactive({
   vers: '',
-  motif: '',
+  motif: ''
 })
 
 // const equipements = reactive({ list: [] })
@@ -176,14 +176,14 @@ const submit = () => {
   console.log('Sub')
 
   if (materiels.list.nombre_disponible == 0) {
-    return form.showError = true
+    return (form.showError = true)
   } else {
     const nombre_disponible = materiels.list.nombre_disponible - 1
     axios({
       url: apiService.getUrl() + '/historique/create',
       method: 'POST',
       data: {
-        type_equipement: equipements.list.type_equipement.label,
+        type_equipement: equipements.list.type_equipement,
         numero_de_serie: equipements.list.numero_de_serie,
         intitule: equipements.list.intitule,
         ajouter_le: equipements.list.ajouter_le,
@@ -193,6 +193,7 @@ const submit = () => {
       }
     }).then((response) => {
       console.log(response)
+
       axios({
         url: apiService.getUrl() + '/materiel/' + materiels.list._id,
         method: 'PUT',
@@ -201,6 +202,14 @@ const submit = () => {
         }
       }).then((res) => {
         console.log(res)
+
+        axios({
+          url: apiService.getUrl() + '/equipement/' + equipements.list._id,
+          method: 'DELETE'
+        }).then((re) => {
+          console.log('Dtee', re)
+        })
+
         form.showSucess = true
         setTimeout(() => {
           location.reload()

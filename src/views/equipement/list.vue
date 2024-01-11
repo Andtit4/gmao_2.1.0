@@ -141,6 +141,7 @@ onMounted(() => {})
       <tr>
         <th v-if="checkable" />
         <th />
+        <th>Lot</th>
         <th>Type d'équipement</th>
         <th>Total</th>
         <th />
@@ -151,6 +152,9 @@ onMounted(() => {})
         <TableCheckboxCell v-if="checkable" @checked="checked($event, equipement)" />
         <td class="border-b-0 lg:w-6 before:hidden">
           <UserAvatar :username="equipement.type_equipement" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
+        </td>
+        <td data-label="Lot">
+          {{ equipement.nom_lot }}
         </td>
         <td data-label="Type d'équipement">
           {{ equipement.type_equipement }}

@@ -41,10 +41,11 @@ const notificationsOutlineError = computed(
 
 const equipementOptions = reactive({ list: [] })
 const siteOptions = reactive({ list: [] })
+const materielOptions = reactive({ list: [] })
 
 const form1 = reactive({
   vers: '',
-  motif: ''
+  motif: '',
 })
 
 // const equipements = reactive({ list: [] })
@@ -135,6 +136,7 @@ const getAllSite = () => {
   })
 } */
 const equipements = reactive({ list: [] })
+const materiels = reactive({ list: [] })
 
 const search = () => {
   // let isModalActive = true
@@ -148,6 +150,19 @@ const search = () => {
     })
       .then((response) => {
         equipements.list = response.data
+        console.log('lot ', equipements.list.nom_lot)
+
+        axios({
+          url: apiService.getUrl() + '/materiel/searchLot?nom_lot=' + equipements.list.nom_lot,
+          method: 'GET'
+        })
+          .then((response) => {
+            materiels.list = response.data[0]
+            // console.log('materiel ', materiels.list[0].nombre_disponible)
+          })
+          .catch((e) => {
+            console.log('An error occured ' + e)
+          })
         isModalActive.value = true
       })
       .catch((e) => {
@@ -160,56 +175,74 @@ const search = () => {
 const submit = () => {
   console.log('Sub')
 
-  axios({
-    url: apiService.getUrl() + '/historique/create',
-    method: 'POST',
-    data: {
-      type_equipement: equipements.list.type_equipement.label,
-      numero_de_serie: equipements.list.numero_de_serie,
-      intitule: equipements.list.intitule,
-      ajouter_le: equipements.list.ajouter_le,
-      action: 'Sortie',
-      motif: form1.motif,
-      vers: form1.vers
-    }
-  }).then((response) => {
-    console.log(response)
+  if (materiels.list.nombre_disponible == 0) {
+    return form.showError = true
+  } else {
+    const nombre_disponible = materiels.list.nombre_disponible - 1
     axios({
-      url: apiService.getUrl() + '/materiel/search?type_equipement=' + form.type_equipement,
-      method: 'GET'
-    }).then((res) => {
-      console.log('Nombre dispo: ', res.data[0].total)
-      const nombre_disponible = res.data[0].total - 1
-      console.log('Nombre dispo: ', res.data[0].total - 1)
-
-      // Request to update nombre disponible dans la table materiel
+      url: apiService.getUrl() + '/historique/create',
+      method: 'POST',
+      data: {
+        type_equipement: equipements.list.type_equipement.label,
+        numero_de_serie: equipements.list.numero_de_serie,
+        intitule: equipements.list.intitule,
+        ajouter_le: equipements.list.ajouter_le,
+        action: 'Sortie',
+        motif: form1.motif,
+        vers: form1.vers
+      }
+    }).then((response) => {
+      console.log(response)
       axios({
-        url: apiService.getUrl() + '/materiel/' + res.data[0]._id,
+        url: apiService.getUrl() + '/materiel/' + materiels.list._id,
         method: 'PUT',
         data: {
           nombre_disponible: nombre_disponible
         }
+      }).then((res) => {
+        console.log(res)
+        form.showSucess = true
+        setTimeout(() => {
+          location.reload()
+        }, 2000)
       })
-    })
+      /* axios({
+        url: apiService.getUrl() + '/materiel/search?type_equipement=' + form.type_equipement,
+        method: 'GET'
+      }).then((res) => {
+        console.log('Nombre dispo: ', res.data[0].total)
+        const nombre_disponible = res.data[0].total - 1
+        console.log('Nombre dispo: ', res.data[0].total - 1) */
 
-    // axios({
-    //   url: apiService.getUrl() + '/equipement/' + form.type_equipement,
-    //   method: 'PUT',
-    //   data: {
-    //     total: total
-    //   }
-    // }).then((response) => {
-    //   console.log(response)
-    //   form.showSucess = true
-    //   setTimeout(() => {
-    //     location.reload()
-    //   }, 2000)
-    // })
-    /* form.showSucess = true
+      // Request to update nombre disponible dans la table materiel
+      /*   axios({
+          url: apiService.getUrl() + '/materiel/' + res.data[0]._id,
+          method: 'PUT',
+          data: {
+            nombre_disponible: nombre_disponible
+          }
+        })
+      }) */
+
+      // axios({
+      //   url: apiService.getUrl() + '/equipement/' + form.type_equipement,
+      //   method: 'PUT',
+      //   data: {
+      //     total: total
+      //   }
+      // }).then((response) => {
+      //   console.log(response)
+      //   form.showSucess = true
+      //   setTimeout(() => {
+      //     location.reload()
+      //   }, 2000)
+      // })
+      /* form.showSucess = true
       setTimeout(() => {
         location.reload()
       }, 2000) */
-  })
+    })
+  }
 
   if (form.nombre_retire > equipements.list.total) {
     console.log('supérieur')
@@ -260,7 +293,7 @@ onMounted(() => {
       <FormField label="Informations complémentaires">
         <!-- <FormControl v-model="equipements.list.ajouter_le" placeholder="Image" type="date" /> -->
         <FormControl v-model="form1.motif" placeholder="Motif" />
-        <select v-model="form.vers" class="form-select bg-white dark:bg-slate-800">
+        <select v-model="form1.vers" class="form-select bg-white dark:bg-slate-800">
           <option value="">Sélectionnez la destination</option>
           <option value="MAGASIN">MAGASIN</option>
           <option
@@ -271,6 +304,10 @@ onMounted(() => {
             {{ equipement.nom_site }}
           </option>
         </select>
+      </FormField>
+      <FormField label="Disponobilité">
+        <p>Nombre disponible:</p>
+        {{ materiels.list.nombre_disponible }}
       </FormField>
     </FormField>
     <p><BaseButton color="success" label="Valider" @click="submit()" /></p>
@@ -288,8 +325,8 @@ onMounted(() => {
               :key="index"
               :value="equipement._id"
             >
-              {{ equipement.intitule }} | {{ equipement.numero_de_serie }} |
-              {{ equipement.type_equipement }}
+              {{ equipement.nom_lot }} | {{ equipement.type_equipement }} |
+              {{ equipement.numero_de_serie }}
             </option>
           </select>
           <BaseButtons>

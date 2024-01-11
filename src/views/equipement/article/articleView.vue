@@ -22,10 +22,22 @@ const form = reactive({
   intitule: '',
   email: '',
   ajouter_le: '',
-  lot_date: '',
+  nom_lot: ''
 })
 
-
+const selectOptions = [
+  { id: 1, label: 'GE' },
+  { id: 2, label: 'PANNEAU SOLAIRE' },
+  { id: 3, label: 'REGULATEUR' },
+  { id: 4, label: 'UPS' },
+  { id: 5, label: 'TGBT' },
+  { id: 6, label: 'REDRESSEUR' },
+  { id: 7, label: 'PROTECTION' },
+  { id: 8, label: 'BATTERIE DEMARRAGE' },
+  { id: 9, label: 'BATTERIE PS' },
+  { id: 10, label: 'BATTERIE UPS' },
+  { id: 11, label: 'CLIMATISATION' }
+]
 
 const equipementOptions = reactive({ list: [] })
 
@@ -47,19 +59,6 @@ const getAllEquipement = () => {
 
 const searchResult = reactive({ list: [] })
 const submit = () => {
-  // console.log(gen)
-
-  axios({})
-
-  // axios({
-  //   url: apiService.getUrl() + '/equipement/' + form.type_equipement,
-  //   method: 'GET'
-  // }).then((res) => {
-
-  // })
-
-
-
   axios({
     url: apiService.getUrl() + '/equipement/create',
     method: 'POST',
@@ -73,6 +72,7 @@ const submit = () => {
       numero_de_serie: form.numero_de_serie,
       intitule: form.intitule,
       action: 'Entrée',
+      nom_lot: form.nom_lot,
       ajouter_le: form.ajouter_le
     }
   }).then((repsonse) => {
@@ -90,26 +90,25 @@ const submit = () => {
 
         // Request to update nombre disponible dans la table materiel
         axios({
-            url: apiService.getUrl() + '/historique/create',
-            method: 'POST',
-            headers: {
-              'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-              'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
-              'Access-Control-Allow-Credentials': true
-            },
-            data: {
-              type_equipement: form.type_equipement,
-              numero_de_serie: form.numero_de_serie,
-              intitule: form.intitule,
-              lot_date: form.lot_date,
-              ajouter_le: form.ajouter_le,
-              action: 'Entrée',
-              motif: 'Ajout de matériel au magazin',
-              vers: 'MAGASIN'
-            }
-          }).then((res) => {
-            console.log('Success ' + res)
-          })
+          url: apiService.getUrl() + '/historique/create',
+          method: 'POST',
+          headers: {
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+            'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
+            'Access-Control-Allow-Credentials': true
+          },
+          data: {
+            type_equipement: form.type_equipement,
+            numero_de_serie: form.numero_de_serie,
+            intitule: form.intitule,
+            ajouter_le: form.ajouter_le,
+            action: 'Entrée',
+            motif: 'Ajout de matériel au magazin',
+            vers: 'MAGASIN'
+          }
+        }).then((res) => {
+          console.log('Success ' + res)
+        })
         /* axios({
           url: apiService.getUrl() + '/materiel/' + res.data[0]._id,
           method: 'PUT',
@@ -148,17 +147,30 @@ onMounted(() => {
               <FormControl v-model="form.numero_de_serie" placeholder="Numero de référence" />
               <FormControl v-model="form.intitule" placeholder="Intitulé" />
             </FormField>
-            <select v-model="form.type_equipement" class="form-select bg-white dark:bg-slate-800">
-              <option value="">Les matériels disponibles</option>
-              <option
-                v-for="(equipement, index) in equipementOptions.list"
-                :key="index"
-                :value="equipement.type_equipement"
-              >
-                {{ equipement.type_equipement }} | {{ equipement.ajouter_le }}
-              </option>
-            </select>
-            <FormControl v-model="form.lot_date" type="date" />
+            <FormField label="Equipements">
+              <select v-model="form.nom_lot" class="form-select bg-white dark:bg-slate-800">
+                <option value="">Les lots disponibles</option>
+                <option
+                  v-for="(equipement, index) in equipementOptions.list"
+                  :key="index"
+                  :value="equipement.nom_lot"
+                >
+                  {{ equipement.nom_lot }}
+                </option>
+              </select>
+              <select v-model="form.type_equipement" class="form-select bg-white dark:bg-slate-800">
+                <option value="">Les Equipements</option>
+                <option
+                  v-for="(equipement, index) in equipementOptions.list"
+                  :key="index"
+                  :value="equipement.type_equipement"
+                >
+                  {{ equipement.type_equipement }}
+                </option>
+              </select>
+            </FormField>
+
+            <FormControl v-model="form.ajouter_le" type="date" />
           </FormField>
         </FormField>
         <BaseDivider />

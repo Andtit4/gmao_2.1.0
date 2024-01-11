@@ -53,6 +53,7 @@ const submit = () => {
     data: {
       type_equipement: form.type_equipement.label,
       total: form.total,
+      nom_lot: form.nom_lot,
       lot_date: form.ajouter_le,
       action: 'Entrée',
       nombre_disponible: form.total
@@ -102,7 +103,6 @@ const submit = () => {
           </FormField>
         </FormField>
         <BaseDivider />
-
         <template #footer>
           <BaseButtons>
             <BaseButton type="submit" color="info" label="Submit" @click="submit()" />

@@ -33,7 +33,9 @@ const exportxlx = async () => {
       'Action',
       'Total',
       'Nombre par action',
-      'Ajouté le'
+      'Ajouté le',
+      'motif',
+      'vers'
     ],
     ...apiData.map((item) => [
       item.numero_de_serie,
@@ -42,7 +44,9 @@ const exportxlx = async () => {
       item.action,
       item.total,
       item.nombre,
-      item.ajouter_le
+      item.ajouter_le,
+      item.motif,
+      item.vers,
     ])
     // ... Ajoutez vos données ici
   ]

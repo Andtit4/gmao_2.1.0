@@ -22,7 +22,7 @@ const equipements = reactive({ list: [] })
 
 const getAllEquipement = () => {
   axios({
-    url: apiService.getUrl() + '/equipement',
+    url: apiService.getUrl() + '/materiel',
     method: 'GET'
   })
     .then((response) => {
@@ -35,7 +35,7 @@ const getAllEquipement = () => {
 
 const deleteEquipement = (_id) => {
   axios({
-    url: apiService.getUrl() + '/equipement/'  + _id,
+    url: apiService.getUrl() + '/materiel/'  + _id,
     method: "DELETE",
   })
     .then((response) => {
@@ -104,13 +104,26 @@ const checked = (isChecked, client) => {
   }
 }
 
+const result = reactive({ list: []})
+const search = (_id) => {
+  axios({
+    url: apiService.getUrl() + '/materiel/' + _id,
+    method: "GET"
+  }).then((response) => {
+    result.list = response.data
+    isModalActive.value = true
+  })
+}
+
 onMounted(() => {})
 </script>
 
 <template>
-  <CardBoxModal v-model="isModalActive" title="Sample modal">
-    <p>Lorem ipsum dolor sit amet <b>adipiscing elit</b></p>
-    <p>This is sample modal</p>
+  <CardBoxModal v-model="isModalActive" title="Détails">
+    <p><b>Type d'équipement: </b>{{ result.list.type_equipement }} </p>
+    <p><b>Nombre total: </b>{{ result.list.total }} </p>
+    <p><b>Nombre disponible: </b>{{ result.list.nombre_disponible }} </p>
+    <p><b>Ajouté le: </b>{{ result.list.ajouter_le }} </p>
   </CardBoxModal>
 
   <div v-if="checkedRows.length" class="p-3 bg-gray-100/50 dark:bg-slate-800">
@@ -129,10 +142,7 @@ onMounted(() => {})
         <th v-if="checkable" />
         <th />
         <th>Type d'équipement</th>
-        <th>Numero de série</th>
-        <th>Intitulé</th>
         <th>Total</th>
-        <th>Ajouté le</th>
         <th />
       </tr>
     </thead>
@@ -145,21 +155,12 @@ onMounted(() => {})
         <td data-label="Type d'équipement">
           {{ equipement.type_equipement }}
         </td>
-        <td data-label="Numero de série ">
-          {{ equipement.numero_de_serie }}
-        </td>
-        <td data-label="Intitulé">
-          {{ equipement.intitule }}
-        </td>
         <td data-label="Total">
           {{ equipement.total }}
         </td>
-        <td data-label="Ajouté le">
-          {{ equipement.ajouter_le }}
-        </td>
         <td class="before:hidden lg:w-1 whitespace-nowrap">
           <BaseButtons type="justify-start lg:justify-end" no-wrap>
-            <BaseButton color="info" :icon="mdiEye" small @click="isModalActive = true" />
+            <BaseButton color="info" :icon="mdiEye" small @click="search(equipement._id)" />
             <BaseButton
               color="danger"
               :icon="mdiTrashCan"

@@ -9,6 +9,7 @@ import Equipement from '@/views/equipement/equipementView.vue'
 import EquipementList from '@/views/equipement/equipementList.vue'
 import HistoriqueEquipement from '@/views/equipement/historique/historiqueEquipement.vue'
 import SortiEquipement from '@/views/equipement/sortis/sortiView.vue'
+import ArticleView from '@/views/equipement/article/articleView.vue'
 import SiteList from '@/views/sites/list.vue';
 
 const routes = [
@@ -85,6 +86,14 @@ const routes = [
     path: '/equipement/list/:type/:pass',
     name: 'equipement list',
     component: EquipementList
+  },
+  {
+    meta: {
+      title: 'Articles'
+    },
+    path: '/article/:type/:pass',
+    name: 'article',
+    component: ArticleView
   },
   {
     meta: {

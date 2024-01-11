@@ -40,6 +40,12 @@ const notificationsOutlineError = computed(
 )
 
 const equipementOptions = reactive({ list: [] })
+const siteOptions = reactive({ list: [] })
+
+const form1 = reactive({
+  vers: '',
+  motif: ''
+})
 
 // const equipements = reactive({ list: [] })
 // const router = useRouter()
@@ -57,6 +63,18 @@ const getAllEquipement = () => {
     })
 }
 
+const getAllSite = () => {
+  axios({
+    url: apiService.getUrl() + '/site',
+    method: 'GET'
+  })
+    .then((response) => {
+      siteOptions.list = response.data
+    })
+    .catch((e) => {
+      console.log('An error occured ' + e)
+    })
+}
 /* const selectOptions = [
   { id: 1, label: 'GE' },
   { id: 2, label: 'PANNEAU SOLAIRE' },
@@ -142,45 +160,63 @@ const search = () => {
 const submit = () => {
   console.log('Sub')
 
+  axios({
+    url: apiService.getUrl() + '/historique/create',
+    method: 'POST',
+    data: {
+      type_equipement: equipements.list.type_equipement.label,
+      numero_de_serie: equipements.list.numero_de_serie,
+      intitule: equipements.list.intitule,
+      ajouter_le: equipements.list.ajouter_le,
+      action: 'Sortie',
+      motif: form1.motif,
+      vers: form1.vers
+    }
+  }).then((response) => {
+    console.log(response)
+    axios({
+      url: apiService.getUrl() + '/materiel/search?type_equipement=' + form.type_equipement,
+      method: 'GET'
+    }).then((res) => {
+      console.log('Nombre dispo: ', res.data[0].total)
+      const nombre_disponible = res.data[0].total - 1
+      console.log('Nombre dispo: ', res.data[0].total - 1)
+
+      // Request to update nombre disponible dans la table materiel
+      axios({
+        url: apiService.getUrl() + '/materiel/' + res.data[0]._id,
+        method: 'PUT',
+        data: {
+          nombre_disponible: nombre_disponible
+        }
+      })
+    })
+
+    // axios({
+    //   url: apiService.getUrl() + '/equipement/' + form.type_equipement,
+    //   method: 'PUT',
+    //   data: {
+    //     total: total
+    //   }
+    // }).then((response) => {
+    //   console.log(response)
+    //   form.showSucess = true
+    //   setTimeout(() => {
+    //     location.reload()
+    //   }, 2000)
+    // })
+    /* form.showSucess = true
+      setTimeout(() => {
+        location.reload()
+      }, 2000) */
+  })
+
   if (form.nombre_retire > equipements.list.total) {
     console.log('supérieur')
     form.showError = true
   } else {
     // form.showSucess = true
-    const total = equipements.list.total - form.nombre_retire
-    axios({
-      url: apiService.getUrl() + '/historique/create',
-      method: 'POST',
-      data: {
-        type_equipement: equipements.list.type_equipement.label,
-        numero_de_serie: equipements.list.numero_de_serie,
-        intitule: equipements.list.intitule,
-        total: equipements.list.total,
-        ajouter_le: equipements.list.ajouter_le,
-        action: 'Sortie',
-        nombre: form.nombre_retire
-      }
-    }).then((response) => {
-      console.log(response)
-
-      axios({
-        url: apiService.getUrl() + '/equipement/' + form.type_equipement,
-        method: 'PUT',
-        data: {
-          total: total
-        }
-      }).then((response) => {
-        console.log(response)
-        form.showSucess = true
-        setTimeout(() => {
-          location.reload()
-        }, 2000)
-      })
-      /* form.showSucess = true
-      setTimeout(() => {
-        location.reload()
-      }, 2000) */
-    })
+    // const total = equipements.list.total - form.nombre_retire
   }
   // showNotification.value = true;
   // notificationsOutline = notificationSettingsModel.value.indexOf('outline') > -1
@@ -188,6 +224,7 @@ const submit = () => {
 
 onMounted(() => {
   getAllEquipement()
+  getAllSite()
 })
 </script>
 
@@ -220,10 +257,20 @@ onMounted(() => {
         readonly="true"
       />
       <FormControl v-model="equipements.list.intitule" placeholder="Intitulé" />
-      <FormField label="Nombre disponible">
+      <FormField label="Informations complémentaires">
         <!-- <FormControl v-model="equipements.list.ajouter_le" placeholder="Image" type="date" /> -->
-        <FormControl v-model="equipements.list.total" placeholder="total" type="number" />
-        <FormControl v-model="form.nombre_retire" placeholder="Nombre à retirer" type="number" />
+        <FormControl v-model="form1.motif" placeholder="Motif" />
+        <select v-model="form.vers" class="form-select bg-white dark:bg-slate-800">
+          <option value="">Sélectionnez la destination</option>
+          <option value="MAGASIN">MAGASIN</option>
+          <option
+            v-for="(equipement, index) in siteOptions.list"
+            :key="index"
+            :value="equipement.nom_site"
+          >
+            {{ equipement.nom_site }}
+          </option>
+        </select>
       </FormField>
     </FormField>
     <p><BaseButton color="success" label="Valider" @click="submit()" /></p>

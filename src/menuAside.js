@@ -52,12 +52,20 @@ export default [
     ]
   },
   {
-    label: 'Equipements',
+    label: 'Matériels',
     icon: mdiViewList,
     menu: [
       {
-        label: 'Ajouter',
+        label: 'Ajouter un materiel',
         to: '/equipement/' + type + '/' + pass
+      },
+      {
+        label: 'Liste matériel',
+        to: '/equipement/list/' + type + '/' + pass
+      },
+      {
+        label: 'Entrées',
+        to: '/article/' + type + '/' + pass
       },
       {
         label: 'Sortie',
@@ -66,10 +74,6 @@ export default [
       {
         label: 'Historique',
         to: '/historique/' + type + '/' + pass
-      },
-      {
-        label: 'Liste',
-        to: '/equipement/list/' + type + '/' + pass
       }
     ]
   }

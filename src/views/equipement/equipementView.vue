@@ -22,7 +22,8 @@ const form = reactive({
   intitule: '',
   total: '',
   email: '',
-  ajouter_le: ''
+  nom_lot: '',
+  lot_date: ''
 })
 
 const selectOptions = [
@@ -42,7 +43,7 @@ const selectOptions = [
 const submit = () => {
   // console.log(gen)
   axios({
-    url: apiService.getUrl() + '/equipement/create',
+    url: apiService.getUrl() + '/materiel/create',
     method: 'POST',
     headers: {
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
@@ -51,15 +52,15 @@ const submit = () => {
     },
     data: {
       type_equipement: form.type_equipement.label,
-      numero_de_serie: form.numero_de_serie,
-      intitule: form.intitule,
       total: form.total,
-      ajouter_le: form.ajouter_le
+      lot_date: form.ajouter_le,
+      action: 'Entrée',
+      nombre_disponible: form.total
     }
   }).then((repsonse) => {
     console.log('Success ' + repsonse)
 
-    axios({
+    /* axios({
       url: apiService.getUrl() + '/historique/create',
       method: 'POST',
       headers: {
@@ -77,7 +78,7 @@ const submit = () => {
       }
     }).then((res) => {
       console.log('Success ' + res)
-    })
+    }) */
 
     setTimeout(() => {
       location.reload()
@@ -92,13 +93,12 @@ const submit = () => {
       <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Equipements" main>
       </SectionTitleLineWithButton>
       <CardBox form @submit.prevent="submit()">
-        <FormField label="Informations générale">
-          <FormControl v-model="form.numero_de_serie" placeholder="Numéro de série" />
-          <FormControl v-model="form.intitule" placeholder="Intitulé" />
-          <FormField label="Informations complémentaires">
-            <FormControl v-model="form.ajouter_le" placeholder="Image" type="date" />
-            <FormControl v-model="form.total" placeholder="total" type="number" />
+        <FormField label="">
+          <FormField label="Informations générale">
             <FormControl v-model="form.type_equipement" :options="selectOptions" />
+            <FormControl v-model="form.nom_lot" placeholder="Nom du lot" />
+            <FormControl v-model="form.total" placeholder="total" type="number" />
+            <FormControl v-model="form.lot_date"  type="date" />
           </FormField>
         </FormField>
         <BaseDivider />

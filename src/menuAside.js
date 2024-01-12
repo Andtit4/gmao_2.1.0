@@ -28,6 +28,10 @@ export default [
     icon: mdiTable,
     menu: [
       {
+        label: 'Zone',
+        to: '/zone/' + type + '/' + pass
+      },
+      {
         label: 'Ajouter',
         to: '/site/' + type + '/' + pass
       },

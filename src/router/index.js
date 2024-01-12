@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 // import Style from '@/views/StyleView.vue'
 import Home from '@/views/HomeView.vue'
 import Login from '@/views/LoginView.vue'
+import Zone from '@/views/sites/zone/zone.vue'
 import Site from '@/views/sites/sitesView.vue'
 import Intervenant from "@/views/intervenant/IntervenantView.vue"
 import IntervenantList from '@/views/intervenant/intervenantList.vue'
@@ -46,6 +47,14 @@ const routes = [
     path: '/site/:type/:pass',
     name: 'sites',
     component: Site
+  },
+  {
+    meta: {
+      title: 'Zones'
+    },
+    path: '/zone/:type/:pass',
+    name: 'zone',
+    component: Zone
   },
   {
     meta: {

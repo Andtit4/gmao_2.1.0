@@ -128,6 +128,22 @@ const technologieOptions = [
   { id: 1, label: '2G/3G/4G' }
 ]
 
+const zones = reactive({ list: [] })
+// const router = useRouter()
+
+const getAllZone = () => {
+  axios({
+    url: apiService.getUrl() + '/zone',
+    method: 'GET'
+  })
+    .then((response) => {
+      zones.list = response.data
+    })
+    .catch((e) => {
+      console.log('An error occured ' + e)
+    })
+}
+
 const selectOptions = [
   { id: 1, label: 'LOME-EST' },
   { id: 2, label: 'LOME-OUEST' },
@@ -178,6 +194,10 @@ const submit = () => {
     }, 1000)
   })
 }
+
+onMounted(() => {
+  getAllZone()
+})
 </script>
 
 <template>
@@ -192,7 +212,12 @@ const submit = () => {
           <FormControl v-model="form.longitude" placeholder="Longitude" />
           <FormControl v-model="form.latitude" placeholder="Latitude" />
           <FormField label="Zone">
-            <FormControl v-model="form.zone" :options="selectOptions" />
+            <select v-model="form.zone" class="form-select bg-white dark:bg-slate-800">
+              <option value="">Séléctionnez une zone</option>
+              <option v-for="(zone, index) in zones.list" :key="index" :value="zone.nom">
+                {{ zone.nom }}
+              </option>
+            </select>
             <FormControl v-model="form.config_du_site" :options="configOptions" />
           </FormField>
           <FormField label="Technologie">

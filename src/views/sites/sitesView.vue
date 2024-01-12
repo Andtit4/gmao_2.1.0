@@ -154,7 +154,7 @@ const submit = () => {
       nom_site: form.nom_site,
       longitude: form.longitude,
       latitude: form.latitude,
-      zone: form.zone.label,
+      zone: form.zone,
       config_du_site: form.config_du_site.label,
       technologie: form.technologie.label,
       nombre_de_dependance: form.nombre_de_dependance,

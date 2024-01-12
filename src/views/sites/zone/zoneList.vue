@@ -49,42 +49,6 @@ const deleteSite = (_id) => {
 };
 
 
-/* const getAllCategorie = () => {
-  axios({
-    // url: 'https://good-crow-flannel-nightgown.cyclic.app/partenaire/',
-    url: "http://localhost:3000/categorie/",
-    method: "GET",
-  })
-    .then((response) => {
-      categories.list = response.data;
-    })
-    .catch((e) => {
-      console.log("An error occured " + e);
-    });
-}; */
-/*
-const deleteCategorie = (_id) => {
-  axios({
-    url: "http://localhost:3000/categorie/" + _id,
-    // url: "https://good-crow-flannel-nightgown.cyclic.app/partenaire/" + _id,
-    method: "DELETE",
-  })
-    .then((response) => {
-      console.log(response);
-      setTimeout(() => {
-        location.reload();
-      }, 1000);
-    })
-    .catch((e) => {
-      console.log("An error occured " + e);
-    });
-};
-
-setTimeout(() => {
-  categories.list;
-  console.log("lkdlfkg");
-}, 2000); */
-
 const mainStore = useMainStore()
 
 const items = computed(() => mainStore.clients)
@@ -137,12 +101,24 @@ const checked = (isChecked, client) => {
   }
 }
 
+const oneZone = reactive({ list: []})
+
+const showZone = (id) => {
+  isModalActive.value = true
+  axios({
+    url: apiService.getUrl() + '/zone/' + id,
+    method: 'GET'
+  }).then((response) => {
+    oneZone.list = response.data[0]
+  })
+}
+
 onMounted(() => {})
 </script>
 
 <template>
-  <CardBoxModal v-model="isModalActive" title="Sample modal">
-    <p>Lorem ipsum dolor sit amet <b>adipiscing elit</b></p>
+  <CardBoxModal v-model="isModalActive" title="Détails">
+    <p>Intitulé zone: <b>{{ oneZone.list.nom }}</b></p>
     <p>This is sample modal</p>
   </CardBoxModal>
 
@@ -176,7 +152,7 @@ onMounted(() => {})
         </td>
         <td class="before:hidden lg:w-1 whitespace-nowrap">
           <BaseButtons type="justify-start lg:justify-end" no-wrap>
-            <BaseButton color="info" :icon="mdiEye" small @click="isModalActive = true" />
+            <!-- <BaseButton color="info" :icon="mdiEye" small @click="showZone(site._id)" /> -->
             <BaseButton
               color="danger"
               :icon="mdiTrashCan"

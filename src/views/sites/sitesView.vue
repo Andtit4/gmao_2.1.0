@@ -144,28 +144,6 @@ const getAllZone = () => {
     })
 }
 
-const selectOptions = [
-  { id: 1, label: 'LOME-EST' },
-  { id: 2, label: 'LOME-OUEST' },
-  { id: 3, label: 'LOME-SUD' },
-  { id: 4, label: 'LOME-NORD' },
-  { id: 5, label: 'LOME-VIP' },
-  { id: 6, label: 'ANEHO' },
-  { id: 7, label: 'TSEVIE' },
-  { id: 8, label: 'NOTSE' },
-  { id: 9, label: 'BADOU' },
-  { id: 10, label: 'KPALIME' },
-  { id: 11, label: 'ATAKPAME' },
-  { id: 12, label: 'BLITTA' },
-  { id: 13, label: 'SOKODE' },
-  { id: 14, label: 'TCHAMBA' },
-  { id: 15, label: 'KARA-OUEST' },
-  { id: 16, label: 'KARA-EST' },
-  { id: 17, label: 'BASSAR' },
-  { id: 18, label: 'KANTE' },
-  { id: 19, label: 'MANGO' },
-  { id: 20, label: 'DAPAONG' }
-]
 
 const submit = () => {
   axios({

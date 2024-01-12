@@ -34,56 +34,19 @@ const getAllSite = () => {
 
 const deleteSite = (_id) => {
   axios({
-    url: apiService.getUrl() + '/site/'  + _id,
-    method: "DELETE",
+    url: apiService.getUrl() + '/site/' + _id,
+    method: 'DELETE'
   })
     .then((response) => {
-      console.log(response);
+      console.log(response)
       setTimeout(() => {
-        location.reload();
-      }, 1000);
+        location.reload()
+      }, 1000)
     })
     .catch((e) => {
-      console.log("An error occured " + e);
-    });
-};
-
-
-/* const getAllCategorie = () => {
-  axios({
-    // url: 'https://good-crow-flannel-nightgown.cyclic.app/partenaire/',
-    url: "http://localhost:3000/categorie/",
-    method: "GET",
-  })
-    .then((response) => {
-      categories.list = response.data;
+      console.log('An error occured ' + e)
     })
-    .catch((e) => {
-      console.log("An error occured " + e);
-    });
-}; */
-/*
-const deleteCategorie = (_id) => {
-  axios({
-    url: "http://localhost:3000/categorie/" + _id,
-    // url: "https://good-crow-flannel-nightgown.cyclic.app/partenaire/" + _id,
-    method: "DELETE",
-  })
-    .then((response) => {
-      console.log(response);
-      setTimeout(() => {
-        location.reload();
-      }, 1000);
-    })
-    .catch((e) => {
-      console.log("An error occured " + e);
-    });
-};
-
-setTimeout(() => {
-  categories.list;
-  console.log("lkdlfkg");
-}, 2000); */
+}
 
 const mainStore = useMainStore()
 
@@ -137,13 +100,56 @@ const checked = (isChecked, client) => {
   }
 }
 
+const oneSite = reactive({ list: [] })
+const showSite = (id) => {
+  isModalActive.value = true
+  axios({
+    url: apiService.getUrl() + '/site/' + id,
+    method: 'GET'
+  }).then((res) => {
+    console.log('site selected: ', res.data)
+    oneSite.list = res.data
+  })
+}
+
 onMounted(() => {})
 </script>
 
 <template>
-  <CardBoxModal v-model="isModalActive" title="Sample modal">
-    <p>Lorem ipsum dolor sit amet <b>adipiscing elit</b></p>
-    <p>This is sample modal</p>
+  <CardBoxModal v-model="isModalActive" title="Détails">
+    <p>
+      Site Id : <b>{{ oneSite.list.site_id }}</b>
+    </p>
+    <p>
+      Nom : <b>{{ oneSite.list.nom_site }}</b>
+    </p>
+    <p>
+      Zone : <b>{{ oneSite.list.zone }}</b>
+    </p>
+    <p>
+      Configuration : <b>{{ oneSite.list.config_du_site }}</b>
+    </p>
+    <p>
+      Technologie : <b>{{ oneSite.list.technologie }}</b>
+    </p>
+    <p>
+      Nombre de dépendance : <b>{{ oneSite.list.nombre_de_dependance }}</b>
+    </p>
+    <p>
+      Classe : <b>{{ oneSite.list.classe_technique }}</b>
+    </p>
+    <p>
+      GE : <b>{{ oneSite.list.ge }}</b>
+    </p>
+    <p>
+      Type de batterie : <b>{{ oneSite.list.type_batterie }}</b>
+    </p>
+    <p>
+      Nombre de batteries : <b>{{ oneSite.list.nombre }}</b>
+    </p>
+    <p>
+      Puissance des batteries : <b>{{ oneSite.list.puissance_batteries }}</b>
+    </p>
   </CardBoxModal>
 
   <div v-if="checkedRows.length" class="p-3 bg-gray-100/50 dark:bg-slate-800">
@@ -171,7 +177,7 @@ onMounted(() => {})
       <tr v-for="(site, index) in sites.list" :key="index">
         <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
         <td class="border-b-0 lg:w-6 before:hidden">
-          <UserAvatar :username="site.nom_site" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
+          <!-- <UserAvatar :username="site.nom_site" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
         </td>
         <td data-label="Site Id">
           {{ site.site_id }}
@@ -184,13 +190,8 @@ onMounted(() => {})
         </td>
         <td class="before:hidden lg:w-1 whitespace-nowrap">
           <BaseButtons type="justify-start lg:justify-end" no-wrap>
-            <BaseButton color="info" :icon="mdiEye" small @click="isModalActive = true" />
-            <BaseButton
-              color="danger"
-              :icon="mdiTrashCan"
-              small
-              @click="deleteSite(site._id)"
-            />
+            <BaseButton color="info" :icon="mdiEye" small @click="showSite(site._id)" />
+            <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteSite(site._id)" />
           </BaseButtons>
         </td>
       </tr>

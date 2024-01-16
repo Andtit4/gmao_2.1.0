@@ -149,7 +149,7 @@ onMounted(() => {
             </FormField>
             <FormField label="Equipements">
               <select v-model="form.nom_lot" class="form-select bg-white dark:bg-slate-800">
-                <option value="">Les lots disponibles</option>
+                <option value="">Les matériels disponibles</option>
                 <option
                   v-for="(equipement, index) in equipementOptions.list"
                   :key="index"

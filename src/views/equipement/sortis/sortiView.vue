@@ -53,7 +53,7 @@ const form1 = reactive({
 
 const getAllEquipement = () => {
   axios({
-    url: apiService.getUrl() + '/equipement',
+    url: apiService.getUrl() + '/materiel',
     method: 'GET'
   })
     .then((response) => {
@@ -145,7 +145,7 @@ const search = () => {
     isModalActiveError.value = true
   } else {
     axios({
-      url: apiService.getUrl() + '/equipement/' + form.type_equipement,
+      url: apiService.getUrl() + '/materiel/' + form.type_equipement,
       method: 'GET'
     })
       .then((response) => {
@@ -175,47 +175,53 @@ const search = () => {
 const submit = () => {
   console.log('Sub')
 
-  if (materiels.list.nombre_disponible == 0) {
+  if (equipements.list.nombre_disponible == 0) {
     return (form.showError = true)
   } else {
-    const nombre_disponible = materiels.list.nombre_disponible - 1
-    axios({
-      url: apiService.getUrl() + '/historique/create',
-      method: 'POST',
-      data: {
-        type_equipement: equipements.list.type_equipement,
-        numero_de_serie: equipements.list.numero_de_serie,
-        intitule: equipements.list.intitule,
-        ajouter_le: equipements.list.ajouter_le,
-        action: 'Sortie',
-        motif: form1.motif,
-        vers: form1.vers
-      }
-    }).then((response) => {
-      console.log(response)
-
+    const nombre_disponible = equipements.list.nombre_disponible - form.nombre_retire
+    if (nombre_disponible >= 0) {
       axios({
-        url: apiService.getUrl() + '/materiel/' + materiels.list._id,
-        method: 'PUT',
+        url: apiService.getUrl() + '/historique/create',
+        method: 'POST',
         data: {
-          nombre_disponible: nombre_disponible
+          type_equipement: equipements.list.type_equipement,
+          nom_lot: equipements.list.nom_lot,
+          ajouter_le: equipements.list.ajouter_le,
+          action: 'Sortie',
+          nombre: form.nombre_retire,
+          motif: form1.motif,
+          vers: form1.vers
         }
-      }).then((res) => {
-        console.log(res)
+      }).then((response) => {
+        console.log(response)
 
         axios({
+          url: apiService.getUrl() + '/materiel/' + materiels.list._id,
+          method: 'PUT',
+          data: {
+            nombre_disponible: nombre_disponible
+          }
+        }).then((res) => {
+          console.log(res)
+
+          /*  axios({
           url: apiService.getUrl() + '/equipement/' + equipements.list._id,
           method: 'DELETE'
         }).then((re) => {
           console.log('Dtee', re)
-        })
+        }) */
 
-        form.showSucess = true
-        setTimeout(() => {
-          location.reload()
-        }, 2000)
+          form.showSucess = true
+          setTimeout(() => {
+            location.reload()
+          }, 2000)
+        })
       })
-      /* axios({
+    } else {
+      return (form.showError = true)
+    }
+
+    /* axios({
         url: apiService.getUrl() + '/materiel/search?type_equipement=' + form.type_equipement,
         method: 'GET'
       }).then((res) => {
@@ -223,8 +229,8 @@ const submit = () => {
         const nombre_disponible = res.data[0].total - 1
         console.log('Nombre dispo: ', res.data[0].total - 1) */
 
-      // Request to update nombre disponible dans la table materiel
-      /*   axios({
+    // Request to update nombre disponible dans la table materiel
+    /*   axios({
           url: apiService.getUrl() + '/materiel/' + res.data[0]._id,
           method: 'PUT',
           data: {
@@ -233,24 +239,23 @@ const submit = () => {
         })
       }) */
 
-      // axios({
-      //   url: apiService.getUrl() + '/equipement/' + form.type_equipement,
-      //   method: 'PUT',
-      //   data: {
-      //     total: total
-      //   }
-      // }).then((response) => {
-      //   console.log(response)
-      //   form.showSucess = true
-      //   setTimeout(() => {
-      //     location.reload()
-      //   }, 2000)
-      // })
-      /* form.showSucess = true
+    // axios({
+    //   url: apiService.getUrl() + '/equipement/' + form.type_equipement,
+    //   method: 'PUT',
+    //   data: {
+    //     total: total
+    //   }
+    // }).then((response) => {
+    //   console.log(response)
+    //   form.showSucess = true
+    //   setTimeout(() => {
+    //     location.reload()
+    //   }, 2000)
+    // })
+    /* form.showSucess = true
       setTimeout(() => {
         location.reload()
       }, 2000) */
-    })
   }
 
   if (form.nombre_retire > equipements.list.total) {
@@ -293,14 +298,12 @@ onMounted(() => {
     <!-- End BLoc -->
 
     <FormField label="Informations générale">
-      <FormControl
-        v-model="equipements.list.numero_de_serie"
-        placeholder="Numéro de série"
-        readonly="true"
-      />
-      <FormControl v-model="equipements.list.intitule" placeholder="Intitulé" />
+      <FormControl v-model="equipements.list.nom_lot" placeholder="Num Mat" readonly="true" />
+      <FormControl v-model="equipements.list.type_equipement" placeholder="Type" />
       <FormField label="Informations complémentaires">
         <!-- <FormControl v-model="equipements.list.ajouter_le" placeholder="Image" type="date" /> -->
+        <FormControl v-model="form.nombre_retire" placeholder="Nombre à retirer" />
+
         <FormControl v-model="form1.motif" placeholder="Motif" />
         <select v-model="form1.vers" class="form-select bg-white dark:bg-slate-800">
           <option value="">Sélectionnez la destination</option>
@@ -328,14 +331,13 @@ onMounted(() => {
       <CardBox>
         <FormField label="">
           <select v-model="form.type_equipement" class="form-select bg-white dark:bg-slate-800">
-            <option value="">Sélectionnez un équipement</option>
+            <option value="">Les matériels disponibles</option>
             <option
               v-for="(equipement, index) in equipementOptions.list"
               :key="index"
               :value="equipement._id"
             >
-              {{ equipement.nom_lot }} | {{ equipement.type_equipement }} |
-              {{ equipement.numero_de_serie }}
+              {{ equipement.nom_lot }} | | {{ equipement.type_equipement }}
             </option>
           </select>
           <BaseButtons>

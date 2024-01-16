@@ -60,17 +60,17 @@ export default [
     icon: mdiViewList,
     menu: [
       {
-        label: 'Ajouter un materiel',
+        label: 'Ajouter',
         to: '/equipement/' + type + '/' + pass
       },
       {
         label: 'Liste matériel',
         to: '/equipement/list/' + type + '/' + pass
       },
-      {
+/*       {
         label: 'Entrées',
         to: '/article/' + type + '/' + pass
-      },
+      }, */
       {
         label: 'Sortie',
         to: '/sorti/' + type + '/' + pass

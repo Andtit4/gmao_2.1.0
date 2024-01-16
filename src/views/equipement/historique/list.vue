@@ -114,9 +114,8 @@ onMounted(() => {})
       <tr>
         <th v-if="checkable" />
         <th />
-        <th>Type d'équipement</th>
-        <th>Numero de série</th>
-        <th>Intitulé</th>
+        <th>N de Mat</th>
+        <th>Equipement</th>
         <th>Entrée / Sortie</th>
         <th>Total</th>
         <th>Ajouté le</th>
@@ -129,20 +128,18 @@ onMounted(() => {})
         <td class="border-b-0 lg:w-6 before:hidden">
           <UserAvatar :username="equipement.type_equipement" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
         </td>
+
+        <td data-label="N de Mat ">
+          {{ equipement.nom_lot }}
+        </td>
         <td data-label="Type d'équipement">
           {{ equipement.type_equipement }}
-        </td>
-        <td data-label="Numero de série ">
-          {{ equipement.numero_de_serie }}
-        </td>
-        <td data-label="Intitulé">
-          {{ equipement.intitule }}
         </td>
         <td data-label="Action">
           {{ equipement.action }}
         </td>
         <td data-label="Total">
-          {{ equipement.total }}
+          {{ equipement.nombre }}
         </td>
         <td data-label="Ajouté le">
           {{ equipement.ajouter_le }}

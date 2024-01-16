@@ -61,7 +61,7 @@ const submit = () => {
   }).then((repsonse) => {
     console.log('Success ' + repsonse)
 
-    /* axios({
+    axios({
       url: apiService.getUrl() + '/historique/create',
       method: 'POST',
       headers: {
@@ -71,15 +71,16 @@ const submit = () => {
       },
       data: {
         type_equipement: form.type_equipement.label,
-        numero_de_serie: form.numero_de_serie,
-        intitule: form.intitule,
-        total: form.total,
+        nom_lot: form.nom_lot,
+        nombre: form.total,
         ajouter_le: form.ajouter_le,
-        action: 'Entré'
+        motif: 'AJOUT DE MATERIEL AU MAGASIN',
+        vers: 'MAGASIN',
+        action: 'Entrée'
       }
     }).then((res) => {
       console.log('Success ' + res)
-    }) */
+    })
 
     setTimeout(() => {
       location.reload()
@@ -97,7 +98,7 @@ const submit = () => {
         <FormField label="">
           <FormField label="Informations générale">
             <FormControl v-model="form.type_equipement" :options="selectOptions" />
-            <FormControl v-model="form.nom_lot" placeholder="Nom du lot" />
+            <FormControl v-model="form.nom_lot" placeholder="N Du Mat" />
             <FormControl v-model="form.total" placeholder="total" type="number" />
             <FormControl v-model="form.lot_date"  type="date" />
           </FormField>

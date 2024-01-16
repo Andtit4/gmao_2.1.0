@@ -27,22 +27,18 @@ const exportxlx = async () => {
 
   const data = [
     [
-      'Numero de série',
+      'Numero Matricule',
       'Type Equipement',
-      'Intitulé',
       'Action',
-      'Total',
-      'Nombre par action',
+      'Retiré / Ajouté',
       'Ajouté le',
       'motif',
       'vers'
     ],
     ...apiData.map((item) => [
-      item.numero_de_serie,
+      item.nom_lot,
       item.type_equipement,
-      item.intitule,
       item.action,
-      item.total,
       item.nombre,
       item.ajouter_le,
       item.motif,

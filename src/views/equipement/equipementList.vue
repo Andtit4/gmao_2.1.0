@@ -17,7 +17,7 @@ import apiService from '@/services/apiService'
 import * as XLSX from 'xlsx'
 
 const getAllEquipement = async () => {
-  const response = await axios.get(apiService.getUrl() + '/equipement')
+  const response = await axios.get(apiService.getUrl() + '/materiel')
   return response.data
 }
 
@@ -26,13 +26,12 @@ const exportxlx = async () => {
   const apiData = await getAllEquipement()
 
   const data = [
-    ['Numero de série', 'Nom du lot' , 'Type Equipement', 'Intitulé', 'Total', 'Ajouté le'],
+    ['Numero de Matricule', 'Type Equipement',  'Total ajouté', 'Nombre disponible', 'Ajouté le'],
     ...apiData.map((item) => [
-      item.numero_de_serie,
       item.nom_lot,
       item.type_equipement,
-      item.intitule,
       item.total,
+      item.nombre_disponible,
       item.ajouter_le
     ])
     // ... Ajoutez vos données ici
@@ -43,6 +42,8 @@ const exportxlx = async () => {
 
   // Créez une feuille avec vos données
   const ws = XLSX.utils.aoa_to_sheet(data)
+
+  ws['A1'].s = { font: { color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '000080' } } }
 
   // Ajoutez la feuille au workbook
   XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')

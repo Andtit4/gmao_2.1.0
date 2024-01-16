@@ -14,9 +14,7 @@ import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
 // import siteList from '@/views/sites/siteList.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
-import generatePassword from '@/services/generatePassword.js';
-
-
+import generatePassword from '@/services/generatePassword.js'
 
 const form = reactive({
   matricule: '',
@@ -24,8 +22,11 @@ const form = reactive({
   prenom: '',
   telephone: '',
   email: '',
+  type_utilisateur: '',
   zone: ''
 })
+
+const zones = reactive({ list: [] })
 
 const selectOptions = [
   { id: 1, label: 'LOME-EST' },
@@ -50,11 +51,24 @@ const selectOptions = [
   { id: 20, label: 'DAPAONG' }
 ]
 
+const getAllZone = () => {
+  axios({
+    url: apiService.getUrl() + '/zone',
+    method: 'GET'
+  })
+    .then((response) => {
+      zones.list = response.data
+    })
+    .catch((e) => {
+      console.log('An error occured ' + e)
+    })
+}
+
 const submit = () => {
-  const gen = generatePassword.generatePassword();
+  const gen = generatePassword.generatePassword()
   // console.log(gen)
   axios({
-    url: apiService.getLocal() + '/intervenant/create',
+    url: apiService.getUrl() + '/intervenant/create',
     method: 'POST',
     data: {
       matricule: form.matricule,
@@ -62,7 +76,9 @@ const submit = () => {
       prenom: form.prenom,
       email: form.email,
       mot_de_passe: gen,
-      zone: form.zone.label
+      zone: form.zone,
+      telephone: form.telephone,
+      type_utilisateur: form.type_utilisateur
     }
   }).then((repsonse) => {
     console.log('Success ' + repsonse)
@@ -71,6 +87,10 @@ const submit = () => {
     }, 1000)
   })
 }
+
+onMounted(() => {
+  getAllZone()
+})
 </script>
 
 <template>
@@ -85,8 +105,20 @@ const submit = () => {
           <FormControl v-model="form.prenom" placeholder="Prénoms" />
           <FormControl v-model="form.telephone" placeholder="Téléphone" />
           <FormControl v-model="form.email" placeholder="Email" />
-          <FormField label="Zone">
-            <FormControl v-model="form.zone" :options="selectOptions" />
+          <FormField label="Informations Complémentaires">
+            <!-- <FormControl v-model="form.zone" :options="selectOptions" /> -->
+            <select v-model="form.zone" class="form-select bg-white dark:bg-slate-800">
+              <option value="">Séléctionnez une zone</option>
+              <option v-for="(zone, index) in zones.list" :key="index" :value="zone.nom">
+                {{ zone.nom }}
+              </option>
+            </select>
+            <select v-model="form.type_utilisateur" class="form-select bg-white dark:bg-slate-800">
+              <option value="">Séléctionnez le type d'utilisateur</option>
+              <option value="USER">INTERVENANT / TECHNICIEN</option>
+              <option value="CHEF DE ZONE">INTERVENANT / CHEF DE ZONE</option>
+              <option value="CHAUFFEUR">INTERVENANT / CHAUFFEUR</option>
+            </select>
           </FormField>
         </FormField>
         <BaseDivider />

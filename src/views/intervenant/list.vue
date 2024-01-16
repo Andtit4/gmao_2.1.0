@@ -166,6 +166,7 @@ onMounted(() => {})
         <th>Nom</th>
         <th>Prénom</th>
         <th>Email</th>
+        <th>Type utilisateur</th>
         <th>Mot de passe</th>
         <th />
       </tr>
@@ -187,6 +188,9 @@ onMounted(() => {})
         </td>
         <td data-label="Email">
           {{ intervenant.email }}
+        </td>
+        <td data-label="Type utilisateur">
+          {{ intervenant.type_utilisateur }}
         </td>
         <td data-label="Mot de passe">
           {{ intervenant.mot_de_passe }}

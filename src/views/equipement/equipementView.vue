@@ -1,20 +1,20 @@
 <script setup>
-import { mdiMonitorCellphone, mdiTableBorder, mdiTableOff, mdiGithub, mdiAccount } from '@mdi/js'
+// import { mdiMonitorCellphone, mdiTableBorder, mdiTableOff, mdiGithub, mdiAccount } from '@mdi/js'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
-import { onMounted, reactive } from 'vue'
+import { /* onMounted */ reactive } from 'vue'
 import SectionMain from '@/components/SectionMain.vue'
-import NotificationBar from '@/components/NotificationBar.vue'
-import TableSampleClients from '@/components/TableSampleClients.vue'
+// import NotificationBar from '@/components/NotificationBar.vue'
+// import TableSampleClients from '@/components/TableSampleClients.vue'
 import CardBox from '@/components/CardBox.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
+// import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
 // import siteList from '@/views/sites/siteList.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
-import generatePassword from '@/services/generatePassword.js'
+// import generatePassword from '@/services/generatePassword.js'
 
 const form = reactive({
   type_equipement: '',

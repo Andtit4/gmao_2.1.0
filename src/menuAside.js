@@ -82,7 +82,7 @@ export default [
     ]
   },
   {
-    label: 'M. PREVENTIVE',
+    label: 'M. Préventive',
     icon: mdiViewList,
     menu: [
       {

@@ -12,6 +12,7 @@ import HistoriqueEquipement from '@/views/equipement/historique/historiqueEquipe
 import SortiEquipement from '@/views/equipement/sortis/sortiView.vue'
 import ArticleView from '@/views/equipement/article/articleView.vue'
 import SiteList from '@/views/sites/list.vue';
+import ClassiqueView from '@/views/preventive/classique/ClassiqueView.vue'
 
 const routes = [
   /*  {
@@ -127,6 +128,14 @@ const routes = [
     path: '/tables',
     name: 'tables',
     component: Site
+  },
+  {
+    meta: {
+      title: 'MP'
+    },
+    path: '/preventive/classique/:type/:pass',
+    name: 'preventiveClassique',
+    component: ClassiqueView
   },
   {
     meta: {

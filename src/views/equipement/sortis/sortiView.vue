@@ -53,7 +53,7 @@ const form1 = reactive({
 
 const getAllEquipement = () => {
   axios({
-    url: apiService.getUrl() + '/materiel',
+    url: apiService.getUrl() + '/equipement',
     method: 'GET'
   })
     .then((response) => {
@@ -145,7 +145,7 @@ const search = () => {
     isModalActiveError.value = true
   } else {
     axios({
-      url: apiService.getUrl() + '/materiel/' + form.type_equipement,
+      url: apiService.getUrl() + '/equipement/' + form.type_equipement,
       method: 'GET'
     })
       .then((response) => {
@@ -178,7 +178,7 @@ const submit = () => {
   if (equipements.list.nombre_disponible == 0) {
     return (form.showError = true)
   } else {
-    const nombre_disponible = equipements.list.nombre_disponible - form.nombre_retire
+    const nombre_disponible = equipements.list.nombre_disponible - 1
     if (nombre_disponible >= 0) {
       axios({
         url: apiService.getUrl() + '/historique/create',
@@ -186,9 +186,10 @@ const submit = () => {
         data: {
           type_equipement: equipements.list.type_equipement,
           nom_lot: equipements.list.nom_lot,
+          numero_de_serie: equipements.list.numero_de_serie,
           ajouter_le: equipements.list.ajouter_le,
           action: 'Sortie',
-          nombre: form.nombre_retire,
+          nombre: nombre_disponible,
           motif: form1.motif,
           vers: form1.vers
         }
@@ -204,12 +205,12 @@ const submit = () => {
         }).then((res) => {
           console.log(res)
 
-          /*  axios({
+           axios({
           url: apiService.getUrl() + '/equipement/' + equipements.list._id,
           method: 'DELETE'
         }).then((re) => {
           console.log('Dtee', re)
-        }) */
+        })
 
           form.showSucess = true
           setTimeout(() => {
@@ -252,7 +253,7 @@ const submit = () => {
     //     location.reload()
     //   }, 2000)
     // })
-    
+
     /* form.showSucess = true
       setTimeout(() => {
         location.reload()
@@ -299,11 +300,13 @@ onMounted(() => {
     <!-- End BLoc -->
 
     <FormField label="Informations générale">
+        <b>Retrait d'équipement : {{ equipements.list.numero_de_serie }}</b>
+
       <FormControl v-model="equipements.list.nom_lot" placeholder="Num Mat" readonly="true" />
       <FormControl v-model="equipements.list.type_equipement" placeholder="Type" />
       <FormField label="Informations complémentaires">
         <!-- <FormControl v-model="equipements.list.ajouter_le" placeholder="Image" type="date" /> -->
-        <FormControl v-model="form.nombre_retire" placeholder="Nombre à retirer" />
+        <!-- <FormControl v-model="form.nombre_retire" placeholder="Nombre à retirer" /> -->
 
         <FormControl v-model="form1.motif" placeholder="Motif" />
         <select v-model="form1.vers" class="form-select bg-white dark:bg-slate-800">
@@ -319,7 +322,7 @@ onMounted(() => {
         </select>
       </FormField>
       <FormField label="Disponobilité">
-        <p>Nombre disponible:</p>
+        <p>Nombre disponible de {{ materiels.list.type_equipement }} :</p>
         {{ materiels.list.nombre_disponible }}
       </FormField>
     </FormField>
@@ -338,7 +341,7 @@ onMounted(() => {
               :key="index"
               :value="equipement._id"
             >
-              {{ equipement.nom_lot }} | | {{ equipement.type_equipement }}
+              {{ equipement.nom_lot }} || {{ equipement.type_equipement }} || {{ equipement.numero_de_serie }}
             </option>
           </select>
           <BaseButtons>

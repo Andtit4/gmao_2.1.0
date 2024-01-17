@@ -67,10 +67,10 @@ export default [
         label: 'Liste matériel',
         to: '/equipement/list/' + type + '/' + pass
       },
-/*       {
+      {
         label: 'Entrées',
         to: '/article/' + type + '/' + pass
-      }, */
+      },
       {
         label: 'Sortie',
         to: '/sorti/' + type + '/' + pass
@@ -79,6 +79,36 @@ export default [
         label: 'Historique',
         to: '/historique/' + type + '/' + pass
       }
+    ]
+  },
+  {
+    label: 'M. PREVENTIVE',
+    icon: mdiViewList,
+    menu: [
+      {
+        label: 'Classique',
+        to: '/preventive/classique/' + type + '/' + pass
+      }
+      /*  {
+        label: 'Ajouter',
+        to: '/equipement/' + type + '/' + pass
+      },
+      {
+        label: 'Liste matériel',
+        to: '/equipement/list/' + type + '/' + pass
+      },
+      {
+        label: 'Entrées',
+        to: '/article/' + type + '/' + pass
+      },
+      {
+        label: 'Sortie',
+        to: '/sorti/' + type + '/' + pass
+      },
+      {
+        label: 'Historique',
+        to: '/historique/' + type + '/' + pass
+      } */
     ]
   }
   /*  {

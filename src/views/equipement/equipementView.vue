@@ -71,10 +71,11 @@ const submit = () => {
       },
       data: {
         type_equipement: form.type_equipement.label,
+        numero_de_serie: form.type_equipement.label,
         nom_lot: form.nom_lot,
         nombre: form.total,
         ajouter_le: form.ajouter_le,
-        motif: 'AJOUT DE MATERIEL AU MAGASIN',
+        motif: 'AJOUT DU LOT DE ' + form.nom_lot + ' AU MAGASIN',
         vers: 'MAGASIN',
         action: 'Entrée'
       }
@@ -92,13 +93,13 @@ const submit = () => {
 <template>
   <LayoutAuthenticated>
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Equipements" main>
+      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Lot d'équipement" main>
       </SectionTitleLineWithButton>
       <CardBox form @submit.prevent="submit()">
         <FormField label="">
           <FormField label="Informations générale">
             <FormControl v-model="form.type_equipement" :options="selectOptions" />
-            <FormControl v-model="form.nom_lot" placeholder="N Du Mat" />
+            <FormControl v-model="form.nom_lot" placeholder="Nom du lot" />
             <FormControl v-model="form.total" placeholder="total" type="number" />
             <FormControl v-model="form.lot_date"  type="date" />
           </FormField>

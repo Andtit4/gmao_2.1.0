@@ -41,9 +41,6 @@ const selectOptions = [
 
 const equipementOptions = reactive({ list: [] })
 
-// const equipements = reactive({ list: [] })
-// const router = useRouter()
-
 const getAllEquipement = () => {
   axios({
     url: apiService.getUrl() + '/materiel',
@@ -60,56 +57,37 @@ const getAllEquipement = () => {
 const searchResult = reactive({ list: [] })
 const submit = () => {
   axios({
-    url: apiService.getUrl() + '/equipement/create',
-    method: 'POST',
-    headers: {
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-      'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
-      'Access-Control-Allow-Credentials': true
-    },
-    data: {
-      type_equipement: form.type_equipement,
-      numero_de_serie: form.numero_de_serie,
-      intitule: form.intitule,
-      action: 'Entrée',
-      nom_lot: form.nom_lot,
-      ajouter_le: form.ajouter_le
-    }
-  }).then((repsonse) => {
-    console.log('Success ' + repsonse)
+    url: apiService.getUrl() + '/materiel/search?type_equipement=' + form.type_equipement,
+    method: 'GET'
+  })
+    .then((res) => {
+      console.log('Nombre dispo: ', res.data[0].total)
 
-    // Request for search type equipement for materiel
-    axios({
-      url: apiService.getUrl() + '/materiel/search?type_equipement=' + form.type_equipement,
-      method: 'GET'
-    })
-      .then((res) => {
-        console.log('Nombre dispo: ', res.data[0].total)
-        // const nombre_disponible = res.data[0].total - 1
-        // console.log('Nombre dispo: ', res.data[0].total - 1)
-
-        // Request to update nombre disponible dans la table materiel
-        axios({
-          url: apiService.getUrl() + '/historique/create',
-          method: 'POST',
-          headers: {
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-            'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
-            'Access-Control-Allow-Credentials': true
-          },
-          data: {
-            type_equipement: form.type_equipement,
-            numero_de_serie: form.numero_de_serie,
-            intitule: form.intitule,
-            ajouter_le: form.ajouter_le,
-            action: 'Entrée',
-            motif: 'Ajout de matériel au magazin',
-            vers: 'MAGASIN'
-          }
-        }).then((res) => {
-          console.log('Success ' + res)
-        })
-        /* axios({
+      // Request to update nombre disponible dans la table materiel
+      axios({
+        url: apiService.getUrl() + '/historique/create',
+        method: 'POST',
+        headers: {
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+          'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
+          'Access-Control-Allow-Credentials': true
+        },
+        data: {
+          type_equipement: form.type_equipement,
+          numero_de_serie: form.numero_de_serie,
+          intitule: form.intitule,
+          ajouter_le: form.ajouter_le,
+          nom_lot: form.nom_lot,
+          nombre: '1',
+          action: 'Entrée',
+          nombre_disponible: res.data[0].nombre_disponible,
+          motif: 'AJOUT DE MATERIEL DANS LE MAGASIN',
+          vers: 'MAGASIN'
+        }
+      }).then((res) => {
+        console.log('Success ' + res)
+      })
+      /* axios({
           url: apiService.getUrl() + '/materiel/' + res.data[0]._id,
           method: 'PUT',
           data: {
@@ -119,15 +97,37 @@ const submit = () => {
           console.log('modified ' + res.data)
 
         }) */
-      })
-      .catch((err) => {
-        console.log('An error occured while getting search equipement ', err)
-      })
 
-    setTimeout(() => {
-      location.reload()
-    }, 3000)
-  })
+      axios({
+        url: apiService.getUrl() + '/equipement/create',
+        method: 'POST',
+        headers: {
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+          'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
+          'Access-Control-Allow-Credentials': true
+        },
+        data: {
+          type_equipement: form.type_equipement,
+          numero_de_serie: form.numero_de_serie,
+          intitule: form.intitule,
+          action: 'Entrée',
+          nom_lot: form.nom_lot,
+          ajouter_le: form.ajouter_le,
+          nombre_disponible: res.data[0].nombre_disponible
+        }
+      }).then((repsonse) => {
+        console.log('Success ' + repsonse)
+
+        // Request for search type equipement for materiel
+
+        setTimeout(() => {
+          location.reload()
+        }, 3000)
+      })
+    })
+    .catch((err) => {
+      console.log('An error occured while getting search equipement ', err)
+    })
 }
 
 onMounted(() => {
@@ -149,7 +149,7 @@ onMounted(() => {
             </FormField>
             <FormField label="Equipements">
               <select v-model="form.nom_lot" class="form-select bg-white dark:bg-slate-800">
-                <option value="">Les matériels disponibles</option>
+                <option value="">Sélectionnez le lot</option>
                 <option
                   v-for="(equipement, index) in equipementOptions.list"
                   :key="index"
@@ -159,7 +159,7 @@ onMounted(() => {
                 </option>
               </select>
               <select v-model="form.type_equipement" class="form-select bg-white dark:bg-slate-800">
-                <option value="">Les Equipements</option>
+                <option value="">Le Type d'équipement</option>
                 <option
                   v-for="(equipement, index) in equipementOptions.list"
                   :key="index"

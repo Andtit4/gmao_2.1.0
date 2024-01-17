@@ -27,7 +27,7 @@ const exportxlx = async () => {
 
   const data = [
     [
-      'Numero Matricule',
+      'Nom Lot / Numéro de Ref',
       'Type Equipement',
       'Action',
       'Retiré / Ajouté',

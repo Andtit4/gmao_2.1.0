@@ -33,11 +33,6 @@ const getAllEquipement = () => {
     })
 }
 
-
-
-
-
-
 const mainStore = useMainStore()
 
 const items = computed(() => mainStore.clients)
@@ -114,7 +109,8 @@ onMounted(() => {})
       <tr>
         <th v-if="checkable" />
         <th />
-        <th>N de Mat</th>
+        <th>Nom du lot</th>
+        <th>Numero de série</th>
         <th>Equipement</th>
         <th>Entrée / Sortie</th>
         <th>Total</th>
@@ -126,11 +122,19 @@ onMounted(() => {})
       <tr v-for="(equipement, index) in equipements.list" :key="index">
         <TableCheckboxCell v-if="checkable" @checked="checked($event, equipement)" />
         <td class="border-b-0 lg:w-6 before:hidden">
-          <UserAvatar :username="equipement.type_equipement" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
+          <UserAvatar
+            :username="equipement.type_equipement"
+            class="w-24 h-24 mx-auto lg:w-6 lg:h-6"
+          />
         </td>
+        <div v-if="equipement.nom_lot != undefined || equipement.nom_lot != ''">
+          <td data-label="Nom du lot ">
+            {{ equipement.nom_lot }}
+          </td>
+        </div>
 
-        <td data-label="N de Mat ">
-          {{ equipement.nom_lot }}
+        <td data-label="Numero de Ref ">
+          {{ equipement.numero_de_serie }}
         </td>
         <td data-label="Type d'équipement">
           {{ equipement.type_equipement }}

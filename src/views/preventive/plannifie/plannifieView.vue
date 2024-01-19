@@ -236,7 +236,7 @@ onMounted(() => {
 
     <SectionMain>
       <CardBox has-table>
-        <zoneList />
+        <!-- <zoneList /> -->
       </CardBox>
     </SectionMain>
   </LayoutAuthenticated>

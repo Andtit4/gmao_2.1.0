@@ -88,6 +88,10 @@ export default [
       {
         label: 'Classique',
         to: '/preventive/classique/' + type + '/' + pass
+      },
+      {
+        label: 'Plannifier',
+        to: '/preventive/plannifie/' + type + '/' + pass
       }
       /*  {
         label: 'Ajouter',

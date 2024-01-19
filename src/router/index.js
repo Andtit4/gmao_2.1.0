@@ -13,6 +13,7 @@ import SortiEquipement from '@/views/equipement/sortis/sortiView.vue'
 import ArticleView from '@/views/equipement/article/articleView.vue'
 import SiteList from '@/views/sites/list.vue';
 import ClassiqueView from '@/views/preventive/classique/ClassiqueView.vue'
+import PlanifieView from '@/views/preventive/plannifie/plannifieView.vue'
 
 const routes = [
   /*  {
@@ -136,6 +137,14 @@ const routes = [
     path: '/preventive/classique/:type/:pass',
     name: 'preventiveClassique',
     component: ClassiqueView
+  },
+  {
+    meta: {
+      title: 'PLANNIFIE'
+    },
+    path: '/preventive/plannifie/:type/:pass',
+    name: 'plannifie',
+    component: PlanifieView
   },
   {
     meta: {

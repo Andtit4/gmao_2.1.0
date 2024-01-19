@@ -205,7 +205,7 @@ onMounted(() => {
                 </b>
               </p>
               <select v-model="form.weeks" class="form-select bg-white dark:bg-slate-800" @change="extractDates(form.weeks)">
-                <option value="">Séléctionnez une zone</option>
+                <option value="">Semaine de plannification</option>
                 <option
                   v-for="(zone, index) in semaines.list"
                   :key="index"

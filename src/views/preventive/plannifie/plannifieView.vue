@@ -12,7 +12,6 @@ import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import BaseButton from '@/components/BaseButton.vue'
 // import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
-import zoneList from '@/views/preventive/classique/ClassiqueList.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
 import moment from 'moment'
@@ -30,7 +29,8 @@ const form = reactive({
   nnbSites: '',
   debut_semaine: '',
   fin_semaine: '',
-  weeks:''
+  weeks: '',
+  site: ''
 })
 
 const semaines = reactive({ list: [] })
@@ -43,7 +43,7 @@ const notificationsOutline = computed(() => notificationSettingsModel.value.inde
 
 const getAllZone = () => {
   axios({
-    url: apiService.getUrl() + '/zone',
+    url: apiService.getUrl() + '/preventive',
     method: 'GET'
   })
     .then((response) => {
@@ -98,6 +98,7 @@ const getDate = (zone) => {
       form.date_fin = response.data[0].date_fin
       form.quota_semaine = response.data[0].quota_semaine
       getNbWeek(form.date_debut, form.date_fin)
+      sitesByZone()
     }
   })
 }
@@ -118,10 +119,10 @@ const getNbWeek = (date_debut, date_fin) => {
     )
     currentWeekStart.add(7, 'days')
   }
-  console.log(semaines.list)
+  // console.log(semaines.list)
 }
 const extractDates = (text) => {
-    console.log('\nmatches[1] ', text)
+  // console.log('\nmatches[1] ', text)
 
   const regex = /Semaine du (\d{4}-\d{2}-\d{2}) au (\d{4}-\d{2}-\d{2})/
   const matches = text.match(regex)
@@ -133,6 +134,15 @@ const extractDates = (text) => {
   } else {
     console.error('Format de période invalide')
   }
+}
+
+const sitesByZone = () => {
+  axios({
+    url: apiService.getUrl() + '/site/zone/search?zone=' + form.zone,
+    method: 'GET'
+  }).then((res) => {
+    sites.list = res.data
+  })
 }
 
 onMounted(() => {
@@ -182,8 +192,8 @@ onMounted(() => {
             @change="getDate(form.zone)"
           >
             <option value="">Séléctionnez une zone</option>
-            <option v-for="(zone, index) in zones.list" :key="index" :value="zone.nom">
-              {{ zone.nom }}
+            <option v-for="(zone, index) in zones.list" :key="index" :value="zone.zone">
+              {{ zone.zone }}
             </option>
           </select>
           <div v-if="form.showInformation == true">
@@ -204,20 +214,31 @@ onMounted(() => {
                   {{ form.date_fin ? new Date(form.date_fin).toISOString().split('T')[0] : '' }}
                 </b>
               </p>
-              <select v-model="form.weeks" class="form-select bg-white dark:bg-slate-800" @change="extractDates(form.weeks)">
+              <select
+                v-model="form.weeks"
+                class="form-select bg-white dark:bg-slate-800"
+                @change="extractDates(form.weeks)"
+              >
                 <option value="">Semaine de plannification</option>
-                <option
-                  v-for="(zone, index) in semaines.list"
-                  :key="index"
-                  :value="zone"
-
-                >
+                <option v-for="(zone, index) in semaines.list" :key="index" :value="zone">
                   {{ zone }}
                 </option>
               </select>
               <FormField label="Dates prévues">
                 <FormControl v-model="form.debut_semaine" type="date" />
                 <FormControl v-model="form.fin_semaine" type="date" />
+              </FormField>
+              <FormField label="Sites">
+                <select
+                  v-model="form.site"
+                  class="form-select bg-white dark:bg-slate-800"
+                  @change="extractDates(form.site)"
+                >
+                  <option value="">Sélectionnez le site</option>
+                  <option v-for="(site, index) in sites.list" :key="index" :value="site.nom_site">
+                    {{ site.nom_site }}
+                  </option>
+                </select>
               </FormField>
             </FormField>
           </div>

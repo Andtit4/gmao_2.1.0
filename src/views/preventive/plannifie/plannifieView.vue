@@ -11,6 +11,7 @@ import CardBox from '@/components/CardBox.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import BaseButton from '@/components/BaseButton.vue'
+import PlannifieList from '@/views/preventive/plannifie/plannifieList.vue'
 // import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
@@ -145,6 +146,26 @@ const sitesByZone = () => {
   })
 }
 
+const submit = () => {
+  axios({
+    url: apiService.getUrl() + '/mission',
+    method: 'POST',
+    data: {
+      zone: form.zone,
+      quota: form.quota_semaine,
+      // nom_site: form.site,
+      date_ajout: new Date(),
+      date_debut: form.debut_semaine,
+      date_fin: form.fin_semaine
+    }
+  }).then((res) => {
+    console.log(res)
+    setTimeout(() => {
+      location.reload()
+    }, 500)
+  })
+}
+
 onMounted(() => {
   getAllZone()
 })
@@ -228,7 +249,7 @@ onMounted(() => {
                 <FormControl v-model="form.debut_semaine" type="date" />
                 <FormControl v-model="form.fin_semaine" type="date" />
               </FormField>
-              <FormField label="Sites">
+              <!-- <FormField label="Sites">
                 <select
                   v-model="form.site"
                   class="form-select bg-white dark:bg-slate-800"
@@ -239,12 +260,12 @@ onMounted(() => {
                     {{ site.nom_site }}
                   </option>
                 </select>
-              </FormField>
+              </FormField> -->
             </FormField>
           </div>
 
           <!-- <BaseButton color="info" :icon="mdiEye" small @click="showSite(site._id)" /> -->
-          <BaseButton color="info" small label="Submit" @click="submit(form.zone)" />
+          <BaseButton color="info" small label="Submit" @click="submit()" />
         </FormField>
         <BaseDivider />
         <template #footer>
@@ -257,7 +278,7 @@ onMounted(() => {
 
     <SectionMain>
       <CardBox has-table>
-        <!-- <zoneList /> -->
+        <PlannifieList />
       </CardBox>
     </SectionMain>
   </LayoutAuthenticated>

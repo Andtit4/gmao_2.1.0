@@ -58,14 +58,14 @@ window.addEventListener('keydown', (e) => {
       is-modal
     >
       <CardBoxComponentTitle :title="title">
-        <BaseButton
+        <!-- <BaseButton
           v-if="hasCancel"
           :icon="mdiClose"
           color="whiteDark"
           small
           rounded-full
           @click.prevent="cancel"
-        />
+        /> -->
       </CardBoxComponentTitle>
 
       <div class="space-y-3">
@@ -74,8 +74,8 @@ window.addEventListener('keydown', (e) => {
 
       <template #footer>
         <BaseButtons>
-          <BaseButton :label="buttonLabel" :color="button" @click="confirm" />
-          <BaseButton v-if="hasCancel" label="Fermer" :color="button" outline @click="cancel" />
+          <!-- <BaseButton :label="buttonLabel" :color="button" @click="confirm" /> -->
+          <!-- <BaseButton v-if="hasCancel" label="Fermer" :color="button" outline @click="cancel" /> -->
         </BaseButtons>
       </template>
     </CardBox>

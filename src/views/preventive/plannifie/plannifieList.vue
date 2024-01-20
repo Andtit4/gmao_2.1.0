@@ -7,6 +7,8 @@ import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
+import FormField from '@/components/FormField.vue'
+
 // import UserAvatar from '@/components/UserAvatar.vue'
 import axios from 'axios'
 // import { useRouter } from 'vue-router'
@@ -18,7 +20,9 @@ defineProps({
 
 const form = reactive({
   site: '',
-  id_plannification: ''
+  id_plannification: '',
+  siteAddNb: '',
+  showRestOfItem: true
 })
 
 const sites = reactive({ list: [] })
@@ -105,18 +109,35 @@ const checked = (isChecked, client) => {
   }
 }
 
+const getCountNbSitePlannifier = (id) => {
+  console.log('id === ', id)
+  axios({
+    url: apiService.getUrl() + '/plannifie/count/' + id,
+    method: 'GET'
+  })
+    .then((res) => {
+      console.log('Nb ==== ', res)
+      form.siteAddNb = res.data[0].nb
+    })
+    .catch((err) => {
+      console.error('An error === ', err)
+    })
+}
+
 const oneZone = reactive({ list: [] })
 // const sites = reactive({ list: [] })
 
 const showZone = (id) => {
   isModalActive.value = true
   form.id_plannification = id
+  getCountNbSitePlannifier(form.id_plannification)
   axios({
     url: apiService.getUrl() + '/mission/' + id,
     method: 'GET'
   }).then((response) => {
     oneZone.list = response.data
     sitesByZone(oneZone.list.zone)
+    controlNb(oneZone.list.quota, form.siteAddNb)
   })
 }
 
@@ -127,6 +148,13 @@ const sitesByZone = (zone) => {
   }).then((res) => {
     sites.list = res.data
   })
+}
+
+const controlNb = (nbPrevu, nbAjout) => {
+  if (nbPrevu == nbAjout) {
+    form.showRestOfItem = false
+  }
+  console.log('Showed === ', form.showRestOfItem)
 }
 
 const save = () => {
@@ -174,21 +202,26 @@ onMounted(() => {
         oneZone.list.date_fin ? new Date(oneZone.list.date_fin).toISOString().split('T')[0] : ''
       }}</b>
     </p>
-    <p>Site(s) ajouté(s) à la plannification : <b>0</b></p>
-    <FormField label="Sites">
-      <select
-        v-model="form.site"
-        class="form-select bg-white dark:bg-slate-800"
-        @change="extractDates(form.site)"
-      >
-        <option value="">Sélectionnez le site</option>
-        <option v-for="(site, index) in sites.list" :key="index" :value="site.nom_site">
-          {{ site.nom_site }}
-        </option>
-      </select>
-           <br><br> <BaseButton color="info" small label="Valider" @click="save()" />
-
-    </FormField>
+    <p>
+      Site(s) ajouté(s) à la plannification : <b>{{ form.siteAddNb }}</b>
+    </p>
+    <div v-if="form.showRestOfItem == true">
+      <FormField label="">
+        <select
+          v-model="form.site"
+          class="form-select bg-white dark:bg-slate-800"
+          @change="extractDates(form.site)"
+        >
+          <option value="">Sélectionnez le site</option>
+          <option v-for="(site, index) in sites.list" :key="index" :value="site.nom_site">
+            {{ site.nom_site }}
+          </option>
+        </select>
+        <br /><br />
+        <BaseButton color="info" small label="Valider" @click="save()" />
+      </FormField>
+    </div>
+    <div v-else></div>
   </CardBoxModal>
 
   <div v-if="checkedRows.length" class="p-3 bg-gray-100/50 dark:bg-slate-800">

@@ -115,8 +115,8 @@ onMounted(() => {
             </select>
             <select v-model="form.type_utilisateur" class="form-select bg-white dark:bg-slate-800">
               <option value="">Séléctionnez le type d'utilisateur</option>
-              <option value="USER">INTERVENANT / TECHNICIEN</option>
-              <option value="CHEF DE ZONE">INTERVENANT / CHEF DE ZONE</option>
+              <option value="USER">INTERVENANT / CHEF DE ZONE</option>
+              <option value="SUPERVISEUR">INTERVENANT / SUPERVISEUR</option>
               <option value="CHAUFFEUR">INTERVENANT / CHAUFFEUR</option>
             </select>
           </FormField>

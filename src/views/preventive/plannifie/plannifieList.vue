@@ -217,7 +217,7 @@ const exportxlx = async (zone) => {
   XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
 
   // Générez le fichier Excel et téléchargez-le
-  XLSX.writeFile(wb, 'site.xlsx')
+  XLSX.writeFile(wb, 'PLANNIFICATION.xlsx')
 }
 
 onMounted(() => {

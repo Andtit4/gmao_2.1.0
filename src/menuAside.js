@@ -86,7 +86,7 @@ export default [
     icon: mdiViewList,
     menu: [
       {
-        label: 'Classique',
+        label: 'Initialisation',
         to: '/preventive/classique/' + type + '/' + pass
       },
       {

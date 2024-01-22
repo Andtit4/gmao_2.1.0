@@ -1,14 +1,14 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useMainStore } from '@/stores/main'
-import { mdiEye /* mdiTrashCan */ } from '@mdi/js'
+import { mdiEye /* mdiTrashCan */, mdiFileExcel } from '@mdi/js'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import FormField from '@/components/FormField.vue'
-
+import * as XLSX from 'xlsx'
 // import UserAvatar from '@/components/UserAvatar.vue'
 import axios from 'axios'
 // import { useRouter } from 'vue-router'
@@ -177,6 +177,49 @@ const save = () => {
   })
 }
 
+const getAllDone = async (zone) => {
+  const response = await axios.get(apiService.getUrl() + '/plannifie/zone/done?zone=' + zone)
+  return response.data
+}
+
+const exportxlx = async (zone) => {
+ const apiData = await getAllDone(zone)
+
+  const data = [
+    [
+      'ZONE',
+      'SITE',
+      'DATE EN ATTENTE',
+      'DATE DE PRISE EN COMPTE',
+      'DATE AJOUT PAR LE SUPERVISEUR',
+      'DATE DE DEBUT PREVUE',
+      'DATE DE FIN PREVUE'
+    ],
+    ...apiData.map((item) => [
+      item.zone,
+      item.site,
+      item.date_attente,
+      item.date_prise_en_compte,
+      item.date_ajoute,
+      item.date_debut,
+      item.date_fin,
+    ])
+    // ... Ajoutez vos données ici
+  ]
+
+  // Créez un objet workbook
+  const wb = XLSX.utils.book_new()
+
+  // Créez une feuille avec vos données
+  const ws = XLSX.utils.aoa_to_sheet(data)
+
+  // Ajoutez la feuille au workbook
+  XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
+
+  // Générez le fichier Excel et téléchargez-le
+  XLSX.writeFile(wb, 'site.xlsx')
+}
+
 onMounted(() => {
   // sitesByZone()
 })
@@ -268,8 +311,15 @@ onMounted(() => {
         <td class="before:hidden lg:w-1 whitespace-nowrap">
           <BaseButtons type="justify-start lg:justify-end" no-wrap>
             <BaseButton color="info" :icon="mdiEye" small @click="showZone(site._id)" />
+            <div v-if="form.showRestOfItem == true">
+              <BaseButton color="success" :icon="mdiFileExcel" small @click="exportxlx(site.zone)" />
+            </div>
+            <div v-else>
+              <div></div>
+            </div>
             <!-- <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteSite(site._id)" /> -->
           </BaseButtons>
+
         </td>
       </tr>
     </tbody>

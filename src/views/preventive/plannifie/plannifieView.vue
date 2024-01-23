@@ -11,7 +11,7 @@ import CardBox from '@/components/CardBox.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import PlannifieList from '@/views/preventive/plannifie/plannifieList.vue'
+// import PlannifieList from '@/views/preventive/plannifie/plannifieList.vue'
 // import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
@@ -278,10 +278,10 @@ onMounted(() => {
       </CardBox>
     </SectionMain>
 
-    <SectionMain>
+    <!-- <SectionMain>
       <CardBox has-table>
         <PlannifieList />
       </CardBox>
-    </SectionMain>
+    </SectionMain> -->
   </LayoutAuthenticated>
 </template>

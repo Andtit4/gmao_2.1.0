@@ -86,12 +86,16 @@ export default [
     icon: mdiViewList,
     menu: [
       {
-        label: 'Initialisation',
+        label: 'Zone',
         to: '/preventive/classique/' + type + '/' + pass
       },
       {
         label: 'Plannifier',
         to: '/preventive/plannifie/' + type + '/' + pass
+      },
+      {
+        label: 'Plannifications',
+        to: '/preventive/plannification/' + type + '/' + pass
       }
       /*  {
         label: 'Ajouter',

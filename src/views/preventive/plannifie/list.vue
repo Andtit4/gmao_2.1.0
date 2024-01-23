@@ -1,0 +1,190 @@
+<!-- eslint-disable vue/multi-word-component-names -->
+<script setup>
+import { mdiFileExcel } from '@mdi/js'
+// import FormField from '@/components/FormField.vue'
+// import FormControl from '@/components/FormControl.vue'
+// import { onMounted, reactive } from 'vue'
+import SectionMain from '@/components/SectionMain.vue'
+// import NotificationBar from '@/components/NotificationBar.vue'
+// import TableSampleClients from '@/components/TableSampleClients.vue'
+import CardBox from '@/components/CardBox.vue'
+import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
+// import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
+import BaseButton from '@/components/BaseButton.vue'
+// import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
+import PlannifieList from '@/views/preventive/plannifie/plannifieList.vue'
+import axios from 'axios'
+import apiService from '@/services/apiService'
+import * as XLSX from 'xlsx'
+// import * as XLSX from 'xlsx-style'
+
+const getAllsite = async () => {
+  const response = await axios.get(apiService.getUrl() + '/plannifie/all/done')
+  return response.data
+}
+const getAllPlannif = async () => {
+  const response = await axios.get(apiService.getUrl() + '/plannifie/all')
+  return response.data
+}
+
+const getEncoursPlannif = async () => {
+  const response = await axios.get(apiService.getUrl() + '/plannifie/encours')
+  return response.data
+}
+
+const exportxlx = async () => {
+  // Votre logique pour récupérer les données à exporter
+  const apiData = await getAllsite()
+
+  const data = [
+    [
+       { v: 'NUMERO DE TICKET', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'ZONE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'SITE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'DATE EN ATTENTE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'DATE DE PRISE EN COMPTE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'DATE DE DEBUT PREVUE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'DATE DE FIN PREVUE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } }
+    ],
+    ...apiData.map((item) => [
+      item.numero_ticket,
+      item.zone,
+      item.site,
+      item.date_attente,
+      item.date_prise_en_compte,
+      item.date_debut,
+      item.date_fin,
+    ])
+    // ... Ajoutez vos données ici
+  ]
+
+  // Créez un objet workbook
+  const wb = XLSX.utils.book_new()
+
+  // Créez une feuille avec vos données
+  const ws = XLSX.utils.aoa_to_sheet(data)
+
+  // Ajoutez la feuille au workbook
+  XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
+
+  // Générez le fichier Excel et téléchargez-le
+  XLSX.writeFile(wb, 'PLANNIFICATION.xlsx')
+}
+
+const exportAll = async () => {
+  // Votre logique pour récupérer les données à exporter
+  const apiData = await getAllPlannif()
+
+  const data = [
+    [
+       { v: 'NUMERO DE TICKET', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'ZONE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'SITE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'DATE EN ATTENTE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'DATE DE PRISE EN COMPTE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'DATE DE DEBUT PREVUE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'DATE DE FIN PREVUE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } }
+    ],
+    ...apiData.map((item) => [
+      item.numero_ticket,
+      item.zone,
+      item.site,
+      item.date_attente,
+      item.date_prise_en_compte,
+      item.date_debut,
+      item.date_fin,
+    ])
+    // ... Ajoutez vos données ici
+  ]
+
+  // Créez un objet workbook
+  const wb = XLSX.utils.book_new()
+
+  // Créez une feuille avec vos données
+  const ws = XLSX.utils.aoa_to_sheet(data)
+
+  // Ajoutez la feuille au workbook
+  XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
+
+  // Générez le fichier Excel et téléchargez-le
+  XLSX.writeFile(wb, 'PLANNIFICATION.xlsx')
+}
+
+const exportEncours = async () => {
+  // Votre logique pour récupérer les données à exporter
+  const apiData = await getEncoursPlannif()
+
+  const data = [
+    [
+       { v: 'NUMERO DE TICKET', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'ZONE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'SITE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'DATE EN ATTENTE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'DATE DE PRISE EN COMPTE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'DATE DE DEBUT PREVUE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
+      { v: 'DATE DE FIN PREVUE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } }
+    ],
+    ...apiData.map((item) => [
+      item.numero_ticket,
+      item.zone,
+      item.site,
+      item.date_attente,
+      item.date_prise_en_compte,
+      item.date_debut,
+      item.date_fin,
+    ])
+    // ... Ajoutez vos données ici
+  ]
+
+  // Créez un objet workbook
+  const wb = XLSX.utils.book_new()
+
+  // Créez une feuille avec vos données
+  const ws = XLSX.utils.aoa_to_sheet(data)
+
+  // Ajoutez la feuille au workbook
+  XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
+
+  // Générez le fichier Excel et téléchargez-le
+  XLSX.writeFile(wb, 'PLANNIFICATION.xlsx')
+}
+</script>
+
+<template>
+  <LayoutAuthenticated>
+    <SectionMain>
+      <BaseButton
+        target="_blank"
+        :icon="mdiFileExcel"
+        label="Tout"
+        color="info"
+        rounded-full
+        small
+        @click="exportAll()"
+      />
+
+      <BaseButton
+        target="_blank"
+        :icon="mdiFileExcel"
+        label="En cours"
+        color="warning"
+        rounded-full
+        small
+        @click="exportEncours()"
+      />
+      <BaseButton
+        target="_blank"
+        :icon="mdiFileExcel"
+        label="Fait"
+        color="success"
+        rounded-full
+        small
+        @click="exportxlx()"
+      />
+      <br />
+      <CardBox has-table>
+        <PlannifieList />
+      </CardBox>
+    </SectionMain>
+  </LayoutAuthenticated>
+</template>

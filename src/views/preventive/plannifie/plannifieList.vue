@@ -125,6 +125,8 @@ const getCountNbSitePlannifier = (id) => {
 }
 
 const oneZone = reactive({ list: [] })
+const siteDropDown = reactive({ list: [] })
+
 // const sites = reactive({ list: [] })
 
 const showZone = (id) => {
@@ -146,7 +148,7 @@ const sitesByZone = (zone) => {
     url: apiService.getUrl() + '/site/zone/search?zone=' + zone,
     method: 'GET'
   }).then((res) => {
-    sites.list = res.data
+    siteDropDown.list = res.data
   })
 }
 
@@ -256,7 +258,7 @@ onMounted(() => {
           @change="extractDates(form.site)"
         >
           <option value="">Sélectionnez le site</option>
-          <option v-for="(site, index) in sites.list" :key="index" :value="site.nom_site">
+          <option v-for="(site, index) in siteDropDown.list" :key="index" :value="site.nom_site">
             {{ site.nom_site }}
           </option>
         </select>

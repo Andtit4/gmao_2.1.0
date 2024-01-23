@@ -317,7 +317,9 @@ onMounted(() => {
               <BaseButton color="success" :icon="mdiFileExcel" small @click="exportxlx(site.zone)" />
             </div>
             <div v-else>
-              <div></div>
+              <div>
+                <BaseButton color="success" :icon="mdiFileExcel" small @click="exportxlx(site.zone)" />
+              </div>
             </div>
             <!-- <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteSite(site._id)" /> -->
           </BaseButtons>

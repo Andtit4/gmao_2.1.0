@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, reactive } from 'vue'
 import { useMainStore } from '@/stores/main'
 import {
   mdiAccountMultiple,
@@ -22,6 +22,8 @@ import BaseButton from '@/components/BaseButton.vue'
 // import CardBoxClient from '@/components/CardBoxClient.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
+import axios from 'axios'
+import apiService from '@/services/apiService'
 // import SectionBannerStarOnGitHub from '@/components/SectionBannerStarOnGitHub.vue'
 
 const chartData = ref(null)
@@ -29,9 +31,20 @@ const chartData = ref(null)
 const fillChartData = () => {
   chartData.value = chartConfig.sampleChartData()
 }
+const form = reactive({
+  nbFait: 0
+})
+
+const getNbDone = async () => {
+  /* console.log('Link: ', apiService.getUrl() + '/plannifie/done/nb')
+  const response =  axios.get(apiService.getUrl() + '/plannifie/done/nb')
+  form.nbFait = response.data
+  console.log('nb fait: ', response.data) */
+}
 
 onMounted(() => {
-  fillChartData()
+  fillChartData(),
+  getNbDone()
 })
 
 // const mainStore = useMainStore()
@@ -62,8 +75,8 @@ onMounted(() => {
           trend-type="up"
           color="text-emerald-500"
           :icon="mdiChartTimelineVariant"
-          :number="512"
-          label="DR1"
+          :number="10"
+          label="Faits"
         />
         <CardBoxWidget
           trend="12%"
@@ -71,7 +84,7 @@ onMounted(() => {
           color="text-red-500"
           :icon="mdiChartTimelineVariant"
           :number="100"
-          label="DR2"
+          label="En attente"
         />
         <!-- <CardBoxWidget
           trend="Overflow"

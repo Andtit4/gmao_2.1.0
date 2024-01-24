@@ -160,7 +160,7 @@ onMounted(() => {
         </div>
       </CardBox>
 
-      <SectionTitleLineWithButton :icon="mdiAccountMultiple" title="Sites Down" />
+      <SectionTitleLineWithButton :icon="mdiAccountMultiple" title="Sites Non faits" />
 
       <!--       <NotificationBar color="info" :icon="mdiMonitorCellphone">
         <b>Responsive table.</b> Collapses on mobile

@@ -83,20 +83,22 @@ onMounted(() => {
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
         <CardBoxWidget
-          trend="12%"
-          trend-type="up"
+          color="text-info-500"
+          :icon="mdiChartTimelineVariant"
+          :number="form.nbFait"
+          label="Sites prévus"
+        />
+        <CardBoxWidget
           color="text-emerald-500"
           :icon="mdiChartTimelineVariant"
           :number="form.nbFait"
-          label="Faits"
+          label="Sites faits"
         />
         <CardBoxWidget
-          trend="12%"
-          trend-type="alert"
           color="text-red-500"
           :icon="mdiChartTimelineVariant"
           :number="form.nbEncours"
-          label="En attente"
+          label="Sites non faits"
         />
         <!-- <CardBoxWidget
           trend="Overflow"
@@ -141,8 +143,20 @@ onMounted(() => {
       </SectionTitleLineWithButton>
 
       <CardBox class="mb-6">
-        <div v-if="chartData">
+        <!-- <div v-if="chartData">
           <line-chart :data="chartData" class="h-96" />
+        </div> -->
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
+          <CardBoxWidget
+            color="text-emerald-500"
+            :number="form.nbFait"
+            label="Sites faits"
+          />
+          <CardBoxWidget
+            color="text-red-500"
+            :number="form.nbEncours"
+            label="Sites non faits"
+          />
         </div>
       </CardBox>
 

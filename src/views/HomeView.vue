@@ -81,7 +81,7 @@ onMounted(() => {
         /> -->
       </SectionTitleLineWithButton>
 
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-4 mb-6">
         <CardBoxWidget
           color="text-info-500"
           :icon="mdiChartTimelineVariant"
@@ -93,6 +93,12 @@ onMounted(() => {
           :icon="mdiChartTimelineVariant"
           :number="form.nbFait"
           label="Sites faits"
+        />
+        <CardBoxWidget
+          color="text-warning-500"
+          :icon="mdiChartTimelineVariant"
+          :number="form.nbFait"
+          label="Sites en cours"
         />
         <CardBoxWidget
           color="text-red-500"
@@ -160,15 +166,15 @@ onMounted(() => {
         </div>
       </CardBox>
 
-      <SectionTitleLineWithButton :icon="mdiAccountMultiple" title="Sites Non faits" />
+      <!-- <SectionTitleLineWithButton :icon="mdiAccountMultiple" title="Sites Non faits" /> -->
 
       <!--       <NotificationBar color="info" :icon="mdiMonitorCellphone">
         <b>Responsive table.</b> Collapses on mobile
       </NotificationBar> -->
 
-      <CardBox has-table>
+      <!-- <CardBox has-table>
         <TableSampleClients />
-      </CardBox>
+      </CardBox> -->
     </SectionMain>
   </LayoutAuthenticated>
 </template>

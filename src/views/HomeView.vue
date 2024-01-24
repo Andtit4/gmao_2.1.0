@@ -32,19 +32,31 @@ const fillChartData = () => {
   chartData.value = chartConfig.sampleChartData()
 }
 const form = reactive({
-  nbFait: 0
+  nbFait: 0,
+  nbEncours: 0
 })
 
 const getNbDone = async () => {
-  /* console.log('Link: ', apiService.getUrl() + '/plannifie/done/nb')
-  const response =  axios.get(apiService.getUrl() + '/plannifie/done/nb')
-  form.nbFait = response.data
-  console.log('nb fait: ', response.data) */
+  console.log('Link: ', apiService.getUrl() + '/plannifie/done/nb')
+  axios({
+    url: apiService.getUrl() + '/plannifie/done/nb',
+    method: 'GET'
+  }).then((response) => {
+    form.nbFait = response.data[0].nb
+  })
+}
+
+const getNbEncours = async () => {
+  axios({
+    url: apiService.getUrl() + '/plannifie/encours/nb',
+    method: 'GET'
+  }).then((response) => {
+    form.nbEncours = response.data[0].nb
+  })
 }
 
 onMounted(() => {
-  fillChartData(),
-  getNbDone()
+  fillChartData(), getNbDone(), getNbEncours()
 })
 
 // const mainStore = useMainStore()
@@ -75,7 +87,7 @@ onMounted(() => {
           trend-type="up"
           color="text-emerald-500"
           :icon="mdiChartTimelineVariant"
-          :number="10"
+          :number="form.nbFait"
           label="Faits"
         />
         <CardBoxWidget
@@ -83,7 +95,7 @@ onMounted(() => {
           trend-type="alert"
           color="text-red-500"
           :icon="mdiChartTimelineVariant"
-          :number="100"
+          :number="form.nbEncours"
           label="En attente"
         />
         <!-- <CardBoxWidget

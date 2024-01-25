@@ -75,7 +75,6 @@ const submit = async () => {
             await Cookies.set('pass', hash)
             useMainStore().userName = form.nom + ' ' + form.prenom
             router.push({
-              // path: "/partner/dashboard/",
               name: 'Dashboard',
               params: { type: 'superviseur', pass: hash }
             })

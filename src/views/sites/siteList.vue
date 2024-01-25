@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useMainStore } from '@/stores/main'
-import { mdiEye, mdiTrashCan } from '@mdi/js'
+import { mdiEye, mdiTrashCan, mdiPencil } from '@mdi/js'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
@@ -53,6 +53,8 @@ const mainStore = useMainStore()
 const items = computed(() => mainStore.clients)
 
 const isModalActive = ref(false)
+const isModalEdit = ref(false)
+
 
 const isModalDangerActive = ref(false)
 
@@ -112,10 +114,25 @@ const showSite = (id) => {
   })
 }
 
+
+const editSite = (id) => {
+  isModalEdit.value = true,
+  axios({
+    url: apiService.getUrl() + '/site/' + id,
+    method: 'PUT',
+  }).then((res) => {
+    console.log('site selected: ', res.data)
+    // oneSite.list = res.data
+  })
+}
+
 onMounted(() => {})
 </script>
 
 <template>
+  <CardBoxModal v-model="isModalEdit" title="Modifier">
+    <p>Indisponible pour le moment</p>
+  </CardBoxModal>
   <CardBoxModal v-model="isModalActive" title="Détails">
     <p>
       Site Id : <b>{{ oneSite.list.site_id }}</b>
@@ -190,6 +207,7 @@ onMounted(() => {})
         </td>
         <td class="before:hidden lg:w-1 whitespace-nowrap">
           <BaseButtons type="justify-start lg:justify-end" no-wrap>
+            <BaseButton color="success" :icon="mdiPencil" small @click="editSite(site._id)" />
             <BaseButton color="info" :icon="mdiEye" small @click="showSite(site._id)" />
             <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteSite(site._id)" />
           </BaseButtons>

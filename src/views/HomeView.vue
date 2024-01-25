@@ -37,7 +37,7 @@ const form = reactive({
   nbEncours: 0
 })
 
-const getNbDone =  () => {
+/* const getNbDone =  () => {
   console.log('Link: ', apiService.getUrl() + '/plannifie/done/nb')
   axios({
     url: apiService.getUrl() + '/plannifie/done/nb',
@@ -45,19 +45,19 @@ const getNbDone =  () => {
   }).then((response) => {
     form.nbFait = response.data[0].nb
   })
-}
+} */
 
-const getNbEncours =  () => {
+/* const getNbEncours =  () => {
   axios({
     url: apiService.getUrl() + '/plannifie/encours/nb',
     method: 'GET'
   }).then((response) => {
     form.nbEncours = response.data[0].nb
   })
-}
+} */
 
 onMounted(() => {
-  fillChartData(), getNbDone(), getNbEncours(), refreshPageOnceWithDelay(500)
+  fillChartData(), /* getNbDone(), getNbEncours() */ refreshPageOnceWithDelay(500)
   /* setTimeout(() => {
       location.reload()
     }, 100) */

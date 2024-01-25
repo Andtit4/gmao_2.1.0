@@ -1,11 +1,19 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
+import Cookies from 'js-cookie'
+
 
 export const useMainStore = defineStore('main', () => {
-  const userName = ref('John Doe')
+  let userName = ref([])
   const userEmail = ref('doe.doe.doe@example.com')
+
+  let name = Cookies.get('nom')
+  let firstname = Cookies.get('prenom')
+
+  userName.value = name + ' ' + firstname
+
 
   const userAvatar = computed(
     () =>

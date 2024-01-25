@@ -15,10 +15,16 @@ import apiService from '@/services/apiService'
 import NotificationBar from '@/components/NotificationBar.vue'
 import CryptoJS from 'crypto-js'
 import Cookies from 'js-cookie'
+import { useMainStore } from '@/stores/main.js'
+
 
 const form = reactive({
   login: '',
   pass: '',
+  id: '',
+  nom: '',
+  prenom: '',
+  email: '',
   remember: true,
   err: '',
   showError: false
@@ -29,8 +35,9 @@ const router = useRouter()
 const submit = async () => {
   // router.push('/dashboard')
   const hash = CryptoJS.SHA256(form.pass)
+
   const url = apiService.getUrl() + `/admin/auth/${form.login}/${hash}`
-  console.log(url)
+  console.log(hash)
   axios({
     url: apiService.getUrl() + `/admin/auth/${form.login}/${hash}`,
     method: 'GET'
@@ -49,22 +56,24 @@ const submit = async () => {
             form.err = "Utilisateur recherché n'existe pas"
             console.log('Supervisor not exist')
           } else {
-            const id = response.data._id
-            const email = response.data.email
-            const nom = response.data.nom
-            const prenom = response.data.prenom
-            await Cookies.remove('id', { path: '' })
+            form.id = response.data._id
+            form.email = response.data.email
+            form.nom = response.data.nom
+            form.prenom = response.data.prenom
+
+            /* await Cookies.remove('id', { path: '' })
             await Cookies.remove('email', { path: '' })
             await Cookies.remove('nom', { path: '' })
             await Cookies.remove('prenom', { path: '' })
             await Cookies.remove('type', { path: '' })
-            await Cookies.remove('pass', { path: '' })
+            await Cookies.remove('pass', { path: '' }) */
             await Cookies.set('type', 'superviseur')
-            await Cookies.set('id', id)
-            await Cookies.set('email', email)
-            await Cookies.set('nom', nom)
-            await Cookies.set('prenom', prenom)
+            await Cookies.set('id', form.id)
+            await Cookies.set('email', form.email)
+            await Cookies.set('nom', form.nom)
+            await Cookies.set('prenom', form.prenom)
             await Cookies.set('pass', hash)
+            useMainStore().userName = form.nom + ' ' + form.prenom
             router.push({
               // path: "/partner/dashboard/",
               name: 'Dashboard',
@@ -82,12 +91,12 @@ const submit = async () => {
       const email = response.data.email
       const nom = response.data.nom
       const prenom = response.data.prenom
-      await Cookies.remove('type', { path: '' })
+      /* await Cookies.remove('type', { path: '' })
       await Cookies.remove('id', { path: '' })
       await Cookies.remove('email', { path: '' })
       await Cookies.remove('nom', { path: '' })
       await Cookies.remove('prenom', { path: '' })
-      await Cookies.remove('pass', { path: '' })
+      await Cookies.remove('pass', { path: '' }) */
       await Cookies.set('type', 'admin')
       await Cookies.set('id', id)
       await Cookies.set('email', email)

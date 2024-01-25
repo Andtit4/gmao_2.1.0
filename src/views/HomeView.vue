@@ -37,7 +37,7 @@ const form = reactive({
   nbEncours: 0
 })
 
-const getNbDone = async () => {
+const getNbDone =  () => {
   console.log('Link: ', apiService.getUrl() + '/plannifie/done/nb')
   axios({
     url: apiService.getUrl() + '/plannifie/done/nb',
@@ -47,7 +47,7 @@ const getNbDone = async () => {
   })
 }
 
-const getNbEncours = async () => {
+const getNbEncours =  () => {
   axios({
     url: apiService.getUrl() + '/plannifie/encours/nb',
     method: 'GET'

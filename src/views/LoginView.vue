@@ -32,16 +32,16 @@ const form = reactive({
 
 const router = useRouter()
 
-const submit = async () => {
+const submit =  () => {
   // router.push('/dashboard')
   const hash = CryptoJS.SHA256(form.pass)
 
   const url = apiService.getUrl() + `/admin/auth/${form.login}/${hash}`
-  console.log(hash)
+  console.log(url)
   axios({
     url: apiService.getUrl() + `/admin/auth/${form.login}/${hash}`,
     method: 'GET'
-  }).then(async (response) => {
+  }).then( (response) => {
     if (response.data._id == undefined) {
       console.log('User not exist')
       /* form.showError = true
@@ -50,7 +50,7 @@ const submit = async () => {
         url: apiService.getUrl() + `/intervenant/auth/${form.login}/${form.pass}`,
         method: 'GET'
       })
-        .then(async (res) => {
+        .then( (res) => {
           if (res.data._id == undefined) {
             form.showError = true
             form.err = "Utilisateur recherché n'existe pas"
@@ -67,12 +67,12 @@ const submit = async () => {
             await Cookies.remove('prenom', { path: '' })
             await Cookies.remove('type', { path: '' })
             await Cookies.remove('pass', { path: '' }) */
-            await Cookies.set('type', 'superviseur')
-            await Cookies.set('id', form.id)
-            await Cookies.set('email', form.email)
-            await Cookies.set('nom', form.nom)
-            await Cookies.set('prenom', form.prenom)
-            await Cookies.set('pass', hash)
+             Cookies.set('type', 'superviseur')
+             Cookies.set('id', form.id)
+             Cookies.set('email', form.email)
+             Cookies.set('nom', form.nom)
+             Cookies.set('prenom', form.prenom)
+             Cookies.set('pass', hash)
             useMainStore().userName = form.nom + ' ' + form.prenom
             router.push({
               name: 'Dashboard',
@@ -90,18 +90,18 @@ const submit = async () => {
       const email = response.data.email
       const nom = response.data.nom
       const prenom = response.data.prenom
-      /* await Cookies.remove('type', { path: '' })
-      await Cookies.remove('id', { path: '' })
-      await Cookies.remove('email', { path: '' })
-      await Cookies.remove('nom', { path: '' })
-      await Cookies.remove('prenom', { path: '' })
-      await Cookies.remove('pass', { path: '' }) */
-      await Cookies.set('type', 'admin')
-      await Cookies.set('id', id)
-      await Cookies.set('email', email)
-      await Cookies.set('nom', nom)
-      await Cookies.set('prenom', prenom)
-      await Cookies.set('pass', hash)
+      /*  Cookies.remove('type', { path: '' })
+       Cookies.remove('id', { path: '' })
+       Cookies.remove('email', { path: '' })
+       Cookies.remove('nom', { path: '' })
+       Cookies.remove('prenom', { path: '' })
+       Cookies.remove('pass', { path: '' }) */
+       Cookies.set('type', 'admin')
+       Cookies.set('id', id)
+       Cookies.set('email', email)
+       Cookies.set('nom', nom)
+       Cookies.set('prenom', prenom)
+       Cookies.set('pass', hash)
       router.push({
         // path: "/partner/dashboard/",
         name: 'Dashboard',

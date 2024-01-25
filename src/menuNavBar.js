@@ -13,7 +13,6 @@ import {
 } from '@mdi/js'
 
 export default [
-
   {
     isCurrentUser: true,
     menu: [
@@ -36,6 +35,7 @@ export default [
       {
         icon: mdiLogout,
         label: 'Log Out',
+        to: '/',
         isLogout: true
       }
     ]
@@ -51,6 +51,7 @@ export default [
     icon: mdiLogout,
     label: 'Log out',
     isDesktopNoLabel: true,
+    to: '/',
     isLogout: true
   }
 ]

@@ -53,6 +53,12 @@ const submit = () => {
             const email = response.data.email
             const nom = response.data.nom
             const prenom = response.data.prenom
+            Cookies.remove('id', { path: '' })
+            Cookies.remove('email', { path: '' })
+            Cookies.remove('nom', { path: '' })
+            Cookies.remove('prenom', { path: '' })
+            Cookies.remove('type', { path: '' })
+            Cookies.remove('pass', { path: '' })
             Cookies.set('id', id)
             Cookies.set('email', email)
             Cookies.set('nom', nom)
@@ -76,6 +82,12 @@ const submit = () => {
       const email = response.data.email
       const nom = response.data.nom
       const prenom = response.data.prenom
+      Cookies.remove('id', { path: '' })
+      Cookies.remove('email', { path: '' })
+      Cookies.remove('nom', { path: '' })
+      Cookies.remove('prenom', { path: '' })
+      Cookies.remove('type', { path: '' })
+      Cookies.remove('pass', { path: '' })
       Cookies.set('id', id)
       Cookies.set('email', email)
       Cookies.set('nom', nom)

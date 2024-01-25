@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted, reactive } from 'vue'
+import {  ref, onMounted, reactive } from 'vue'
 import { useMainStore } from '@/stores/main'
 import {
   mdiAccountMultiple,
@@ -55,8 +55,12 @@ const getNbEncours = async () => {
   })
 }
 
+
 onMounted(() => {
   fillChartData(), getNbDone(), getNbEncours()
+   /* setTimeout(() => {
+      location.reload()
+    }, 100) */
 })
 
 // const mainStore = useMainStore()
@@ -153,16 +157,8 @@ onMounted(() => {
           <line-chart :data="chartData" class="h-96" />
         </div> -->
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
-          <CardBoxWidget
-            color="text-emerald-500"
-            :number="form.nbFait"
-            label="Sites faits"
-          />
-          <CardBoxWidget
-            color="text-red-500"
-            :number="form.nbEncours"
-            label="Sites non faits"
-          />
+          <CardBoxWidget color="text-emerald-500" :number="form.nbFait" label="Sites faits" />
+          <CardBoxWidget color="text-red-500" :number="form.nbEncours" label="Sites non faits" />
         </div>
       </CardBox>
 

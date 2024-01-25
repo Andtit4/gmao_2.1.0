@@ -1,5 +1,5 @@
 <script setup>
-import {  ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { useMainStore } from '@/stores/main'
 import {
   mdiAccountMultiple,
@@ -24,6 +24,7 @@ import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
+import { refreshPageOnceWithDelay } from '@/services/document'
 // import SectionBannerStarOnGitHub from '@/components/SectionBannerStarOnGitHub.vue'
 
 const chartData = ref(null)
@@ -55,10 +56,9 @@ const getNbEncours = async () => {
   })
 }
 
-
 onMounted(() => {
-  fillChartData(), getNbDone(), getNbEncours()
-   /* setTimeout(() => {
+  fillChartData(), getNbDone(), getNbEncours(), refreshPageOnceWithDelay(500)
+  /* setTimeout(() => {
       location.reload()
     }, 100) */
 })

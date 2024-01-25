@@ -14,9 +14,11 @@ import {
 } from '@mdi/js'
 import Cookies from 'js-cookie'
 
-let type = Cookies.get('type')
+let type = await Cookies.get('type')
 let pass = Cookies.get('pass')
 let data
+
+console.log('\n\ntype = ', type)
 
 if (type == 'superviseur') {
   data = [

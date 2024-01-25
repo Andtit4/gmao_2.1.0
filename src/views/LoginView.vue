@@ -12,13 +12,16 @@ import BaseButtons from '@/components/BaseButtons.vue'
 import LayoutGuest from '@/layouts/LayoutGuest.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
+import NotificationBar from '@/components/NotificationBar.vue'
 import CryptoJS from 'crypto-js'
 import Cookies from 'js-cookie'
 
 const form = reactive({
   login: '',
   pass: '',
-  remember: true
+  remember: true,
+  err: '',
+  showError: false
 })
 
 const router = useRouter()
@@ -34,17 +37,45 @@ const submit = () => {
   }).then((response) => {
     if (response.data._id == undefined) {
       console.log('User not exist')
+      /* form.showError = true
+      form.err = "Utilisateur recherché n'existe pas" */
+      axios({
+        url: apiService.getUrl() + `/intervenant/auth/${form.login}/${form.pass}`,
+        method: 'GET'
+      })
+        .then((res) => {
+          if (res.data._id == undefined) {
+            form.showError = true
+            form.err = "Utilisateur recherché n'existe pas"
+            console.log('Supervisor not exist')
+          } else {
+            const id = response.data._id
+            const email = response.data.email
+            const nom = response.data.nom
+            const prenom = response.data.prenom
+            Cookies.set('id', id)
+            Cookies.set('email', email)
+            Cookies.set('nom', nom)
+            Cookies.set('prenom', prenom)
+            Cookies.set('pass', hash)
+            Cookies.set('type', 'superviseur')
+            router.push({
+              // path: "/partner/dashboard/",
+              name: 'Dashboard',
+              params: { type: 'superviseur', pass: hash }
+            })
+          }
+        })
+        .catch((err) => {
+          form.err = 'An error occured ' + err.message
+          form.showError = true
+          console.log('An error occured', err.message)
+        })
     } else {
       const id = response.data._id
       const email = response.data.email
       const nom = response.data.nom
       const prenom = response.data.prenom
-      /* Cookies.remove('id', id)
-      Cookies.remove('email', email)
-      Cookies.remove('nom', nom)
-      Cookies.remove('prenom', prenom)
-      Cookies.remove('pass', hash)
-      Cookies.remove('type', 'admin') */
       Cookies.set('id', id)
       Cookies.set('email', email)
       Cookies.set('nom', nom)
@@ -70,7 +101,14 @@ const submit = () => {
             <img src="@/assets/logo.png" alt="" width="40" />
           </div>
         </div>
-        <br /><br />
+        <br />
+        <div v-if="form.showError == true">
+          <NotificationBar color="danger" :icon="mdiMonitorCellphone">
+            {{ form.err }}
+          </NotificationBar>
+        </div>
+        <div v-else></div>
+        <br />
         <FormField label="Login" help="Please enter your login">
           <FormControl
             v-model="form.login"

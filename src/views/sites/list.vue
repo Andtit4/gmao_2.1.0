@@ -21,7 +21,7 @@ const getAllsite = async () => {
   return response.data
 }
 const form = reactive({
-  nbAllSite: 0
+  nbAllSite: 0,
 })
 
 const exportxlx = async () => {

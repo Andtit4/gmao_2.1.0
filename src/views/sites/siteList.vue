@@ -33,7 +33,9 @@ const form = reactive({
   ge: '',
   type_batterie: '',
   nombre: '',
-  puissance_batteries: ''
+  puissance_batteries: '',
+  searchSite: ''
+
 })
 
 const geOptions = [
@@ -283,8 +285,8 @@ const editSave = (id) => {
   }).then((res) => {
     console.log('site selected: ', res.data)
     setTimeout(() => {
-        location.reload()
-      }, 1000)
+      location.reload()
+    }, 1000)
   })
 }
 
@@ -304,6 +306,19 @@ const getAllZone = () => {
     })
 }
 
+const search = () => {
+  axios({
+    url: apiService.getUrl() + '/site/search/dyn?nom_site=' + form.searchSite.toUpperCase(),
+    method: 'GET'
+  })
+    .then((response) => {
+      sites.list = response.data
+    })
+    .catch((e) => {
+      console.log('An error occured ' + e)
+    })
+}
+
 onMounted(() => {
   getAllZone()
 })
@@ -312,7 +327,7 @@ onMounted(() => {
 <template>
   <CardBoxModal v-model="isModalEdit" title="Modifier">
     <FormField label="Informations générale">
-      <FormControl :value="siteSelected.site_id" v-model="form.site_id" placeholder="Site id" />
+      <FormControl v-model="form.site_id" :value="siteSelected.site_id" placeholder="Site id" />
       <FormControl v-model="form.nom_site" placeholder="Nom site" />
       <!-- <FormControl v-model="form.technologie" :options="technologieOptions" /> -->
 
@@ -400,7 +415,9 @@ onMounted(() => {
       {{ checkedRow.name }}
     </span>
   </div>
-
+  <br />
+  <FormControl v-model="form.searchSite" placeholder="Entrez le nom du site" @input="search()" />
+  <br />
   <table>
     <thead>
       <tr>

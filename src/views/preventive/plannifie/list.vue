@@ -17,6 +17,9 @@ import axios from 'axios'
 import apiService from '@/services/apiService'
 import * as XLSX from 'xlsx'
 // import * as XLSX from 'xlsx-style'
+import Cookies from 'js-cookie'
+
+let type = Cookies.get('type')
 
 const getAllsite = async () => {
   const response = await axios.get(apiService.getUrl() + '/plannifie/all/done')
@@ -38,13 +41,34 @@ const exportxlx = async () => {
 
   const data = [
     [
-       { v: 'NUMERO DE TICKET', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'ZONE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'SITE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'DATE EN ATTENTE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'DATE DE PRISE EN COMPTE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'DATE DE DEBUT PREVUE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'DATE DE FIN PREVUE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } }
+      {
+        v: 'NUMERO DE TICKET',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'ZONE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'SITE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'DATE EN ATTENTE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'DATE DE PRISE EN COMPTE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'DATE DE DEBUT PREVUE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'DATE DE FIN PREVUE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      }
     ],
     ...apiData.map((item) => [
       item.numero_ticket,
@@ -53,7 +77,7 @@ const exportxlx = async () => {
       item.date_attente,
       item.date_prise_en_compte,
       item.date_debut,
-      item.date_fin,
+      item.date_fin
     ])
     // ... Ajoutez vos données ici
   ]
@@ -77,13 +101,34 @@ const exportAll = async () => {
 
   const data = [
     [
-       { v: 'NUMERO DE TICKET', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'ZONE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'SITE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'DATE EN ATTENTE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'DATE DE PRISE EN COMPTE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'DATE DE DEBUT PREVUE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'DATE DE FIN PREVUE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } }
+      {
+        v: 'NUMERO DE TICKET',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'ZONE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'SITE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'DATE EN ATTENTE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'DATE DE PRISE EN COMPTE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'DATE DE DEBUT PREVUE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'DATE DE FIN PREVUE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      }
     ],
     ...apiData.map((item) => [
       item.numero_ticket,
@@ -92,7 +137,7 @@ const exportAll = async () => {
       item.date_attente,
       item.date_prise_en_compte,
       item.date_debut,
-      item.date_fin,
+      item.date_fin
     ])
     // ... Ajoutez vos données ici
   ]
@@ -116,13 +161,34 @@ const exportEncours = async () => {
 
   const data = [
     [
-       { v: 'NUMERO DE TICKET', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'ZONE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'SITE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'DATE EN ATTENTE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'DATE DE PRISE EN COMPTE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'DATE DE DEBUT PREVUE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } },
-      { v: 'DATE DE FIN PREVUE', s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } } }
+      {
+        v: 'NUMERO DE TICKET',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'ZONE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'SITE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'DATE EN ATTENTE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'DATE DE PRISE EN COMPTE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'DATE DE DEBUT PREVUE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
+        v: 'DATE DE FIN PREVUE',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      }
     ],
     ...apiData.map((item) => [
       item.numero_ticket,
@@ -131,7 +197,7 @@ const exportEncours = async () => {
       item.date_attente,
       item.date_prise_en_compte,
       item.date_debut,
-      item.date_fin,
+      item.date_fin
     ])
     // ... Ajoutez vos données ici
   ]
@@ -153,34 +219,40 @@ const exportEncours = async () => {
 <template>
   <LayoutAuthenticated>
     <SectionMain>
-      <BaseButton
-        target="_blank"
-        :icon="mdiFileExcel"
-        label="Tout"
-        color="info"
-        rounded-full
-        small
-        @click="exportAll()"
-      />
+      <div v-if="type == 'superviseur'">
+        <div></div>
+      </div>
+      <div v-else>
+        <BaseButton
+          target="_blank"
+          :icon="mdiFileExcel"
+          label="Tout"
+          color="info"
+          rounded-full
+          small
+          @click="exportAll()"
+        />
 
-      <BaseButton
-        target="_blank"
-        :icon="mdiFileExcel"
-        label="En cours"
-        color="warning"
-        rounded-full
-        small
-        @click="exportEncours()"
-      />
-      <BaseButton
-        target="_blank"
-        :icon="mdiFileExcel"
-        label="Fait"
-        color="success"
-        rounded-full
-        small
-        @click="exportxlx()"
-      />
+        <BaseButton
+          target="_blank"
+          :icon="mdiFileExcel"
+          label="En cours"
+          color="warning"
+          rounded-full
+          small
+          @click="exportEncours()"
+        />
+        <BaseButton
+          target="_blank"
+          :icon="mdiFileExcel"
+          label="Fait"
+          color="success"
+          rounded-full
+          small
+          @click="exportxlx()"
+        />
+      </div>
+
       <br />
       <CardBox has-table>
         <PlannifieList />

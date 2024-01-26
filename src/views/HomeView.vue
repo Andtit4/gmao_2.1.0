@@ -202,24 +202,11 @@ onMounted(() => {
       </SectionTitleLineWithButton>
 
       <CardBox class="mb-6">
-        <!-- <div v-if="chartData">
-          <line-chart :data="chartData" class="h-96" />
-        </div> -->
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
           <CardBoxWidget color="text-emerald-500" :number="form.nbTotalFait" label="Sites faits" />
           <CardBoxWidget color="text-red-500" :number="form.nbSiteTotalNonFait" label="Sites non faits" />
         </div>
       </CardBox>
-
-      <!-- <SectionTitleLineWithButton :icon="mdiAccountMultiple" title="Sites Non faits" /> -->
-
-      <!--       <NotificationBar color="info" :icon="mdiMonitorCellphone">
-        <b>Responsive table.</b> Collapses on mobile
-      </NotificationBar> -->
-
-      <!-- <CardBox has-table>
-        <TableSampleClients />
-      </CardBox> -->
     </SectionMain>
   </LayoutAuthenticated>
 </template>

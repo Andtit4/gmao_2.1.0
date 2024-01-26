@@ -17,7 +17,6 @@ import CryptoJS from 'crypto-js'
 import Cookies from 'js-cookie'
 import { useMainStore } from '@/stores/main.js'
 
-
 const form = reactive({
   login: '',
   pass: '',
@@ -32,16 +31,17 @@ const form = reactive({
 
 const router = useRouter()
 
-const submit =  () => {
+const submit = () => {
   // router.push('/dashboard')
   const hash = CryptoJS.SHA256(form.pass)
+  // const url = apiService.getUrl() + `/admin/auth/${form.login}/${hash}`
+  // let type = Cookies.get('type')
+  // console.log('type ',)
 
-  const url = apiService.getUrl() + `/admin/auth/${form.login}/${hash}`
-  console.log(url)
   axios({
     url: apiService.getUrl() + `/admin/auth/${form.login}/${hash}`,
     method: 'GET'
-  }).then( (response) => {
+  }).then((response) => {
     if (response.data._id == undefined) {
       console.log('User not exist')
       /* form.showError = true
@@ -50,30 +50,24 @@ const submit =  () => {
         url: apiService.getUrl() + `/intervenant/auth/${form.login}/${form.pass}`,
         method: 'GET'
       })
-        .then( (res) => {
+        .then((res) => {
           if (res.data._id == undefined) {
             form.showError = true
-            form.err = "Utilisateur recherché n'existe pas"
+            form.err = 'Email ou mot de passe incorrect'
             console.log('Supervisor not exist')
           } else {
-            form.id = response.data._id
-            form.email = response.data.email
-            form.nom = response.data.nom
-            form.prenom = response.data.prenom
+            const id = response.data._id
+            const email = response.data.email
+            const nom = response.data.nom
+            const prenom = response.data.prenom
 
-            /* await Cookies.remove('id', { path: '' })
-            await Cookies.remove('email', { path: '' })
-            await Cookies.remove('nom', { path: '' })
-            await Cookies.remove('prenom', { path: '' })
-            await Cookies.remove('type', { path: '' })
-            await Cookies.remove('pass', { path: '' }) */
-             Cookies.set('type', 'superviseur')
-             Cookies.set('id', form.id)
-             Cookies.set('email', form.email)
-             Cookies.set('nom', form.nom)
-             Cookies.set('prenom', form.prenom)
-             Cookies.set('pass', hash)
-            useMainStore().userName = form.nom + ' ' + form.prenom
+            Cookies.set('type', 'superviseur')
+            Cookies.set('id', id)
+            Cookies.set('email', email)
+            Cookies.set('nom', nom)
+            Cookies.set('prenom', prenom)
+            Cookies.set('pass', hash)
+            useMainStore().setUser(response.data)
             router.push({
               name: 'Dashboard',
               params: { type: 'superviseur', pass: hash }
@@ -90,18 +84,13 @@ const submit =  () => {
       const email = response.data.email
       const nom = response.data.nom
       const prenom = response.data.prenom
-      /*  Cookies.remove('type', { path: '' })
-       Cookies.remove('id', { path: '' })
-       Cookies.remove('email', { path: '' })
-       Cookies.remove('nom', { path: '' })
-       Cookies.remove('prenom', { path: '' })
-       Cookies.remove('pass', { path: '' }) */
-       Cookies.set('type', 'admin')
-       Cookies.set('id', id)
-       Cookies.set('email', email)
-       Cookies.set('nom', nom)
-       Cookies.set('prenom', prenom)
-       Cookies.set('pass', hash)
+      Cookies.set('type', 'admin')
+      Cookies.set('id', id)
+      Cookies.set('email', email)
+      Cookies.set('nom', nom)
+      Cookies.set('prenom', prenom)
+      Cookies.set('pass', hash)
+      useMainStore().setUser(response.data)
       router.push({
         // path: "/partner/dashboard/",
         name: 'Dashboard',

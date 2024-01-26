@@ -21,14 +21,14 @@ export default [
         label: 'My Profile',
         to: '/profile'
       },
-      {
+     /*  {
         icon: mdiCogOutline,
         label: 'Settings'
       },
       {
         icon: mdiEmail,
         label: 'Messages'
-      },
+      }, */
       {
         isDivider: true
       },

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed, reactive } from 'vue'
+import { ref, computed } from 'vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
 import Cookies from 'js-cookie'
@@ -8,14 +8,12 @@ import Cookies from 'js-cookie'
 export const useMainStore = defineStore('main', () => {
   let userName = ref([])
   const userEmail = ref([])
-   const date = reactive({
-    startWeek: '',
-    endOfWeek: ''
-   })
+
 
   let name = Cookies.get('nom')
   let firstname = Cookies.get('prenom')
   let email = Cookies.get('email')
+  
 
   userName.value = name + ' ' + firstname
   userEmail.value = email
@@ -36,8 +34,8 @@ export const useMainStore = defineStore('main', () => {
   const sites = ref([])
 
   function setUser(payload) {
-    if (payload.name) {
-      userName.value = payload.name
+    if (payload.nom) {
+      userName.value = payload.nom + ' ' + payload.prenom
     }
     if (payload.email) {
       userEmail.value = payload.email

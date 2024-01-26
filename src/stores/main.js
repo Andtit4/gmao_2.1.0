@@ -7,12 +7,14 @@ import Cookies from 'js-cookie'
 
 export const useMainStore = defineStore('main', () => {
   let userName = ref([])
-  const userEmail = ref('doe.doe.doe@example.com')
+  const userEmail = ref([])
 
   let name = Cookies.get('nom')
   let firstname = Cookies.get('prenom')
+  let email = Cookies.get('email')
 
   userName.value = name + ' ' + firstname
+  userEmail.value = email
 
 
   const userAvatar = computed(

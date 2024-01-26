@@ -103,7 +103,7 @@ onMounted(() => {
     <!-- Notification for success -->
     <div v-if="form.showSucess == true">
       <NotificationBar color="success" :icon="mdiInformation" :outline="notificationsOutline">
-        <b>Sortie enregistrée</b>.
+        <b>Plannification initialisée</b>.
       </NotificationBar>
     </div>
     <!-- End BLoc -->

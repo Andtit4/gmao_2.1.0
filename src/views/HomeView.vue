@@ -34,7 +34,8 @@ const fillChartData = () => {
 }
 const form = reactive({
   nbFait: 0,
-  nbEncours: 0
+  nbEncours: 0,
+  nbSitePlannifie: 0
 })
 
 const getNbFait = () => {
@@ -53,6 +54,16 @@ const getNbEncours = () => {
     method: 'GET'
   }).then((res) => {
     form.nbEncours = res.data[0].nb
+    console.log('Nombre fait ', res.data[0].nb)
+  })
+}
+
+const getNbSitePlannifie = () => {
+  axios({
+    url: apiService.getUrl() + '/plannifie/nb',
+    method: 'GET'
+  }).then((res) => {
+    form.nbSitePlannifie = res.data[0].nb
     console.log('Nombre fait ', res.data[0].nb)
   })
 }
@@ -77,7 +88,11 @@ const getNbEncours = () => {
 } */
 
 onMounted(() => {
-  fillChartData(),getNbFait(), getNbEncours(), /* getNbDone(), getNbEncours() */ refreshPageOnceWithDelay(500)
+  fillChartData(),
+    getNbFait(),
+    getNbEncours(),
+    /* getNbDone(), getNbEncours() */ refreshPageOnceWithDelay(500),
+    getNbSitePlannifie()
   /* setTimeout(() => {
       location.reload()
     }, 100) */
@@ -109,7 +124,7 @@ onMounted(() => {
         <CardBoxWidget
           color="text-info-500"
           :icon="mdiChartTimelineVariant"
-          :number="form.nbFait"
+          :number="form.nbSitePlannifie"
           label="Sites prévus"
         />
         <CardBoxWidget

@@ -19,6 +19,7 @@ defineProps({
 })
 
 const form = reactive({
+  _id: '',
   site_id: '',
   nom_site: '',
   longitude: '',
@@ -235,6 +236,7 @@ const editSite = (id) => {
     }).then((res) => {
       siteSelected.list = res.data
       ;(form.site_id = res.data.site_id),
+        (form._id = res.data._id),
         (form.nom_site = res.data.nom_site),
         (form.longitude = res.data.longitude),
         (form.latitude = res.data.latitude),
@@ -255,8 +257,35 @@ const editSite = (id) => {
       }).then((res) => {
         console.log('site selected: ', res.data)
       }) */
-      
     })
+}
+
+const editSave = (id) => {
+  axios({
+    url: apiService.getUrl() + '/site/' + id,
+    method: 'PUT',
+    data: {
+      site_id: form.site_id,
+      nom_site: form.nom_site,
+      longitude: form.longitude,
+      latitude: form.latitude,
+      zone: form.zone,
+      config_du_site: form.config_du_site.label,
+      technologie: form.technologie.label,
+      nombre_de_dependance: form.nombre_de_dependance,
+      classe_technique: form.classe_technique.label,
+      typologie_energie: form.typologie_energie.label,
+      ge: form.ge.label,
+      type_batterie: form.type_batterie,
+      nombre: form.nombre,
+      puissance_batteries: form.puissance_batteries
+    }
+  }).then((res) => {
+    console.log('site selected: ', res.data)
+    setTimeout(() => {
+        location.reload()
+      }, 1000)
+  })
 }
 
 const zones = reactive({ list: [] })
@@ -324,6 +353,7 @@ onMounted(() => {
         <FormControl v-model="form.puissance_batteries" placeholder="Puissance de batterie" />
       </FormField>
     </FormField>
+    <BaseButton color="info" label="Modifier" :icon="mdiPencil" @click="editSave(form._id)" />
   </CardBoxModal>
   <CardBoxModal v-model="isModalActive" title="Détails">
     <p>

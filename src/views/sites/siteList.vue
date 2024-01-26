@@ -356,7 +356,13 @@ onMounted(() => {
             {{ zone.nom }}
           </option>
         </select>
-        <FormControl v-model="form.config_du_site" :options="configOptions" />
+        <!-- <select v-model="form.config_du_site" class="form-select bg-white dark:bg-slate-800">
+          <option value="">Séléctionnez la config du site</option>
+          <option v-for="(zone, index) in configOptions" :key="index" :value="configOptions">
+            {{ zone.label }}
+          </option>
+        </select> -->
+        <FormControl v-model="form.config_du_site" :options="configOptions.label" />
       </FormField>
 
       <FormField label="">

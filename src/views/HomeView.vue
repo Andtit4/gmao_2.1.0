@@ -24,18 +24,30 @@ import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
-import { refreshPageOnceWithDelay } from '@/services/document'
+import { refreshPageOnceWithDelay, getStartAndEndOfWeek } from '@/services/document'
+
 // import SectionBannerStarOnGitHub from '@/components/SectionBannerStarOnGitHub.vue'
 
 const chartData = ref(null)
+
+const initDate = () => {
+  const result = getStartAndEndOfWeek()
+   form.formattedStartOfWeek = result.dateDebut
+   form.formattedEndOfWeek = result.dateFin
+}
 
 const fillChartData = () => {
   chartData.value = chartConfig.sampleChartData()
 }
 const form = reactive({
   nbFait: 0,
+  nbTotalFait: 0,
   nbEncours: 0,
-  nbSitePlannifie: 0
+  nbSitePlannifie: 0,
+  nbSiteNonFait: 0,
+  nbSiteTotalNonFait: 0,
+  formattedEndOfWeek: '',
+  formattedStartOfWeek: '',
 })
 
 const getNbFait = () => {
@@ -43,8 +55,17 @@ const getNbFait = () => {
     url: apiService.getUrl() + '/plannifie/done/nb',
     method: 'GET'
   }).then((res) => {
-    form.nbFait = res.data[0].nb
-    console.log('Nombre fait ', res.data[0].nb)
+    form.nbTotalFait = res.data[0].nb
+  })
+}
+
+
+const getNbNonFait = () => {
+  axios({
+    url: apiService.getUrl() + '/plannifie/nonfait/nb',
+    method: 'GET'
+  }).then((res) => {
+    form.nbSiteTotalNonFait = res.data[0].nb
   })
 }
 
@@ -54,45 +75,38 @@ const getNbEncours = () => {
     method: 'GET'
   }).then((res) => {
     form.nbEncours = res.data[0].nb
-    console.log('Nombre fait ', res.data[0].nb)
   })
 }
 
 const getNbSitePlannifie = () => {
   axios({
-    url: apiService.getUrl() + '/plannifie/nb',
+    url: apiService.getUrl() + '/plannifie/week/nb/' + form.formattedStartOfWeek + '/' + form.formattedEndOfWeek,
     method: 'GET'
   }).then((res) => {
     form.nbSitePlannifie = res.data[0].nb
-    console.log('Nombre fait ', res.data[0].nb)
   })
 }
 
-/* const getNbDone =  () => {
-  console.log('Link: ', apiService.getUrl() + '/plannifie/done/nb')
+const getNbSiteNonfait = () => {
   axios({
-    url: apiService.getUrl() + '/plannifie/done/nb',
+    url: apiService.getUrl() + '/plannifie/nonfait/week/nb/' + form.formattedStartOfWeek + '/' + form.formattedEndOfWeek,
     method: 'GET'
-  }).then((response) => {
-    form.nbFait = response.data[0].nb
+  }).then((res) => {
+    form.nbSiteNonFait = res.data[0].nb
+    // console.log('Nombre fait ', res.data[0].nb)
   })
-} */
+}
 
-/* const getNbEncours =  () => {
-  axios({
-    url: apiService.getUrl() + '/plannifie/encours/nb',
-    method: 'GET'
-  }).then((response) => {
-    form.nbEncours = response.data[0].nb
-  })
-} */
 
 onMounted(() => {
+  initDate(),
   fillChartData(),
     getNbFait(),
     getNbEncours(),
     /* getNbDone(), getNbEncours() */ refreshPageOnceWithDelay(500),
-    getNbSitePlannifie()
+    getNbSitePlannifie(),
+    getNbSiteNonfait(),
+    getNbNonFait()
   /* setTimeout(() => {
       location.reload()
     }, 100) */
@@ -142,7 +156,7 @@ onMounted(() => {
         <CardBoxWidget
           color="text-red-500"
           :icon="mdiChartTimelineVariant"
-          :number="form.nbEncours"
+          :number="form.nbSiteNonFait"
           label="Sites non faits"
         />
         <!-- <CardBoxWidget
@@ -192,8 +206,8 @@ onMounted(() => {
           <line-chart :data="chartData" class="h-96" />
         </div> -->
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
-          <CardBoxWidget color="text-emerald-500" :number="form.nbFait" label="Sites faits" />
-          <CardBoxWidget color="text-red-500" :number="form.nbEncours" label="Sites non faits" />
+          <CardBoxWidget color="text-emerald-500" :number="form.nbTotalFait" label="Sites faits" />
+          <CardBoxWidget color="text-red-500" :number="form.nbSiteTotalNonFait" label="Sites non faits" />
         </div>
       </CardBox>
 

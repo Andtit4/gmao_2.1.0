@@ -20,6 +20,9 @@ const getAllsite = async () => {
   const response = await axios.get(apiService.getUrl() + '/site')
   return response.data
 }
+const form = reactive({
+  nbAllSite: 0
+})
 
 const exportxlx = async () => {
   // Votre logique pour récupérer les données à exporter
@@ -73,11 +76,27 @@ const exportxlx = async () => {
   // Générez le fichier Excel et téléchargez-le
   XLSX.writeFile(wb, 'site.xlsx')
 }
+
+const countAllSite = () => {
+  axios({
+    url: apiService.getUrl() + '/site/all/nb',
+    method: 'GET'
+  }).then((res) => {
+    form.nbAllSite = res.data[0].nb
+    console.log('Sites   ',form.nbAllSite )
+
+  })
+}
+
+onMounted(() => {
+  countAllSite()
+})
 </script>
 
 <template>
   <LayoutAuthenticated>
     <SectionMain>
+      {{ form.nbAllSite }} Sites
       <BaseButton
         target="_blank"
         :icon="midExcel"

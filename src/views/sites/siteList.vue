@@ -34,8 +34,8 @@ const form = reactive({
   type_batterie: '',
   nombre: '',
   puissance_batteries: '',
-  searchSite: ''
-
+  searchSite: '',
+  searchZone: ''
 })
 
 const geOptions = [
@@ -319,6 +319,19 @@ const search = () => {
     })
 }
 
+const searchZone = () => {
+  axios({
+    url: apiService.getUrl() + '/site/zone/search/dyn?zone=' + form.searchZone.toUpperCase(),
+    method: 'GET'
+  })
+    .then((response) => {
+      sites.list = response.data
+    })
+    .catch((e) => {
+      console.log('An  ' + e)
+    })
+}
+
 onMounted(() => {
   getAllZone()
 })
@@ -416,7 +429,11 @@ onMounted(() => {
     </span>
   </div>
   <br />
-  <FormControl v-model="form.searchSite" placeholder="Entrez le nom du site" @input="search()" />
+  <FormField label="Rechercher">
+    <FormControl v-model="form.searchSite" placeholder="Entrez le nom du site" @input="search()" />
+    <FormControl v-model="form.searchZone" placeholder="Entrez la zone" @input="searchZone()" />
+
+  </FormField>
   <br />
   <table>
     <thead>

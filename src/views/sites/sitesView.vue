@@ -2,7 +2,7 @@
 import { mdiMonitorCellphone, mdiTableBorder, mdiTableOff, mdiGithub, mdiAccount } from '@mdi/js'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, computed } from 'vue'
 import SectionMain from '@/components/SectionMain.vue'
 import NotificationBar from '@/components/NotificationBar.vue'
 import TableSampleClients from '@/components/TableSampleClients.vue'
@@ -29,8 +29,13 @@ const form = reactive({
   ge: '',
   type_batterie: '',
   nombre: '',
-  puissance_batteries: ''
+  puissance_batteries: '',
+  showError: false,
+  err: ''
 })
+
+const notificationsOutline = computed(() => notificationSettingsModel.value.indexOf('outline') > -1)
+
 const classeOptions = [
   { id: 1, label: 'BRONZE' },
   { id: 2, label: 'GOLD' },
@@ -144,33 +149,37 @@ const getAllZone = () => {
     })
 }
 
-
 const submit = () => {
-  axios({
-    url: apiService.getUrl() + '/site',
-    method: 'POST',
-    data: {
-      site_id: form.site_id,
-      nom_site: form.nom_site,
-      longitude: form.longitude,
-      latitude: form.latitude,
-      zone: form.zone,
-      config_du_site: form.config_du_site.label,
-      technologie: form.technologie.label,
-      nombre_de_dependance: form.nombre_de_dependance,
-      classe_technique: form.classe_technique.label,
-      typologie_energie: form.typologie_energie.label,
-      ge: form.ge.label,
-      type_batterie: form.type_batterie,
-      nombre: form.nombre,
-      puissance_batteries: form.puissance_batteries
-    }
-  }).then((repsonse) => {
-    console.log('Success ' + repsonse)
-    setTimeout(() => {
-      location.reload()
-    }, 1000)
-  })
+  if (form.site_id == '') {
+    form.showError = true
+    form.err = 'Veillez remplir le site Id'
+  } else {
+    axios({
+      url: apiService.getUrl() + '/site',
+      method: 'POST',
+      data: {
+        site_id: form.site_id,
+        nom_site: form.nom_site,
+        longitude: form.longitude,
+        latitude: form.latitude,
+        zone: form.zone,
+        config_du_site: form.config_du_site.label,
+        technologie: form.technologie.label,
+        nombre_de_dependance: form.nombre_de_dependance,
+        classe_technique: form.classe_technique.label,
+        typologie_energie: form.typologie_energie.label,
+        ge: form.ge.label,
+        type_batterie: form.type_batterie,
+        nombre: form.nombre,
+        puissance_batteries: form.puissance_batteries
+      }
+    }).then((repsonse) => {
+      console.log('Success ' + repsonse)
+      setTimeout(() => {
+        location.reload()
+      }, 1000)
+    })
+  }
 }
 
 onMounted(() => {
@@ -183,6 +192,11 @@ onMounted(() => {
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Sites" main>
       </SectionTitleLineWithButton>
+      <div v-if="form.showError == true">
+        <NotificationBar color="danger" :icon="mdiMonitorCellphone">
+          {{ form.err }}
+        </NotificationBar>
+      </div>
       <CardBox form @submit.prevent="submit()">
         <FormField label="Informations générale">
           <FormControl v-model="form.site_id" placeholder="Site id" />

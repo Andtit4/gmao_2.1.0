@@ -11,10 +11,123 @@ import UserAvatar from '@/components/UserAvatar.vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import apiService from '@/services/apiService'
+import FormField from '@/components/FormField.vue'
+import FormControl from '@/components/FormControl.vue'
 
 defineProps({
   checkable: Boolean
 })
+
+const form = reactive({
+  site_id: '',
+  nom_site: '',
+  longitude: '',
+  latitude: '',
+  zone: '',
+  config_du_site: '',
+  technologie: '',
+  nombre_de_dependance: '',
+  classe_technique: '',
+  typologie_energie: '',
+  ge: '',
+  type_batterie: '',
+  nombre: '',
+  puissance_batteries: ''
+})
+
+const geOptions = [
+  { id: 3, label: 'ADIYO' },
+  { id: 4, label: 'CAT' },
+  { id: 5, label: 'COELMO' },
+  { id: 3, label: 'CUMMINS' },
+  { id: 4, label: 'GENELEC' },
+  { id: 5, label: 'OLYMPIAN' }
+]
+
+const classeOptions = [
+  { id: 1, label: 'BRONZE' },
+  { id: 2, label: 'GOLD' },
+  { id: 3, label: 'PLATINUM' },
+  { id: 4, label: 'BRONZE' },
+  { id: 5, label: 'SILVER' }
+]
+const typologieOptions = [
+  { id: 1, label: 'GE' },
+  { id: 2, label: 'GRID' },
+  { id: 3, label: 'GRID MOOV+GE' },
+  { id: 4, label: 'GRID+GE' },
+  { id: 6, label: 'GRID+2GE' },
+  { id: 1, label: 'SOLAIRE+GRID' },
+  { id: 2, label: 'PRIMAIRE/ETAT-MAJOR + GE' },
+  { id: 3, label: 'PRIMAIRE/FUSEC' },
+  { id: 4, label: 'PRIMAIRE/MOOV' },
+  { id: 5, label: 'PRIMAIRE GTA' },
+  { id: 3, label: 'PRIMAIRE SIEGE' },
+  { id: 4, label: 'PRIMAIRE/AEROGARE' },
+  { id: 5, label: 'PRIMAIRE/LONATO' },
+  { id: 3, label: 'PRIMAIRE/PAL' },
+  { id: 4, label: 'PRIMAIRE/PALAIS CONGRES + GE' },
+  { id: 5, label: 'PRIMAIRE/PRESIDENCE' },
+  { id: 3, label: 'PRIMAIRE/T-OIL' },
+  { id: 4, label: 'PRIMAIRE/UTB' },
+  { id: 5, label: 'PRIMAIRE + GE' },
+  { id: 3, label: 'SOLAIRE' },
+  { id: 4, label: 'SOLAIRE+GE' },
+  { id: 5, label: 'SOLAIRE+GE+GRID' }
+]
+const configOptions = [
+  {
+    id: 1,
+    label: 'Config 1'
+  },
+  {
+    id: 2,
+    label: 'Config 2'
+  },
+  {
+    id: 3,
+    label: 'Config 3'
+  },
+  {
+    id: 4,
+    label: 'Config 4'
+  },
+  {
+    id: 5,
+    label: 'Config 5'
+  },
+  {
+    id: 6,
+    label: 'Config 7'
+  },
+  {
+    id: 7,
+    label: 'IBS Config Type 1'
+  },
+  {
+    id: 8,
+    label: 'IBS Config Type 2'
+  },
+  {
+    id: 9,
+    label: 'IBS Config Type 5'
+  },
+  {
+    id: 10,
+    label: 'IBS-G1800'
+  },
+  {
+    id: 7,
+    label: 'sSmall Cell U2100'
+  }
+]
+const technologieOptions = [
+  { id: 1, label: '2G' },
+  { id: 2, label: '3G' },
+  { id: 3, label: '4G' },
+  { id: 4, label: '2G/3G' },
+  { id: 1, label: '2G/3G/4G' }
+]
 
 const sites = reactive({ list: [] })
 const router = useRouter()
@@ -54,7 +167,6 @@ const items = computed(() => mainStore.clients)
 
 const isModalActive = ref(false)
 const isModalEdit = ref(false)
-
 
 const isModalDangerActive = ref(false)
 
@@ -114,24 +226,104 @@ const showSite = (id) => {
   })
 }
 
-
+const siteSelected = reactive({ list: [] })
 const editSite = (id) => {
-  isModalEdit.value = true,
-  axios({
-    url: apiService.getUrl() + '/site/' + id,
-    method: 'PUT',
-  }).then((res) => {
-    console.log('site selected: ', res.data)
-    // oneSite.list = res.data
-  })
+  ;(isModalEdit.value = true),
+    axios({
+      url: apiService.getUrl() + '/site/' + id,
+      method: 'GET'
+    }).then((res) => {
+      siteSelected.list = res.data
+      ;(form.site_id = res.data.site_id),
+        (form.nom_site = res.data.nom_site),
+        (form.longitude = res.data.longitude),
+        (form.latitude = res.data.latitude),
+        (form.zone = res.data.zone),
+        (form.config_du_site = res.data.config_du_site),
+        (form.technologie = res.data.technologie),
+        (form.nombre_de_dependance = res.data.nombre_de_dependance),
+        (form.classe_technique = res.data.classe_technique),
+        (form.typologie_energie = res.data.typologie_energie),
+        (form.ge = res.data.ge),
+        (form.type_batterie = res.data.type_batterie),
+        (form.nombre = res.data.nombre),
+        (form.puissance_batteries = res.data.puissance_batteries)
+
+      /* axios({
+        url: apiService.getUrl() + '/site/' + id,
+        method: 'PUT'
+      }).then((res) => {
+        console.log('site selected: ', res.data)
+      }) */
+      
+    })
 }
 
-onMounted(() => {})
+const zones = reactive({ list: [] })
+// const router = useRouter()
+
+const getAllZone = () => {
+  axios({
+    url: apiService.getUrl() + '/zone',
+    method: 'GET'
+  })
+    .then((response) => {
+      zones.list = response.data
+    })
+    .catch((e) => {
+      console.log('An error occured ' + e)
+    })
+}
+
+onMounted(() => {
+  getAllZone()
+})
 </script>
 
 <template>
   <CardBoxModal v-model="isModalEdit" title="Modifier">
-    <p>Indisponible pour le moment</p>
+    <FormField label="Informations générale">
+      <FormControl :value="siteSelected.site_id" v-model="form.site_id" placeholder="Site id" />
+      <FormControl v-model="form.nom_site" placeholder="Nom site" />
+      <!-- <FormControl v-model="form.technologie" :options="technologieOptions" /> -->
+
+      <FormField label="Coordonnées">
+        <FormControl v-model="form.longitude" placeholder="Longitude" />
+        <FormControl v-model="form.latitude" placeholder="Latitude" />
+      </FormField>
+
+      <FormField label="Zone">
+        <select v-model="form.zone" class="form-select bg-white dark:bg-slate-800">
+          <option value="">Séléctionnez une zone</option>
+          <option v-for="(zone, index) in zones.list" :key="index" :value="zone.nom">
+            {{ zone.nom }}
+          </option>
+        </select>
+        <FormControl v-model="form.config_du_site" :options="configOptions" />
+      </FormField>
+
+      <FormField label="">
+        <FormControl
+          v-model="form.classe_technique"
+          placeholder="Classe Technique"
+          :options="classeOptions"
+        />
+        <FormControl
+          v-model="form.typologie_energie"
+          placeholder="Typologie"
+          :options="typologieOptions"
+        />
+      </FormField>
+
+      <FormField label="autres">
+        <FormControl v-model="form.ge" placeholder="Option Ge" :options="geOptions" />
+        <FormControl v-model="form.type_batterie" placeholder="Type de batteries" />
+      </FormField>
+      <FormField label="">
+        <FormControl v-model="form.nombre" placeholder="Nombre" />
+        <FormControl v-model="form.puissance_batteries" placeholder="Puissance de batterie" />
+      </FormField>
+    </FormField>
   </CardBoxModal>
   <CardBoxModal v-model="isModalActive" title="Détails">
     <p>

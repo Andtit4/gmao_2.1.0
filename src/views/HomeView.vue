@@ -60,6 +60,8 @@ const getNbFait = () => {
 }
 
 
+
+
 const getNbNonFait = () => {
   axios({
     url: apiService.getUrl() + '/plannifie/nonfait/nb',
@@ -68,6 +70,16 @@ const getNbNonFait = () => {
     form.nbSiteTotalNonFait = res.data[0].nb
   })
 }
+
+const getNbFaitSemaine = () => {
+  axios({
+    url: apiService.getUrl() + '/plannifie/done/week/nb/' + form.formattedStartOfWeek + '/' + form.formattedEndOfWeek,
+    method: 'GET'
+  }).then((res) => {
+    form.nbFait = res.data[0].nb
+  })
+}
+
 
 const getNbEncours = () => {
   axios({
@@ -84,6 +96,9 @@ const getNbSitePlannifie = () => {
     method: 'GET'
   }).then((res) => {
     form.nbSitePlannifie = res.data[0].nb
+    console.log('Site prévus à la semaine: ', form.nbSitePlannifie)
+  }).catch((err) => {
+    console.log('Erreur sites prévus à la semaine: ', err.message)
   })
 }
 
@@ -106,7 +121,8 @@ onMounted(() => {
     /* getNbDone(), getNbEncours() */ refreshPageOnceWithDelay(500),
     getNbSitePlannifie(),
     getNbSiteNonfait(),
-    getNbNonFait()
+    getNbNonFait(),
+    getNbFaitSemaine()
   /* setTimeout(() => {
       location.reload()
     }, 100) */

@@ -96,6 +96,7 @@ const getNbSitePlannifie = () => {
     method: 'GET'
   }).then((res) => {
     form.nbSitePlannifie = res.data[0].nb
+    // console.log('Url du Site prévus à la semaine: ', apiService.getUrl() + '/plannifie/week/nb/' + form.formattedStartOfWeek + '/' + form.formattedEndOfWeek)
     console.log('Site prévus à la semaine: ', form.nbSitePlannifie)
   }).catch((err) => {
     console.log('Erreur sites prévus à la semaine: ', err.message)

@@ -1,39 +1,24 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
-import { useMainStore } from '@/stores/main'
-import {
-  mdiAccountMultiple,
-  // mdiCartOutline,
-  mdiChartTimelineVariant,
-  // mdiMonitorCellphone,
-  mdiReload,
-  // mdiGithub,
-  mdiChartPie
-} from '@mdi/js'
+import { mdiChartTimelineVariant, mdiReload, mdiChartPie } from '@mdi/js'
 import * as chartConfig from '@/components/Charts/chart.config.js'
-import LineChart from '@/components/Charts/LineChart.vue'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBoxWidget from '@/components/CardBoxWidget.vue'
 import CardBox from '@/components/CardBox.vue'
-import TableSampleClients from '@/views/sites/down/siteDown.vue'
-// import NotificationBar from '@/components/NotificationBar.vue'
 import BaseButton from '@/components/BaseButton.vue'
-// import CardBoxTransaction from '@/components/CardBoxTransaction.vue'
-// import CardBoxClient from '@/components/CardBoxClient.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
 import { refreshPageOnceWithDelay, getStartAndEndOfWeek } from '@/services/document'
-
-// import SectionBannerStarOnGitHub from '@/components/SectionBannerStarOnGitHub.vue'
+import TogoMap from '@/layouts/TogoMapComponent.vue'
 
 const chartData = ref(null)
 
 const initDate = () => {
   const result = getStartAndEndOfWeek()
-   form.formattedStartOfWeek = result.dateDebut
-   form.formattedEndOfWeek = result.dateFin
+  form.formattedStartOfWeek = result.dateDebut
+  form.formattedEndOfWeek = result.dateFin
 }
 
 const fillChartData = () => {
@@ -47,7 +32,7 @@ const form = reactive({
   nbSiteNonFait: 0,
   nbSiteTotalNonFait: 0,
   formattedEndOfWeek: '',
-  formattedStartOfWeek: '',
+  formattedStartOfWeek: ''
 })
 
 const getNbFait = () => {
@@ -58,9 +43,6 @@ const getNbFait = () => {
     form.nbTotalFait = res.data[0].nb
   })
 }
-
-
-
 
 const getNbNonFait = () => {
   axios({
@@ -73,13 +55,17 @@ const getNbNonFait = () => {
 
 const getNbFaitSemaine = () => {
   axios({
-    url: apiService.getUrl() + '/plannifie/done/week/nb/' + form.formattedStartOfWeek + '/' + form.formattedEndOfWeek,
+    url:
+      apiService.getUrl() +
+      '/plannifie/done/week/nb/' +
+      form.formattedStartOfWeek +
+      '/' +
+      form.formattedEndOfWeek,
     method: 'GET'
   }).then((res) => {
     form.nbFait = res.data[0].nb
   })
 }
-
 
 const getNbEncours = () => {
   axios({
@@ -92,63 +78,54 @@ const getNbEncours = () => {
 
 const getNbSitePlannifie = () => {
   axios({
-    url: apiService.getUrl() + '/plannifie/week/nb/' + form.formattedStartOfWeek + '/' + form.formattedEndOfWeek,
+    url:
+      apiService.getUrl() +
+      '/plannifie/week/nb/' +
+      form.formattedStartOfWeek +
+      '/' +
+      form.formattedEndOfWeek,
     method: 'GET'
-  }).then((res) => {
-    form.nbSitePlannifie = res.data[0].nb
-    // console.log('Url du Site prévus à la semaine: ', apiService.getUrl() + '/plannifie/week/nb/' + form.formattedStartOfWeek + '/' + form.formattedEndOfWeek)
-    console.log('Site prévus à la semaine: ', form.nbSitePlannifie)
-  }).catch((err) => {
-    console.log('Erreur sites prévus à la semaine: ', err.message)
   })
+    .then((res) => {
+      form.nbSitePlannifie = res.data[0].nb
+      console.log('Site prévus à la semaine: ', form.nbSitePlannifie)
+    })
+    .catch((err) => {
+      console.log('Erreur sites prévus à la semaine: ', err.message)
+    })
 }
 
 const getNbSiteNonfait = () => {
   axios({
-    url: apiService.getUrl() + '/plannifie/nonfait/week/nb/' + form.formattedStartOfWeek + '/' + form.formattedEndOfWeek,
+    url:
+      apiService.getUrl() +
+      '/plannifie/nonfait/week/nb/' +
+      form.formattedStartOfWeek +
+      '/' +
+      form.formattedEndOfWeek,
     method: 'GET'
   }).then((res) => {
     form.nbSiteNonFait = res.data[0].nb
-    // console.log('Nombre fait ', res.data[0].nb)
   })
 }
 
-
 onMounted(() => {
   initDate(),
-  fillChartData(),
+    fillChartData(),
     getNbFait(),
     getNbEncours(),
-    /* getNbDone(), getNbEncours() */ refreshPageOnceWithDelay(500),
+    refreshPageOnceWithDelay(500),
     getNbSitePlannifie(),
     getNbSiteNonfait(),
     getNbNonFait(),
     getNbFaitSemaine()
-  /* setTimeout(() => {
-      location.reload()
-    }, 100) */
 })
-
-// const mainStore = useMainStore()
-
-// const clientBarItems = computed(() => mainStore.clients.slice(0, 4))
-
-// const transactionBarItems = computed(() => mainStore.history)
 </script>
 
 <template>
   <LayoutAuthenticated>
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" title="Tableau de bord" main>
-        <!--  <BaseButton
-          href="https://github.com/justboil/admin-one-vue-tailwind"
-          target="_blank"
-          :icon="mdiGithub"
-          label="Star on GitHub"
-          color="contrast"
-          rounded-full
-          small
-        /> -->
       </SectionTitleLineWithButton>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-4 mb-6">
@@ -176,43 +153,7 @@ onMounted(() => {
           :number="form.nbSiteNonFait"
           label="Sites non faits"
         />
-        <!-- <CardBoxWidget
-          trend="Overflow"
-          trend-type="alert"
-          color="text-red-500"
-          :icon="mdiChartTimelineVariant"
-          :number="256"
-          suffix="%"
-          label="Performance"
-        /> -->
       </div>
-
-      <!-- <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div class="flex flex-col justify-between">
-          <CardBoxTransaction
-            v-for="(transaction, index) in transactionBarItems"
-            :key="index"
-            :amount="transaction.amount"
-            :date="transaction.date"
-            :business="transaction.business"
-            :type="transaction.type"
-            :name="transaction.name"
-            :account="transaction.account"
-          />
-        </div>
-        <div class="flex flex-col justify-between">
-          <CardBoxClient
-            v-for="client in clientBarItems"
-            :key="client.id"
-            :name="client.name"
-            :login="client.login"
-            :date="client.created"
-            :progress="client.progress"
-          />
-        </div>
-      </div> -->
-
-      <!-- <SectionBannerStarOnGitHub class="mt-6 mb-6" /> -->
 
       <SectionTitleLineWithButton :icon="mdiChartPie" title="Statistiques">
         <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
@@ -221,7 +162,17 @@ onMounted(() => {
       <CardBox class="mb-6">
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
           <CardBoxWidget color="text-emerald-500" :number="form.nbTotalFait" label="Sites faits" />
-          <CardBoxWidget color="text-red-500" :number="form.nbSiteTotalNonFait" label="Sites non faits" />
+          <CardBoxWidget
+            color="text-red-500"
+            :number="form.nbSiteTotalNonFait"
+            label="Sites non faits"
+          />
+        </div>
+      </CardBox>
+      <CardBox class="mb-6">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
+          <CardBoxWidget color="text-emerald-500" :number="form.nbTotalFait" label="Sites faits" />
+          <TogoMap />
         </div>
       </CardBox>
     </SectionMain>

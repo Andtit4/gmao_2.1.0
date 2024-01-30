@@ -35,25 +35,31 @@ const form = reactive({
   formattedStartOfWeek: ''
 })
 
-const getNbFait = () => {
+const getNbFait = async () => {
   axios({
     url: apiService.getUrl() + '/plannifie/done/nb',
-    method: 'GET'
-  }).then((res) => {
-    form.nbTotalFait = res.data[0].nb
+    method: 'GET',
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
+  }).then(async (res) => {
+    form.nbTotalFait = await res.data[0].nb
   })
 }
 
-const getNbNonFait = () => {
+const getNbNonFait = async () => {
   axios({
     url: apiService.getUrl() + '/plannifie/nonfait/nb',
-    method: 'GET'
-  }).then((res) => {
-    form.nbSiteTotalNonFait = res.data[0].nb
+    method: 'GET',
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
+  }).then(async (res) => {
+    form.nbSiteTotalNonFait = await res.data[0].nb
   })
 }
 
-const getNbFaitSemaine = () => {
+const getNbFaitSemaine = async () => {
   axios({
     url:
       apiService.getUrl() +
@@ -61,22 +67,28 @@ const getNbFaitSemaine = () => {
       form.formattedStartOfWeek +
       '/' +
       form.formattedEndOfWeek,
-    method: 'GET'
-  }).then((res) => {
-    form.nbFait = res.data[0].nb
+    method: 'GET',
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
+  }).then(async (res) => {
+    form.nbFait = await res.data[0].nb
   })
 }
 
-const getNbEncours = () => {
+const getNbEncours = async () => {
   axios({
     url: apiService.getUrl() + '/plannifie/encours/nb',
-    method: 'GET'
-  }).then((res) => {
-    form.nbEncours = res.data[0].nb
+    method: 'GET',
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
+  }).then(async (res) => {
+    form.nbEncours = await res.data[0].nb
   })
 }
 
-const getNbSitePlannifie = () => {
+const getNbSitePlannifie = async () => {
   axios({
     url:
       apiService.getUrl() +
@@ -84,10 +96,13 @@ const getNbSitePlannifie = () => {
       form.formattedStartOfWeek +
       '/' +
       form.formattedEndOfWeek,
-    method: 'GET'
+    method: 'GET',
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
   })
-    .then((res) => {
-      form.nbSitePlannifie = res.data[0].nb
+    .then(async (res) => {
+      form.nbSitePlannifie = await res.data[0].nb
       console.log('Site prévus à la semaine: ', form.nbSitePlannifie)
     })
     .catch((err) => {
@@ -95,7 +110,7 @@ const getNbSitePlannifie = () => {
     })
 }
 
-const getNbSiteNonfait = () => {
+const getNbSiteNonfait = async () => {
   axios({
     url:
       apiService.getUrl() +
@@ -103,9 +118,12 @@ const getNbSiteNonfait = () => {
       form.formattedStartOfWeek +
       '/' +
       form.formattedEndOfWeek,
-    method: 'GET'
-  }).then((res) => {
-    form.nbSiteNonFait = res.data[0].nb
+    method: 'GET',
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
+  }).then(async (res) => {
+    form.nbSiteNonFait = await res.data[0].nb
   })
 }
 

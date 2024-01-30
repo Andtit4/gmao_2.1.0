@@ -79,12 +79,12 @@ const createCard = () => {
 
   cardSiteList.list.forEach((data) => {
     const marker = L.marker([data.latitude, data.longitude], { icon: redMarkerIcon }).addTo(map)
-    marker.bindPopup(data.zone) // Utiliser la zone ou d'autres informations pertinentes pour la popup
+    marker.bindPopup(data.nom_site) // Utiliser la zone ou d'autres informations pertinentes pour la popup
   })
 
   cardSiteDoneList.list.forEach((data) => {
     const marker = L.marker([data.latitude, data.longitude], { icon: greenMarkerIcon }).addTo(map)
-    marker.bindPopup(data.zone) // Utiliser la zone ou d'autres informations pertinentes pour la popup
+    marker.bindPopup(data.nom_site) // Utiliser la zone ou d'autres informations pertinentes pour la popup
   })
 
   /* for (let data = 0; data <= cardSiteList.list.length; data++) {

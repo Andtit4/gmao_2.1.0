@@ -56,22 +56,38 @@ const submit = () => {
             form.err = 'Email ou mot de passe incorrect'
             console.log('Supervisor not exist')
           } else {
-            const id = response.data._id
-            const email = response.data.email
-            const nom = response.data.nom
-            const prenom = response.data.prenom
+            const id = res.data._id
+            const email = res.data.email
+            const nom = res.data.nom
+            const prenom = res.data.prenom
+            const type_utilisateur = res.data.type_utilisateur
 
-            Cookies.set('type', 'superviseur')
+            console.log('\n res :', res.data)
             Cookies.set('id', id)
             Cookies.set('email', email)
             Cookies.set('nom', nom)
             Cookies.set('prenom', prenom)
             Cookies.set('pass', hash)
-            useMainStore().setUser(response.data)
-            router.push({
+            useMainStore().setUser(res.data)
+
+            if (type_utilisateur == 'USER') {
+              Cookies.set('type', 'chef_equipe')
+              router.push({
+                name: 'Dashboard',
+                params: { type: 'chef_equipe', pass: hash }
+              })
+            } else {
+              console.log('Superviseur ', type_utilisateur)
+              Cookies.set('type', 'superviseur')
+              router.push({
+                name: 'Dashboard',
+                params: { type: 'superviseur', pass: hash }
+              })
+            }
+            /* router.push({
               name: 'Dashboard',
               params: { type: 'superviseur', pass: hash }
-            })
+            }) */
           }
         })
         .catch((err) => {
@@ -119,30 +135,15 @@ const submit = () => {
         <div v-else></div>
         <br />
         <FormField label="Login" help="Please enter your login">
-          <FormControl
-            v-model="form.login"
-            :icon="mdiAccount"
-            name="login"
-            autocomplete="username"
-          />
+          <FormControl v-model="form.login" :icon="mdiAccount" name="login" autocomplete="username" />
         </FormField>
 
         <FormField label="Password" help="Please enter your password">
-          <FormControl
-            v-model="form.pass"
-            :icon="mdiAsterisk"
-            type="password"
-            name="password"
-            autocomplete="current-password"
-          />
+          <FormControl v-model="form.pass" :icon="mdiAsterisk" type="password" name="password"
+            autocomplete="current-password" />
         </FormField>
 
-        <FormCheckRadio
-          v-model="form.remember"
-          name="remember"
-          label="Remember"
-          :input-value="true"
-        />
+        <FormCheckRadio v-model="form.remember" name="remember" label="Remember" :input-value="true" />
 
         <template #footer>
           <BaseButtons>

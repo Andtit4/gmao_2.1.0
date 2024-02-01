@@ -118,7 +118,16 @@ if (type == 'superviseur') {
     target: '_blank'
   } */
   ]
-} else {
+} else if (type == "chef_equipe") {
+  data = [
+    {
+      to: '/dashboard/' + type + '/' + pass,
+      icon: mdiMonitor,
+      label: 'Dashboard'
+    }
+  ]
+
+}else {
   data = [
     {
       to: '/dashboard/' + type + '/' + pass,

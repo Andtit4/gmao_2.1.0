@@ -124,10 +124,27 @@ if (type == 'superviseur') {
       to: '/dashboard/' + type + '/' + pass,
       icon: mdiMonitor,
       label: 'Dashboard'
+    }, {
+      label: 'Sites',
+      icon: mdiTable,
+      menu: [
+        {
+          label: 'Zone',
+          to: '/zone/' + type + '/' + pass
+        },
+        {
+          label: 'Ajouter',
+          to: '/site/' + type + '/' + pass
+        },
+        {
+          label: 'Liste',
+          to: '/site/list/' + type + '/' + pass
+        }
+      ]
     }
   ]
 
-}else {
+} else {
   data = [
     {
       to: '/dashboard/' + type + '/' + pass,

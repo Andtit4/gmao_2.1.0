@@ -141,6 +141,10 @@ if (type == 'superviseur') {
           to: '/site/list/' + type + '/' + pass
         }
       ]
+    }, {
+      label: 'Plannif.',
+      icon: mdiLock,
+      to: '/traiter/' + type + '/' + pass,
     }
   ]
 

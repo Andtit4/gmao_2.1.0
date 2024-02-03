@@ -15,6 +15,7 @@ import SiteList from '@/views/sites/list.vue';
 import ClassiqueView from '@/views/preventive/classique/ClassiqueView.vue'
 import PlanifieView from '@/views/preventive/plannifie/plannifieView.vue'
 import PlanifieList from '@/views/preventive/plannifie/list.vue'
+import TraiterPlannif from '@/views/chef_equipe/HomeView.vue'
 
 const routes = [
   /*  {
@@ -32,6 +33,14 @@ const routes = [
     path: '/',
     name: 'Login',
     component: Login
+  },
+  {
+    meta: {
+      title: 'Traiter'
+    },
+    path: '/traiter/:type/:pass',
+    name: 'Traiter',
+    component: TraiterPlannif
   },
   {
     // Document title tag

@@ -232,6 +232,11 @@ if (type == 'superviseur') {
         }
 
       ]
+    },
+    {
+      label: 'Plannif.',
+      icon: mdiLock,
+      to: '/traiter/' + type + '/' + pass,
     }
 
   ]

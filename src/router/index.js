@@ -16,16 +16,9 @@ import ClassiqueView from '@/views/preventive/classique/ClassiqueView.vue'
 import PlanifieView from '@/views/preventive/plannifie/plannifieView.vue'
 import PlanifieList from '@/views/preventive/plannifie/list.vue'
 import TraiterPlannif from '@/views/chef_equipe/HomeView.vue'
+import ListPlannificationVue from '@/views/chef_equipe/ListPlannification.vue'
 
 const routes = [
-  /*  {
-    meta: {
-      title: 'Select style'
-    },
-    path: '/',
-    name: 'style',
-    component: Login
-  }, */
   {
     meta: {
       title: 'Login'
@@ -164,6 +157,7 @@ const routes = [
     name: 'plannifications',
     component: PlanifieList
   },
+
   {
     meta: {
       title: 'Forms'

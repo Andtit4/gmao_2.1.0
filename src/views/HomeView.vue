@@ -78,7 +78,10 @@ const getNbFaitSemaine = async () => {
 
 const getNbEncours = async () => {
   axios({
-    url: apiService.getUrl() + '/plannifie/encours/nb',
+    url: apiService.getUrl() + '/plannifie/encours/week/nb/' +
+      form.formattedStartOfWeek +
+      '/' +
+      form.formattedEndOfWeek,
     method: 'GET',
     headers: {
       'Access-Control-Allow-Origin': '*'
@@ -147,30 +150,14 @@ onMounted(() => {
       </SectionTitleLineWithButton>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-4 mb-6">
-        <CardBoxWidget
-          color="text-info-500"
-          :icon="mdiChartTimelineVariant"
-          :number="form.nbSitePlannifie"
-          label="Sites prévus"
-        />
-        <CardBoxWidget
-          color="text-emerald-500"
-          :icon="mdiChartTimelineVariant"
-          :number="form.nbFait"
-          label="Sites faits"
-        />
-        <CardBoxWidget
-          color="text-warning-500"
-          :icon="mdiChartTimelineVariant"
-          :number="form.nbEncours"
-          label="Sites en cours"
-        />
-        <CardBoxWidget
-          color="text-red-500"
-          :icon="mdiChartTimelineVariant"
-          :number="form.nbSiteNonFait"
-          label="Sites non faits"
-        />
+        <CardBoxWidget color="text-info-500" :icon="mdiChartTimelineVariant" :number="form.nbSitePlannifie"
+          label="Sites prévus" />
+        <CardBoxWidget color="text-emerald-500" :icon="mdiChartTimelineVariant" :number="form.nbFait"
+          label="Sites faits" />
+        <CardBoxWidget color="text-warning-500" :icon="mdiChartTimelineVariant" :number="form.nbEncours"
+          label="Sites en cours" />
+        <CardBoxWidget color="text-red-500" :icon="mdiChartTimelineVariant" :number="form.nbSiteNonFait"
+          label="Sites non faits" />
       </div>
 
       <SectionTitleLineWithButton :icon="mdiChartPie" title="Statistiques">
@@ -180,11 +167,7 @@ onMounted(() => {
       <CardBox class="mb-6">
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
           <CardBoxWidget color="text-emerald-500" :number="form.nbTotalFait" label="Sites faits" />
-          <CardBoxWidget
-            color="text-red-500"
-            :number="form.nbSiteTotalNonFait"
-            label="Sites non faits"
-          />
+          <CardBoxWidget color="text-red-500" :number="form.nbSiteTotalNonFait" label="Sites non faits" />
         </div>
       </CardBox>
       <CardBox class="mb-6">

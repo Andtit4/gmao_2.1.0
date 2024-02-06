@@ -14,8 +14,6 @@ import NotificationBar from '@/components/NotificationBar.vue'
 
 
 
-
-
 const form = reactive({
   currentZone: '',
   currentEmail: '',
@@ -29,8 +27,18 @@ const form = reactive({
   showEnAttente: false,
   showSuccess: false,
   showErr: false,
-  errMessage: ''
+  errMessage: '',
+  isAdmin: false,
+  tmpZone: '',
 })
+
+const getTypeUser = () => {
+  const type = Cookies.get('type');
+  if (type == 'admin') {
+    form.isAdmin = true;
+    console.log('Is admin == ', form.isAdmin)
+  }
+}
 
 const notificationSettingsModel = ref([])
 const notificationsOutline = computed(() => notificationSettingsModel.value.indexOf('outline') > -1)
@@ -44,13 +52,29 @@ const getUserInfo = async () => {
   }).then(async (res) => {
     form.currentZone = await res.data.zone;
     console.log('Zone = ', form.currentZone);
-    getPlannificationByZone(form.currentZone)
+    if (form.isAdmin) {
+      getPlannification()
+    } else {
+      getPlannificationByZone(form.currentZone)
+    }
   })
 }
 
 const getPlannificationByZone = async (zone) => {
   axios({
     url: apiService.getUrl() + '/mission/zone?zone=' + zone,
+    method: 'GET'
+  }).then(async (res) => {
+    plannifications.list = await res.data
+    console.log('Response: ', res.data)
+  }).catch((err) => {
+    console.log('An occured while getting plannifications ', err.message)
+  })
+}
+
+const getPlannification = async () => {
+  axios({
+    url: apiService.getUrl() + '/mission',
     method: 'GET'
   }).then(async (res) => {
     plannifications.list = await res.data
@@ -68,12 +92,14 @@ const show = (zone, date_debut, date_fin,) => {
   form.date_debut = date_debut;
   form.date_fin = date_fin;
   isModalActive.value = true
+  form.tmpZone = zone;
+  console.log('tmp in show ', form.tmpZone)
   axios({
-    url: apiService.getUrl() + '/plannifie/zone/week?zone=' + zone + '&date_debut=' + date_debut + '&date_fin=' + date_fin,
+    url: apiService.getUrl() + '/plannifie/zone/week?zone=' + form.tmpZone + '&date_debut=' + date_debut + '&date_fin=' + date_fin,
     method: 'GET'
   }).then((res) => {
     sitePlannifie.list = res.data
-    console.log('Sites plannifies: ', res.data)
+    console.log(apiService.getUrl() + '/plannifie/zone/week?zone=' + form.tmpZone + '&date_debut=' + date_debut + '&date_fin=' + date_fin)
   })
 }
 
@@ -89,7 +115,7 @@ const showDate = (site, id_plannification) => {
 
 const treat = () => {
   axios({
-    url: apiService.getUrl() + '/mission/attente/web/' + form.date_traitement + '/' + form.currentZone + '/' + form.id_plannification + '/' + form.site_selected,
+    url: apiService.getUrl() + '/mission/attente/web/' + form.date_traitement + '/' + form.tmpZone + '/' + form.id_plannification + '/' + form.site_selected,
     method: 'PUT'
   }).then((res) => {
     form.showSuccess == true
@@ -102,7 +128,8 @@ const treat = () => {
 }
 
 onMounted(() => {
-  getUserInfo()
+  getTypeUser(),
+    getUserInfo()
 })
 
 
@@ -170,6 +197,7 @@ onMounted(() => {
         <tr>
           <th v-if="checkable" />
           <th />
+          <th>Equipe</th>
           <th>Début</th>
           <th>Fin</th>
           <th>Date ajout</th>
@@ -182,6 +210,9 @@ onMounted(() => {
           <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
           <td class="border-b-0 lg:w-6 before:hidden">
             <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
+          </td>
+          <td data-label="Equipe">
+            {{ site.zone }}
           </td>
           <td data-label="Date de début">
             {{ site.date_debut ? new Date(site.date_debut).toISOString().split('T')[0] : '' }}

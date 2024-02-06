@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useMainStore } from '@/stores/main'
-import { mdiEye /* mdiTrashCan */, mdiFileExcel } from '@mdi/js'
+import { mdiPencil /* mdiTrashCan */, mdiFileExcel } from '@mdi/js'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
@@ -312,7 +312,7 @@ onMounted(() => {
         </td>
         <td class="before:hidden lg:w-1 whitespace-nowrap">
           <BaseButtons type="justify-start lg:justify-end" no-wrap>
-            <BaseButton color="info" :icon="mdiEye" small @click="showZone(site._id)" />
+            <BaseButton color="info" :icon="mdiPencil" small @click="showZone(site._id)" />
             <div v-if="form.showRestOfItem == true">
               <BaseButton color="success" :icon="mdiFileExcel" small @click="exportxlx(site.zone)" />
             </div>

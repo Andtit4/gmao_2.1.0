@@ -43,7 +43,6 @@ const submit = () => {
     method: 'GET'
   }).then((response) => {
     if (response.data._id == undefined) {
-      console.log('User not exist')
       /* form.showError = true
       form.err = "Utilisateur recherché n'existe pas" */
       axios({

@@ -50,59 +50,17 @@ const deleteIntervenant = (_id) => {
 };
 
 
-/* const getAllCategorie = () => {
-  axios({
-    // url: 'https://good-crow-flannel-nightgown.cyclic.app/partenaire/',
-    url: "http://localhost:3000/categorie/",
-    method: "GET",
-  })
-    .then((response) => {
-      categories.list = response.data;
-    })
-    .catch((e) => {
-      console.log("An error occured " + e);
-    });
-}; */
-/*
-const deleteCategorie = (_id) => {
-  axios({
-    url: "http://localhost:3000/categorie/" + _id,
-    // url: "https://good-crow-flannel-nightgown.cyclic.app/partenaire/" + _id,
-    method: "DELETE",
-  })
-    .then((response) => {
-      console.log(response);
-      setTimeout(() => {
-        location.reload();
-      }, 1000);
-    })
-    .catch((e) => {
-      console.log("An error occured " + e);
-    });
-};
-
-setTimeout(() => {
-  categories.list;
-  console.log("lkdlfkg");
-}, 2000); */
-
 const mainStore = useMainStore()
 
 const items = computed(() => mainStore.clients)
 
 const isModalActive = ref(false)
 
-// const isModalDangerActive = ref(false)
-
 const perPage = ref(5)
 
 const currentPage = ref(0)
 
 const checkedRows = ref([])
-
-/* const itemsPaginated = computed(() =>
-  items.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
-) */
 
 const numPages = computed(() => Math.ceil(items.value.length / perPage.value))
 

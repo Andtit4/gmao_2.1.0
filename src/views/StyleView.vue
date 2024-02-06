@@ -1,3 +1,4 @@
+
 <script setup>
 import { useRouter } from 'vue-router'
 import { useDarkModeStore } from '@/stores/darkMode.js'

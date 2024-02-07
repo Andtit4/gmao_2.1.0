@@ -82,7 +82,7 @@ const siteNonFait = async () => {
 const createCard = () => {
   const map = L.map('map', {
     center: [togoCoordinates.latitude, togoCoordinates.longitude],
-    zoom: 8
+    zoom: 7
   }) /* .setView(togoCoordinates.latitude, togoCoordinates.longitude, 8) */
 
   // Ajout d'une couche de carte OpenStreetMap

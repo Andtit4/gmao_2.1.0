@@ -120,7 +120,7 @@ onMounted(() => {})
       <tr>
         <th v-if="checkable" />
         <th />
-        <th>Matricule</th>
+        <th>Zone</th>
         <th>Nom</th>
         <th>Prénom</th>
         <th>Email</th>
@@ -135,8 +135,8 @@ onMounted(() => {})
         <td class="border-b-0 lg:w-6 before:hidden">
           <UserAvatar :username="intervenant.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
         </td>
-        <td data-label="Matricule">
-          {{ intervenant.matricule }}
+        <td data-label="Zone">
+          {{ intervenant.zone }}
         </td>
         <td data-label="Nom ">
           {{ intervenant.nom }}

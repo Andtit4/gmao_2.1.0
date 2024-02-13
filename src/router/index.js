@@ -17,6 +17,7 @@ import PlanifieView from '@/views/preventive/plannifie/plannifieView.vue'
 import PlanifieList from '@/views/preventive/plannifie/list.vue'
 import TraiterPlannif from '@/views/chef_equipe/HomeView.vue'
 import ListPlannificationVue from '@/views/chef_equipe/ListPlannification.vue'
+import ListPlannificationBySite from '@/views/chef_equipe/list/ListPlannification.vue'
 
 const routes = [
   {
@@ -34,6 +35,14 @@ const routes = [
     path: '/traiter/:type/:pass',
     name: 'Traiter',
     component: TraiterPlannif
+  },
+  {
+    meta: {
+      title: 'Liste'
+    },
+    path: '/plannification/site/:type/:pass',
+    name: 'ListePlannificationSite',
+    component: ListPlannificationBySite
   },
   {
     // Document title tag

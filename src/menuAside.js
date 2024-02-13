@@ -165,10 +165,14 @@ if (type == 'superviseur') {
           label: 'Traiter',
           to: '/traiter/' + type + '/' + pass,
         },
-       /*  {
+        {
           label: 'Liste',
-          to: '/traiter/list/' + type + '/' + pass
-        } */
+          to: '/plannification/site/' + type + '/' + pass,
+        }
+        /*  {
+           label: 'Liste',
+           to: '/traiter/list/' + type + '/' + pass
+         } */
       ]
     }
 

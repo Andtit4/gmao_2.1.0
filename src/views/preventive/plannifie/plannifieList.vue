@@ -185,7 +185,7 @@ const getAllDone = async (zone) => {
 }
 
 const exportxlx = async (zone) => {
- const apiData = await getAllDone(zone)
+  const apiData = await getAllDone(zone)
 
   const data = [
     [
@@ -252,11 +252,7 @@ onMounted(() => {
     </p>
     <div v-if="form.showRestOfItem == true">
       <FormField label="">
-        <select
-          v-model="form.site"
-          class="form-select bg-white dark:bg-slate-800"
-          @change="extractDates(form.site)"
-        >
+        <select v-model="form.site" class="form-select bg-white dark:bg-slate-800" @change="extractDates(form.site)">
           <option value="">Sélectionnez le site</option>
           <option v-for="(site, index) in siteDropDown.list" :key="index" :value="site.nom_site">
             {{ site.nom_site }}
@@ -270,76 +266,68 @@ onMounted(() => {
   </CardBoxModal>
 
   <div v-if="checkedRows.length" class="p-3 bg-gray-100/50 dark:bg-slate-800">
-    <span
-      v-for="checkedRow in checkedRows"
-      :key="checkedRow.id"
-      class="inline-block px-2 py-1 rounded-sm mr-2 text-sm bg-gray-100 dark:bg-slate-700"
-    >
+    <span v-for="checkedRow in checkedRows" :key="checkedRow.id"
+      class="inline-block px-2 py-1 rounded-sm mr-2 text-sm bg-gray-100 dark:bg-slate-700">
       {{ checkedRow.name }}
     </span>
   </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th v-if="checkable" />
-        <th />
-        <th>Date de plannification</th>
-        <th>Equipe</th>
-        <th>Début</th>
-        <th>Fin</th>
-        <th>Fin</th>
-        <th />
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(site, index) in sites.list" :key="index">
-        <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
-        <td class="border-b-0 lg:w-6 before:hidden">
-          <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
-        </td>
-        <td data-label="Date de plannification">
-          {{ site.date_ajoute ? new Date(site.date_ajoute).toISOString().split('T')[0] : '' }}
-        </td>
-        <td data-label="Equipe">
-          {{ site.zone }}
-        </td>
-        <td data-label="Date de début">
-          {{ site.date_debut ? new Date(site.date_debut).toISOString().split('T')[0] : '' }}
-        </td>
-        <td data-label="Date de fin">
-          {{ site.date_fin ? new Date(site.date_fin).toISOString().split('T')[0] : '' }}
-        </td>
-        <td class="before:hidden lg:w-1 whitespace-nowrap">
-          <BaseButtons type="justify-start lg:justify-end" no-wrap>
-            <BaseButton color="info" :icon="mdiPencil" small @click="showZone(site._id)" />
-            <div v-if="form.showRestOfItem == true">
-              <BaseButton color="success" :icon="mdiFileExcel" small @click="exportxlx(site.zone)" />
-            </div>
-            <div v-else>
-              <div>
+  <div class="max-h-[32rem] overflow-x-auto">
+    <table>
+      <thead>
+        <tr>
+          <th v-if="checkable" />
+          <th />
+          <th>Date de plannification</th>
+          <th>Equipe</th>
+          <th>Début</th>
+          <th>Fin</th>
+          <th>Fin</th>
+          <th />
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(site, index) in sites.list" :key="index">
+          <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
+          <td class="border-b-0 lg:w-6 before:hidden">
+            <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
+          </td>
+          <td data-label="Date de plannification">
+            {{ site.date_ajoute ? new Date(site.date_ajoute).toISOString().split('T')[0] : '' }}
+          </td>
+          <td data-label="Equipe">
+            {{ site.zone }}
+          </td>
+          <td data-label="Date de début">
+            {{ site.date_debut ? new Date(site.date_debut).toISOString().split('T')[0] : '' }}
+          </td>
+          <td data-label="Date de fin">
+            {{ site.date_fin ? new Date(site.date_fin).toISOString().split('T')[0] : '' }}
+          </td>
+          <td class="before:hidden lg:w-1 whitespace-nowrap">
+            <BaseButtons type="justify-start lg:justify-end" no-wrap>
+              <BaseButton color="info" :icon="mdiPencil" small @click="showZone(site._id)" />
+              <div v-if="form.showRestOfItem == true">
                 <BaseButton color="success" :icon="mdiFileExcel" small @click="exportxlx(site.zone)" />
               </div>
-            </div>
-            <!-- <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteSite(site._id)" /> -->
-          </BaseButtons>
+              <div v-else>
+                <div>
+                  <BaseButton color="success" :icon="mdiFileExcel" small @click="exportxlx(site.zone)" />
+                </div>
+              </div>
+              <!-- <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteSite(site._id)" /> -->
+            </BaseButtons>
 
-        </td>
-      </tr>
-    </tbody>
-  </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
     <BaseLevel>
       <BaseButtons>
-        <BaseButton
-          v-for="page in pagesList"
-          :key="page"
-          :active="page === currentPage"
-          :label="page + 1"
-          :color="page === currentPage ? 'lightDark' : 'whiteDark'"
-          small
-          @click="currentPage = page"
-        />
+        <BaseButton v-for="page in pagesList" :key="page" :active="page === currentPage" :label="page + 1"
+          :color="page === currentPage ? 'lightDark' : 'whiteDark'" small @click="currentPage = page" />
       </BaseButtons>
       <small>Page {{ currentPageHuman }} of {{ numPages }}</small>
     </BaseLevel>

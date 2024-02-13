@@ -35,7 +35,7 @@ const getAllIntervenant = () => {
 
 const deleteIntervenant = (_id) => {
   axios({
-    url: apiService.getUrl() + '/intervenant/'  + _id,
+    url: apiService.getUrl() + '/intervenant/' + _id,
     method: "DELETE",
   })
     .then((response) => {
@@ -96,7 +96,7 @@ const checked = (isChecked, client) => {
   }
 }
 
-onMounted(() => {})
+onMounted(() => { })
 </script>
 
 <template>
@@ -106,79 +106,66 @@ onMounted(() => {})
   </CardBoxModal>
 
   <div v-if="checkedRows.length" class="p-3 bg-gray-100/50 dark:bg-slate-800">
-    <span
-      v-for="checkedRow in checkedRows"
-      :key="checkedRow.id"
-      class="inline-block px-2 py-1 rounded-sm mr-2 text-sm bg-gray-100 dark:bg-slate-700"
-    >
+    <span v-for="checkedRow in checkedRows" :key="checkedRow.id"
+      class="inline-block px-2 py-1 rounded-sm mr-2 text-sm bg-gray-100 dark:bg-slate-700">
       {{ checkedRow.name }}
     </span>
   </div>
+  <div class="max-h-[32rem] overflow-x-auto">
+    <table>
+      <thead>
+        <tr>
+          <th v-if="checkable" />
+          <th />
+          <th>Zone</th>
+          <th>Nom</th>
+          <th>Prénom</th>
+          <th>Email</th>
+          <th>Type utilisateur</th>
+          <th>Mot de passe</th>
+          <th />
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(intervenant, index) in intervenants.list" :key="index">
+          <TableCheckboxCell v-if="checkable" @checked="checked($event, intervenant)" />
+          <td class="border-b-0 lg:w-6 before:hidden">
+            <UserAvatar :username="intervenant.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
+          </td>
+          <td data-label="Zone">
+            {{ intervenant.zone }}
+          </td>
+          <td data-label="Nom ">
+            {{ intervenant.nom }}
+          </td>
+          <td data-label="Prénom">
+            {{ intervenant.prenom }}
+          </td>
+          <td data-label="Email">
+            {{ intervenant.email }}
+          </td>
+          <td data-label="Type utilisateur">
+            {{ intervenant.type_utilisateur }}
+          </td>
+          <td data-label="Mot de passe">
+            {{ intervenant.mot_de_passe }}
+          </td>
+          <td class="before:hidden lg:w-1 whitespace-nowrap">
+            <BaseButtons type="justify-start lg:justify-end" no-wrap>
+              <BaseButton color="info" :icon="mdiEye" small @click="isModalActive = true" />
+              <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteIntervenant(intervenant._id)" />
+            </BaseButtons>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th v-if="checkable" />
-        <th />
-        <th>Zone</th>
-        <th>Nom</th>
-        <th>Prénom</th>
-        <th>Email</th>
-        <th>Type utilisateur</th>
-        <th>Mot de passe</th>
-        <th />
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(intervenant, index) in intervenants.list" :key="index">
-        <TableCheckboxCell v-if="checkable" @checked="checked($event, intervenant)" />
-        <td class="border-b-0 lg:w-6 before:hidden">
-          <UserAvatar :username="intervenant.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
-        </td>
-        <td data-label="Zone">
-          {{ intervenant.zone }}
-        </td>
-        <td data-label="Nom ">
-          {{ intervenant.nom }}
-        </td>
-        <td data-label="Prénom">
-          {{ intervenant.prenom }}
-        </td>
-        <td data-label="Email">
-          {{ intervenant.email }}
-        </td>
-        <td data-label="Type utilisateur">
-          {{ intervenant.type_utilisateur }}
-        </td>
-        <td data-label="Mot de passe">
-          {{ intervenant.mot_de_passe }}
-        </td>
-        <td class="before:hidden lg:w-1 whitespace-nowrap">
-          <BaseButtons type="justify-start lg:justify-end" no-wrap>
-            <BaseButton color="info" :icon="mdiEye" small @click="isModalActive = true" />
-            <BaseButton
-              color="danger"
-              :icon="mdiTrashCan"
-              small
-              @click="deleteIntervenant(intervenant._id)"
-            />
-          </BaseButtons>
-        </td>
-      </tr>
-    </tbody>
-  </table>
   <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
     <BaseLevel>
       <BaseButtons>
-        <BaseButton
-          v-for="page in pagesList"
-          :key="page"
-          :active="page === currentPage"
-          :label="page + 1"
-          :color="page === currentPage ? 'lightDark' : 'whiteDark'"
-          small
-          @click="currentPage = page"
-        />
+        <BaseButton v-for="page in pagesList" :key="page" :active="page === currentPage" :label="page + 1"
+          :color="page === currentPage ? 'lightDark' : 'whiteDark'" small @click="currentPage = page" />
       </BaseButtons>
       <small>Page {{ currentPageHuman }} of {{ numPages }}</small>
     </BaseLevel>

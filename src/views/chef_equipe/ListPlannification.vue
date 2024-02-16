@@ -5,7 +5,7 @@ import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import BaseButton from "@/components/BaseButton.vue";
 import { mdiPencil, mdiTrashCan } from "@mdi/js"
 import { onMounted, reactive } from "vue";
-
+import ListPlannificationEnAttente from "./list/ListPlannificationEnAttente.vue";
 const missions = reactive({
   list: []
 })
@@ -71,6 +71,6 @@ onMounted(() => {
         </tbody>
       </table>
     </div>
-
+    
   </LayoutAuthenticated>
 </template>

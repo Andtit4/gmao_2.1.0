@@ -18,6 +18,7 @@ import apiService from '@/services/apiService'
 import * as XLSX from 'xlsx'
 // import * as XLSX from 'xlsx-style'
 import Cookies from 'js-cookie'
+import ListPlannificationEnAttente from '@/views/chef_equipe/list/ListPlannificationEnAttente.vue'
 
 let type = Cookies.get('type')
 
@@ -223,34 +224,13 @@ const exportEncours = async () => {
         <div></div>
       </div>
       <div v-else>
-        <BaseButton
-          target="_blank"
-          :icon="mdiFileExcel"
-          label="Tout"
-          color="info"
-          rounded-full
-          small
-          @click="exportAll()"
-        />
+        <BaseButton target="_blank" :icon="mdiFileExcel" label="Tout" color="info" rounded-full small
+          @click="exportAll()" />
 
-        <BaseButton
-          target="_blank"
-          :icon="mdiFileExcel"
-          label="En cours"
-          color="warning"
-          rounded-full
-          small
-          @click="exportEncours()"
-        />
-        <BaseButton
-          target="_blank"
-          :icon="mdiFileExcel"
-          label="Fait"
-          color="success"
-          rounded-full
-          small
-          @click="exportxlx()"
-        />
+        <BaseButton target="_blank" :icon="mdiFileExcel" label="En cours" color="warning" rounded-full small
+          @click="exportEncours()" />
+        <BaseButton target="_blank" :icon="mdiFileExcel" label="Fait" color="success" rounded-full small
+          @click="exportxlx()" />
       </div>
 
       <br />
@@ -258,5 +238,14 @@ const exportEncours = async () => {
         <PlannifieList />
       </CardBox>
     </SectionMain>
+
+    <SectionMain>
+      <br />
+      <CardBox has-table>
+        <ListPlannificationEnAttente />
+
+      </CardBox>
+    </SectionMain>
+
   </LayoutAuthenticated>
 </template>

@@ -157,7 +157,7 @@ if (type == 'superviseur') {
 
       ]
     },
-    {
+    /* {
       label: 'Plannif.',
       icon: mdiLock,
       menu: [
@@ -169,12 +169,8 @@ if (type == 'superviseur') {
           label: 'Liste',
           to: '/plannification/site/' + type + '/' + pass,
         }
-        /*  {
-           label: 'Liste',
-           to: '/traiter/list/' + type + '/' + pass
-         } */
       ]
-    }
+    } */
 
   ]
 }

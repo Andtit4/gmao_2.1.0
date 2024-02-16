@@ -24,7 +24,7 @@ const redMarkerIcon = new L.Icon({
 
 const greenMarkerIcon = new L.Icon({
   iconUrl:
-    'https://play-lh.googleusercontent.com/5WifOWRs00-sCNxCvFNJ22d4xg_NQkAODjmOKuCQqe57SjmDw8S6VOSLkqo6fs4zqis',
+    'https://www.clipartmax.com/png/full/117-1179307_filemap-pin-icon-green-map-marker-png-green.png',
   iconSize: [10, 10],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],

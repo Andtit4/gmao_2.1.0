@@ -281,7 +281,7 @@ onMounted(() => {
           <th>Equipe</th>
           <th>Début</th>
           <th>Fin</th>
-          <th>Fin</th>
+          <th>Action</th>
           <th />
         </tr>
       </thead>

@@ -14,7 +14,7 @@ const togoCoordinates = reactive({
 const redMarkerIcon = new L.Icon({
   iconUrl:
     'https://cdn2.iconfinder.com/data/icons/color-svg-vector-icons-2/512/map_marker_base-512.png',
-  iconSize: [10, 10],
+  iconSize: [6, 6],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   tooltipAnchor: [16, -28],
@@ -25,11 +25,11 @@ const redMarkerIcon = new L.Icon({
 const greenMarkerIcon = new L.Icon({
   iconUrl:
     'https://www.clipartmax.com/png/full/117-1179307_filemap-pin-icon-green-map-marker-png-green.png',
-  iconSize: [10, 10],
+  iconSize: [6, 6],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
-  tooltipAnchor: [16, -28],
-  shadowSize: [41, 41]
+  tooltipAnchor: [0, 0],
+  shadowSize: [8, 8]
 })
 
 const warningMarkerIcon = new L.Icon({

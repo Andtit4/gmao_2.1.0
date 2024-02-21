@@ -8,6 +8,7 @@ import BaseLevel from '@/components/BaseLevel.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import FormField from '@/components/FormField.vue'
+import FormControl from '@/components/FormControl.vue'
 import * as XLSX from 'xlsx'
 // import UserAvatar from '@/components/UserAvatar.vue'
 import axios from 'axios'
@@ -22,7 +23,8 @@ const form = reactive({
   site: '',
   id_plannification: '',
   siteAddNb: '',
-  showRestOfItem: true
+  showRestOfItem: true,
+  search: ''
 })
 
 const sites = reactive({ list: [] })
@@ -41,21 +43,6 @@ const getAllSite = () => {
     })
 }
 
-/* const deleteSite = (_id) => {
-  axios({
-    url: apiService.getUrl() + '/zone/' + _id,
-    method: 'DELETE'
-  })
-    .then((response) => {
-      console.log(response)
-      setTimeout(() => {
-        location.reload()
-      }, 1000)
-    })
-    .catch((e) => {
-      console.log('An error occured ' + e)
-    })
-} */
 
 const mainStore = useMainStore()
 
@@ -222,6 +209,19 @@ const exportxlx = async (zone) => {
   XLSX.writeFile(wb, 'PLANNIFICATION.xlsx')
 }
 
+const searchMission = () => {
+  axios({
+    url: apiService.getUrl() + '/mission/search/dyn?zone=' + form.search.toUpperCase(),
+    method: 'GET'
+  })
+    .then((response) => {
+      sites.list = response.data
+    })
+    .catch((e) => {
+      console.log('An error occured ' + e)
+    })
+}
+
 onMounted(() => {
   // sitesByZone()
 })
@@ -272,6 +272,11 @@ onMounted(() => {
     </span>
   </div>
   <div class="max-h-[32rem] overflow-x-auto">
+    <div class="mx-4">
+      <FormField label="Rechercher">
+        <FormControl v-model="form.search" placeholder="Entrez le nom de la zone" @input="searchMission()" />
+      </FormField>
+    </div>
     <table>
       <thead>
         <tr>

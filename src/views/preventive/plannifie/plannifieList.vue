@@ -181,8 +181,7 @@ const exportxlx = async (zone) => {
       'DATE EN ATTENTE',
       'DATE DE PRISE EN COMPTE',
       'DATE AJOUT PAR LE SUPERVISEUR',
-      'DATE DE DEBUT PREVUE',
-      'DATE DE FIN PREVUE'
+      'SEMAINE'
     ],
     ...apiData.map((item) => [
       item.zone,
@@ -190,8 +189,8 @@ const exportxlx = async (zone) => {
       item.date_attente,
       item.date_prise_en_compte,
       item.date_ajoute,
-      item.date_debut,
-      item.date_fin,
+      `SEMAINE DU ${item.date_debut ? new Date(item.date_debut).toISOString().split('T')[0] : ''} AU ${item.date_fin ? new Date(item.date_fin).toISOString().split('T')[0] : ''}` ,
+      item.date_attente == '' ? 'NON FAIT' : item.date_prise_en_compte == '' ? 'NON PRIS EN COMPTE' : 'FAIT'
     ])
     // ... Ajoutez vos données ici
   ]

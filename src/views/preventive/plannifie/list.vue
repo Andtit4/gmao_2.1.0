@@ -62,14 +62,8 @@ const exportxlx = async () => {
         v: 'DATE DE PRISE EN COMPTE',
         s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
       },
-      {
-        v: 'DATE DE DEBUT PREVUE',
-        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
-      },
-      {
-        v: 'DATE DE FIN PREVUE',
-        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
-      }
+      'SEMAINE',
+      'STATUT'
     ],
     ...apiData.map((item) => [
       item.numero_ticket,
@@ -77,8 +71,8 @@ const exportxlx = async () => {
       item.site,
       item.date_attente,
       item.date_prise_en_compte,
-      item.date_debut,
-      item.date_fin
+      `SEMAINE DU ${item.date_debut ? new Date(item.date_debut).toISOString().split('T')[0] : ''} AU ${item.date_fin ? new Date(item.date_fin).toISOString().split('T')[0] : ''}` ,
+      item.date_attente == '' ? 'NON FAIT' : item.date_prise_en_compte == '' ? 'NON PRIS EN COMPTE' : 'FAIT'
     ])
     // ... Ajoutez vos données ici
   ]
@@ -122,14 +116,8 @@ const exportAll = async () => {
         v: 'DATE DE PRISE EN COMPTE',
         s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
       },
-      {
-        v: 'DATE DE DEBUT PREVUE',
-        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
-      },
-      {
-        v: 'DATE DE FIN PREVUE',
-        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
-      }
+      'SEMAINE',
+      'STATUT'
     ],
     ...apiData.map((item) => [
       item.numero_ticket,
@@ -137,8 +125,8 @@ const exportAll = async () => {
       item.site,
       item.date_attente,
       item.date_prise_en_compte,
-      item.date_debut,
-      item.date_fin
+      `SEMAINE DU ${item.date_debut ? new Date(item.date_debut).toISOString().split('T')[0] : ''} AU ${item.date_fin ? new Date(item.date_fin).toISOString().split('T')[0] : ''}` ,
+      item.date_attente == '' ? 'NON FAIT' : item.date_prise_en_compte == '' ? 'NON PRIS EN COMPTE' : 'FAIT'
     ])
     // ... Ajoutez vos données ici
   ]
@@ -182,14 +170,8 @@ const exportEncours = async () => {
         v: 'DATE DE PRISE EN COMPTE',
         s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
       },
-      {
-        v: 'DATE DE DEBUT PREVUE',
-        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
-      },
-      {
-        v: 'DATE DE FIN PREVUE',
-        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
-      }
+      'SEMAINE',
+      'STATUT'
     ],
     ...apiData.map((item) => [
       item.numero_ticket,
@@ -197,8 +179,8 @@ const exportEncours = async () => {
       item.site,
       item.date_attente,
       item.date_prise_en_compte,
-      item.date_debut,
-      item.date_fin
+      `SEMAINE DU ${item.date_debut ? new Date(item.date_debut).toISOString().split('T')[0] : ''} AU ${item.date_fin ? new Date(item.date_fin).toISOString().split('T')[0] : ''}` ,
+      item.date_attente == '' ? 'NON FAIT' : item.date_prise_en_compte == '' ? 'NON PRIS EN COMPTE' : 'FAIT'
     ])
     // ... Ajoutez vos données ici
   ]

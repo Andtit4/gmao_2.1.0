@@ -172,11 +172,13 @@ const exportxlx = async () => {
     [
       'EQUIPE',
       'SITE',
-      'STATUT'
+      'SEMAINE',
+      'STATUT',
     ],
     ...apiData.map((item) => [
       item.zone,
       item.site,
+      `SEMAINE DU ${item.date_debut ? new Date(item.date_debut).toISOString().split('T')[0] : ''} AU ${item.date_fin ? new Date(item.date_fin).toISOString().split('T')[0] : ''}` ,
       item.date_attente == '' ? 'NON FAIT' : item.date_prise_en_compte == '' ? 'NON PRIS EN COMPTE' : 'FAIT'
     ])
   ]

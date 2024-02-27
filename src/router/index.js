@@ -48,11 +48,12 @@ const routes = [
     // Document title tag
     // We combine it with defaultDocumentTitle set in `src/main.js` on router.afterEach hook
     meta: {
-      title: 'Dashboard'
+      title: 'Dashboard',
+      requiresAuth: true
     },
     path: '/dashboard/:type/:pass',
     name: 'Dashboard',
-    component: Home
+    component: Home,
   },
   {
     meta: {
@@ -224,5 +225,21 @@ const router = createRouter({
     return savedPosition || { top: 0 }
   }
 })
+
+// Guard de navigation global
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // Vérifier l'authentification de l'utilisateur
+    const isAuthenticated = true;
+    if (!isAuthenticated) {
+      // Rediriger vers la page de connexion si non authentifié
+      next('/login');
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+});
 
 export default router

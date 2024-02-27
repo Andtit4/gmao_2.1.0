@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
-import { mdiChartTimelineVariant, mdiReload, mdiChartPie } from '@mdi/js'
+import { mdiChartTimelineVariant, mdiReload, mdiChartPie, mdiFileExcel } from '@mdi/js'
 import * as chartConfig from '@/components/Charts/chart.config.js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBoxWidget from '@/components/CardBoxWidget.vue'
@@ -12,6 +12,7 @@ import axios from 'axios'
 import apiService from '@/services/apiService'
 import { refreshPageOnceWithDelay, getStartAndEndOfWeek } from '@/services/document'
 import TogoMap from '@/layouts/TogoMapComponent.vue'
+import * as XLSX from 'xlsx'
 
 const chartData = ref(null)
 
@@ -113,6 +114,40 @@ const getNbSitePlannifie = async () => {
     })
 }
 
+const sitesWeeklyPlan = reactive({ list: [] })
+
+const getSiteWeeklyPlan = async () => {
+  axios({
+    url:
+      apiService.getUrl() +
+      '/plannifie/week/' +
+      form.formattedStartOfWeek +
+      '/' +
+      form.formattedEndOfWeek,
+    method: 'GET',
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
+  })
+    .then(async (res) => {
+      sitesWeeklyPlan.list = res.data
+      // console.log('Site prévus à la semaine: ', form.nbSitePlannifie)
+
+    })
+    .catch((err) => {
+      console.log('Erreur sites prévus à la semaine: ', err.message)
+    })
+}
+
+const getSiteWeeklyPlanForXlx = async (zone) => {
+  const response = await axios.get(apiService.getUrl() +
+    '/plannifie/week/' +
+    form.formattedStartOfWeek +
+    '/' +
+    form.formattedEndOfWeek,)
+  return response.data
+}
+
 const getNbSiteNonfait = async () => {
   axios({
     url:
@@ -130,6 +165,34 @@ const getNbSiteNonfait = async () => {
   })
 }
 
+const exportxlx = async () => {
+  console.log('Export init')
+  const apiData = await getSiteWeeklyPlanForXlx();
+  const data = [
+    [
+      'EQUIPE',
+      'SITE',
+      'STATUT'
+    ],
+    ...apiData.map((item) => [
+      item.zone,
+      item.site,
+      item.date_attente == '' ? 'NON FAIT' : item.date_prise_en_compte == '' ? 'NON PRIS EN COMPTE' : 'FAIT'
+    ])
+  ]
+  // Créez un objet workbook
+  const wb = XLSX.utils.book_new()
+
+  // Créez une feuille avec vos données
+  const ws = XLSX.utils.aoa_to_sheet(data)
+
+  // Ajoutez la feuille au workbook
+  XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
+
+  // Générez le fichier Excel et téléchargez-le
+  XLSX.writeFile(wb, 'PLANNIFICATION DE LA SEMAINE.xlsx')
+}
+
 onMounted(() => {
   initDate(),
     fillChartData(),
@@ -139,7 +202,8 @@ onMounted(() => {
     getNbSitePlannifie(),
     getNbSiteNonfait(),
     getNbNonFait(),
-    getNbFaitSemaine()
+    getNbFaitSemaine(),
+    getSiteWeeklyPlan()
 })
 </script>
 
@@ -147,6 +211,7 @@ onMounted(() => {
   <LayoutAuthenticated>
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" title="Tableau de bord" main>
+        <BaseButton :icon="mdiFileExcel" color="success" label="Export" @click="exportxlx()" />
       </SectionTitleLineWithButton>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-4 mb-6">
@@ -172,7 +237,6 @@ onMounted(() => {
       </CardBox>
       <CardBox class="mb-6">
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
-          <TogoMap />
         </div>
       </CardBox>
     </SectionMain>

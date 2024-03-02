@@ -2,106 +2,161 @@
 // import { mdiMonitorCellphone, mdiTableBorder, mdiTableOff, mdiGithub, mdiAccount } from '@mdi/js'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
-import { /* onMounted */ reactive } from 'vue'
+import { /* onMounted */ reactive, computed, ref, onMounted } from 'vue'
 import SectionMain from '@/components/SectionMain.vue'
-// import NotificationBar from '@/components/NotificationBar.vue'
+import NotificationBar from '@/components/NotificationBar.vue'
 // import TableSampleClients from '@/components/TableSampleClients.vue'
 import CardBox from '@/components/CardBox.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import BaseButton from '@/components/BaseButton.vue'
+import { mdiEye, mdiTrashCan } from '@mdi/js'
 // import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
 // import siteList from '@/views/sites/siteList.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
 // import generatePassword from '@/services/generatePassword.js'
+import CardBoxModal from '@/components/CardBoxModal.vue'
+import { useMainStore } from '@/stores/main'
+
+
 
 const form = reactive({
-  type_equipement: '',
-  numero_de_serie: '',
-  intitule: '',
-  total: '',
-  email: '',
-  nom_lot: '',
-  lot_date: ''
+  article: '',
+  description: '',
+  stock_physique: '',
+  showSucess: false,
+  showError: false,
+  errMessage: '',
+  critical_low: ''
 })
 
-const selectOptions = [
-  { id: 1, label: 'GE' },
-  { id: 2, label: 'PANNEAU SOLAIRE' },
-  { id: 3, label: 'REGULATEUR' },
-  { id: 4, label: 'UPS' },
-  { id: 5, label: 'TGBT' },
-  { id: 6, label: 'REDRESSEUR' },
-  { id: 7, label: 'PROTECTION' },
-  { id: 8, label: 'BATTERIE DEMARRAGE' },
-  { id: 9, label: 'BATTERIE PS' },
-  { id: 10, label: 'BATTERIE UPS' },
-  { id: 11, label: 'CLIMATISATION' }
-]
+const edit = reactive({
+  article: '',
+  description: '',
+  stock_physique: '',
+  showSucess: false,
+  showError: false,
+  errMessage: '',
+  critical_low: ''
+})
+
+const equipements = reactive({ list: [] })
+
+const getAllEquipement = () => {
+  axios({
+    url: apiService.getUrl() + '/stock',
+    method: 'GET'
+  })
+    .then((response) => {
+      equipements.list = response.data
+    })
+    .catch((e) => {
+      console.log('An error occured ' + e)
+    })
+}
+const notificationSettingsModel = ref([])
+const notificationsOutline = computed(() => notificationSettingsModel.value.indexOf('outline') > -1)
+const isModalActive = ref(false)
+
+
 
 const submit = () => {
   // console.log(gen)
+
   axios({
-    url: apiService.getUrl() + '/materiel/create',
+    url: apiService.getUrl() + '/stock',
     method: 'POST',
-    headers: {
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-      'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
-      'Access-Control-Allow-Credentials': true
-    },
     data: {
-      type_equipement: form.type_equipement.label,
-      total: form.total,
-      nom_lot: form.nom_lot,
-      lot_date: form.ajouter_le,
-      action: 'Entrée',
-      nombre_disponible: form.total
+      article: form.article,
+      description: form.description,
+      stock_physique: form.stock_physique,
+      critical_low: form.critical_low
     }
-  }).then((repsonse) => {
-    console.log('Success ' + repsonse)
+  }).then((response) => {
+    console.log(response)
+    form.showSucess = true
+    setTimeout(() => {
+      location.reload()
+    }, 1000)
+  }).catch((err) => {
+    form.errMessage = err.message
+    form.showError = true
+  })
 
-    axios({
-      url: apiService.getUrl() + '/historique/create',
-      method: 'POST',
-      headers: {
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-        'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
-        'Access-Control-Allow-Credentials': true
-      },
-      data: {
-        type_equipement: form.type_equipement.label,
-        numero_de_serie: form.type_equipement.label,
-        nom_lot: form.nom_lot,
-        nombre: form.total,
-        ajouter_le: form.ajouter_le,
-        motif: 'AJOUT DU LOT DE ' + form.nom_lot + ' AU MAGASIN',
-        vers: 'MAGASIN',
-        action: 'Entrée'
-      }
-    }).then((res) => {
-      console.log('Success ' + res)
-    })
+}
 
+const deleteEquipement = (id) => {
+  axios({
+    url: apiService.getUrl() + '/stock/' + id,
+    method: 'DELETE'
+  }).then((res) => {
+    console.log(res)
     setTimeout(() => {
       location.reload()
     }, 1000)
   })
 }
+
+const show = (id) => {
+  isModalActive.value = true;
+  axios({
+    url: apiService.getUrl() + '/stock/' + id,
+    method: 'GET'
+  }).then((res) => {
+    edit.article = res.data.article,
+      edit.description = res.data.description,
+      edit.stock_physique = res.data.stock_physique,
+      edit.critical_low = res.data.critical_low
+  })
+}
+const mainStore = useMainStore()
+
+
+onMounted(() => {
+  getAllEquipement()
+})
+
 </script>
 
 <template>
   <LayoutAuthenticated>
+    <CardBoxModal v-model="isModalActive" title="Détails">
+      <FormField label="Informations générale">
+        <FormControl v-model="edit.article" />
+        <FormControl v-model="edit.description" />
+        <FormField label="">
+          <FormControl v-model="edit.stock_physique" />
+          <FormControl v-model="edit.critical_low" />
+        </FormField>
+        <FormField label="Equipe / Stock">
+          <FormControl placeholder="Equipe" />
+          <FormControl placeholder="Stock" />
+        </FormField>
+      </FormField>
+    </CardBoxModal>
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Lot d'équipement" main>
+      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Matériels" main>
       </SectionTitleLineWithButton>
       <CardBox form @submit.prevent="submit()">
+        <div v-if="form.showSucess == true">
+          <NotificationBar color="success" :icon="mdiInformation" :outline="notificationsOutline">
+            <b>Matériel ajouté avec succès</b>.
+          </NotificationBar>
+        </div>
+        <div v-if="form.showError == true">
+          <NotificationBar color="danger" :icon="mdiInformation" :outline="notificationsOutline">
+            <b>Une erreur est survenue {{ form.errMessage }}</b>.
+          </NotificationBar>
+        </div>
         <FormField label="">
           <FormField label="Informations générale">
-            <FormControl v-model="form.type_equipement" :options="selectOptions" />
-            <FormControl v-model="form.nom_lot" placeholder="Nom du lot" />
-            <FormControl v-model="form.total" placeholder="total" type="number" />
-            <FormControl v-model="form.lot_date"  type="date" />
+            <FormControl v-model="form.article" placeholder="Id Article" />
+            <FormControl v-model="form.description" placeholder="Description" />
+            <FormField label="Paramètres">
+              <FormControl v-model="form.stock_physique" placeholder="Nombre disponible" type="number" />
+              <FormControl v-model="form.critical_low" placeholder="Critical Low" type="number" />
+            </FormField>
           </FormField>
         </FormField>
         <BaseDivider />
@@ -113,11 +168,49 @@ const submit = () => {
         </template>
       </CardBox>
     </SectionMain>
-
     <SectionMain>
-      <!-- <CardBox has-table>
-        <siteList />
-      </CardBox> -->
+      <CardBox hasTable>
+        <div class="max-h-[32rem] overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th v-if="checkable" />
+                <th />
+                <th>Article Id</th>
+                <th>Description</th>
+                <th>Nombre Enregistré</th>
+                <th></th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(equipement, index) in equipements.list" :key="index">
+                <TableCheckboxCell v-if="checkable" @checked="checked($event, equipement)" />
+                <td class="border-b-0 lg:w-6 before:hidden">
+                  <UserAvatar :username="equipement.type_equipement" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
+                </td>
+                <td data-label="Article Id">
+                  {{ equipement.article }}
+                </td>
+                <td data-label="Description">
+                  {{ equipement.description }}
+                </td>
+                <td data-label="Nombre enregistré">
+                  {{ equipement.stock_physique }}
+                </td>
+                <td class="before:hidden lg:w-1 whitespace-nowrap">
+                  <BaseButtons type="justify-start lg:justify-end" no-wrap>
+                    <BaseButton color="info" :icon="mdiEye" small @click="show(equipement._id)" />
+                    <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteEquipement(equipement._id)" />
+                  </BaseButtons>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </CardBox>
+
     </SectionMain>
   </LayoutAuthenticated>
 </template>

@@ -117,7 +117,7 @@ if (type == 'superviseur') {
       icon: mdiViewList,
       menu: [
         {
-          label: 'Ajouter',
+          label: 'Matériels',
           to: '/equipement/' + type + '/' + pass
         },
         {

@@ -171,12 +171,14 @@ const exportxlx = async () => {
   const data = [
     [
       'EQUIPE',
+      'SITE ID',
       'SITE',
       'SEMAINE',
       'STATUT',
     ],
     ...apiData.map((item) => [
       item.zone,
+      item.site_id,
       item.site,
       `SEMAINE DU ${item.date_debut ? new Date(item.date_debut).toISOString().split('T')[0] : ''} AU ${item.date_fin ? new Date(item.date_fin).toISOString().split('T')[0] : ''}` ,
       item.date_attente == '' ? 'NON FAIT' : item.date_prise_en_compte == '' ? 'NON PRIS EN COMPTE' : 'FAIT'
@@ -239,6 +241,7 @@ onMounted(() => {
       </CardBox>
       <CardBox class="mb-6">
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
+          <TogoMap></TogoMap>
         </div>
       </CardBox>
     </SectionMain>

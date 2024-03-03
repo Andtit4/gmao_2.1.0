@@ -124,8 +124,6 @@ onMounted(() => {
   <LayoutAuthenticated>
     <CardBoxModal v-model="showCompleteModal" title="Complèter">
     <p>Clôturer l'intervention</p>
-    <FormControl v-model="form.numero_ticket" placeholder="Numéro de Ticket GMAO" />
-
     <FormControl v-model="form.date_prise_en_compte" type="date" />
     <BaseButton label="Clôturer" color="success" @click="priseEnCompteC()" />
   </CardBoxModal>

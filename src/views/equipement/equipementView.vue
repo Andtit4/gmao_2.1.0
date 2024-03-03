@@ -28,7 +28,8 @@ const form = reactive({
   showSucess: false,
   showError: false,
   errMessage: '',
-  critical_low: ''
+  critical_low: '',
+  stock: ''
 })
 
 const edit = reactive({
@@ -60,6 +61,17 @@ const notificationsOutline = computed(() => notificationSettingsModel.value.inde
 const isModalActive = ref(false)
 
 
+const entrepots = reactive({ list: [] })
+
+const getAllEntrepot = async () => {
+  try {
+    const res = await apiService.getEntrepot();
+    entrepots.list = res.data;
+  } catch (error) {
+    form.showError = true;
+    form.errMessage = 'Une erreur liée à la capture des stocks ' + error;
+  }
+}
 
 const submit = () => {
   // console.log(gen)
@@ -112,9 +124,16 @@ const show = (id) => {
 }
 const mainStore = useMainStore()
 
+const updateEnter = async (stock, article) => {
+  await apiService.updateStock(stock, article);
+  setTimeout(() => {
+    location.reload()
+  }, 1000)
+}
 
 onMounted(() => {
   getAllEquipement()
+  getAllEntrepot()
 })
 
 </script>
@@ -130,10 +149,16 @@ onMounted(() => {
           <FormControl v-model="edit.critical_low" />
         </FormField>
         <FormField label="Equipe / Stock">
-          <FormControl placeholder="Equipe" />
-          <FormControl placeholder="Stock" />
+          <select v-model="form.stock" class="form-select bg-white dark:bg-slate-800">
+            <option value="">Séléctionnez la zone affectée</option>
+            <option v-for="(zone, index) in entrepots.list" :key="index" :value="zone.id_entrepot">
+              {{ zone.id_entrepot }} | {{ zone.zone }}
+            </option>
+          </select>
         </FormField>
       </FormField>
+      <BaseButton type="submit" color="info" label="Valider" @click="updateEnter(form.stock, edit.article)" />
+
     </CardBoxModal>
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Matériels" main>
@@ -177,6 +202,7 @@ onMounted(() => {
                 <th v-if="checkable" />
                 <th />
                 <th>Article Id</th>
+                <th>Stock</th>
                 <th>Description</th>
                 <th>Nombre Enregistré</th>
                 <th></th>
@@ -192,6 +218,16 @@ onMounted(() => {
                 <td data-label="Article Id">
                   {{ equipement.article }}
                 </td>
+                <div v-if="equipement.stock == ''">
+                  <td data-label="Stock">
+                    <span style="color: red;">Non attribué à un stock</span>
+                  </td>
+                </div>
+                <div v-else>
+                  <td data-label="Stock">
+                    {{ equipement.stock }}
+                  </td>
+                </div>
                 <td data-label="Description">
                   {{ equipement.description }}
                 </td>

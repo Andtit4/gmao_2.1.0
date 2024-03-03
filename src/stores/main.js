@@ -8,12 +8,15 @@ import Cookies from 'js-cookie'
 export const useMainStore = defineStore('main', () => {
   let userName = ref([])
   const userEmail = ref([])
+  const input = ref([])
+  const inputview = ref([])
+
 
 
   let name = Cookies.get('nom')
   let firstname = Cookies.get('prenom')
   let email = Cookies.get('email')
-  
+
 
   userName.value = name + ' ' + firstname
   userEmail.value = email
@@ -26,6 +29,13 @@ export const useMainStore = defineStore('main', () => {
         '-'
       )}`
   )
+
+  const generateIdPrefix = () => {
+    const shortenedInput = input.value.substring(0, 3);
+    inputview.value = `${shortenedInput}-STOCK-`;
+
+
+  }
 
   const isFieldFocusRegistered = ref(false)
 
@@ -79,6 +89,8 @@ export const useMainStore = defineStore('main', () => {
   return {
     userName,
     userEmail,
+    input,
+    inputview,
     userAvatar,
     isFieldFocusRegistered,
     clients,
@@ -87,6 +99,7 @@ export const useMainStore = defineStore('main', () => {
     setUser,
     fetchSampleClients,
     fetchSampleHistory,
-    fetchSites
+    fetchSites,
+    generateIdPrefix
   }
 })

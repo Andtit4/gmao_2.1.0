@@ -121,7 +121,7 @@ if (type == 'superviseur') {
           to: '/equipement/' + type + '/' + pass
         },
         {
-          label: 'Liste matériel',
+          label: 'Sotcks',
           to: '/equipement/list/' + type + '/' + pass
         },
         {

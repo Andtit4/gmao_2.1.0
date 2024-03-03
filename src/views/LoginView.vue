@@ -34,9 +34,7 @@ const router = useRouter()
 const submit = () => {
   // router.push('/dashboard')
   const hash = CryptoJS.SHA256(form.pass)
-  // const url = apiService.getUrl() + `/admin/auth/${form.login}/${hash}`
-  // let type = Cookies.get('type')
-  // console.log('type ',)
+
 
   axios({
     url: apiService.getUrl() + `/admin/auth/${form.login}/${hash}`,

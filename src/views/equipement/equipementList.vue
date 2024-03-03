@@ -151,13 +151,6 @@ const fetchZone = async () => {
     form.showError = true;
     form.errMessage = 'Une erreur liée à la capture des zone ' + error;
   })
-  /* try {
-    const response =  await apiService.getZone();
-    zones.list = await response.data;
-  } catch (error) {
-    form.showError = true;
-    form.errMessage = 'Une erreur liée à la capture des zone ' + error;
-  } */
 }
 
 

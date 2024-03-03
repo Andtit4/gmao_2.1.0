@@ -16,171 +16,114 @@ import axios from 'axios'
 import apiService from '@/services/apiService'
 import generatePassword from '@/services/generatePassword.js'
 
+const tabs = reactive([
+  { name: 'Tranfert', content: 'Contenu de l\'onglet 1' },
+  { name: 'Utilisation', content: 'Contenu de l\'onglet 2' }
+]);
+
+const state = reactive({
+  activeTab: 0,
+  hoverTab: null
+});
+
 const form = reactive({
-  type_equipement: '',
-  numero_de_serie: '',
-  intitule: '',
-  email: '',
-  ajouter_le: '',
-  nom_lot: ''
+  depart: '',
+  to: '',
+  showError: false,
+  errMessage: ''
 })
 
-const selectOptions = [
-  { id: 1, label: 'GE' },
-  { id: 2, label: 'PANNEAU SOLAIRE' },
-  { id: 3, label: 'REGULATEUR' },
-  { id: 4, label: 'UPS' },
-  { id: 5, label: 'TGBT' },
-  { id: 6, label: 'REDRESSEUR' },
-  { id: 7, label: 'PROTECTION' },
-  { id: 8, label: 'BATTERIE DEMARRAGE' },
-  { id: 9, label: 'BATTERIE PS' },
-  { id: 10, label: 'BATTERIE UPS' },
-  { id: 11, label: 'CLIMATISATION' }
-]
+const stocks = reactive({ list: [] })
 
-const equipementOptions = reactive({ list: [] })
-
-const getAllEquipement = () => {
-  axios({
-    url: apiService.getUrl() + '/materiel',
-    method: 'GET'
-  })
-    .then((response) => {
-      equipementOptions.list = response.data
-    })
-    .catch((e) => {
-      console.log('An error occured ' + e)
-    })
+const getStocks = async () => {
+  try {
+    const res = await apiService.getEntrepot()
+    stocks.list = await res.data;
+  } catch (error) {
+    form.showError = true
+    form.errMessage = 'Erreur entrepôt ' + error;
+  }
 }
 
-const searchResult = reactive({ list: [] })
-const submit = () => {
-  axios({
-    url: apiService.getUrl() + '/materiel/search?type_equipement=' + form.type_equipement,
-    method: 'GET'
-  })
-    .then((res) => {
-      console.log('Nombre dispo: ', res.data[0].total)
+const articleFetch = reactive({ list: [] })
 
-      // Request to update nombre disponible dans la table materiel
-      axios({
-        url: apiService.getUrl() + '/historique/create',
-        method: 'POST',
-        headers: {
-          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-          'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
-          'Access-Control-Allow-Credentials': true
-        },
-        data: {
-          type_equipement: form.type_equipement,
-          numero_de_serie: form.numero_de_serie,
-          intitule: form.intitule,
-          ajouter_le: form.ajouter_le,
-          nom_lot: form.nom_lot,
-          nombre: '1',
-          action: 'Entrée',
-          nombre_disponible: res.data[0].nombre_disponible,
-          motif: 'AJOUT DE MATERIEL DANS LE MAGASIN',
-          vers: 'MAGASIN'
-        }
-      }).then((res) => {
-        console.log('Success ' + res)
-      })
-      /* axios({
-          url: apiService.getUrl() + '/materiel/' + res.data[0]._id,
-          method: 'PUT',
-          data: {
-            nombre_disponible: nombre_disponible
-          }
-        }).then((res) => {
-          console.log('modified ' + res.data)
-
-        }) */
-
-      axios({
-        url: apiService.getUrl() + '/equipement/create',
-        method: 'POST',
-        headers: {
-          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-          'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
-          'Access-Control-Allow-Credentials': true
-        },
-        data: {
-          type_equipement: form.type_equipement,
-          numero_de_serie: form.numero_de_serie,
-          intitule: form.intitule,
-          action: 'Entrée',
-          nom_lot: form.nom_lot,
-          ajouter_le: form.ajouter_le,
-          nombre_disponible: res.data[0].nombre_disponible
-        }
-      }).then((repsonse) => {
-        console.log('Success ' + repsonse)
-
-        // Request for search type equipement for materiel
-
-        setTimeout(() => {
-          location.reload()
-        }, 3000)
-      })
-    })
-    .catch((err) => {
-      console.log('An error occured while getting search equipement ', err)
-    })
+const searchArticle = async () => {
+  console.log(form.depart)
+  try {
+    const res = await apiService.getArticleByStock(form.depart)
+    articleFetch.list = await res.data
+  } catch (error) {
+    form.showError = true
+    form.errMessage = 'Une erreur est survenue des matériels du stock ' + error;
+  }
 }
+
+const selectTab = (index) => {
+  state.activeTab = index;
+};
 
 onMounted(() => {
-  getAllEquipement()
+  getStocks()
 })
 </script>
 
 <template>
   <LayoutAuthenticated>
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Equipements" main>
+      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Mouvements" main>
       </SectionTitleLineWithButton>
       <CardBox form @submit.prevent="submit()">
-        <FormField label="">
-          <FormField label="Informations générale">
-            <FormField>
-              <FormControl v-model="form.numero_de_serie" placeholder="Numero de référence" />
-              <FormControl v-model="form.intitule" placeholder="Intitulé" />
-            </FormField>
-            <FormField label="Equipements">
-              <select v-model="form.nom_lot" class="form-select bg-white dark:bg-slate-800">
-                <option value="">Sélectionnez le lot</option>
-                <option
-                  v-for="(equipement, index) in equipementOptions.list"
-                  :key="index"
-                  :value="equipement.nom_lot"
-                >
-                  {{ equipement.nom_lot }}
-                </option>
-              </select>
-              <select v-model="form.type_equipement" class="form-select bg-white dark:bg-slate-800">
-                <option value="">Le Type d'équipement</option>
-                <option
-                  v-for="(equipement, index) in equipementOptions.list"
-                  :key="index"
-                  :value="equipement.type_equipement"
-                >
-                  {{ equipement.type_equipement }}
-                </option>
-              </select>
-            </FormField>
-
-            <FormControl v-model="form.ajouter_le" type="date" />
-          </FormField>
-        </FormField>
-        <BaseDivider />
-
-        <template #footer>
-          <BaseButtons>
-            <BaseButton type="submit" color="info" label="Submit" @click="submit()" />
-            <BaseButton type="reset" color="info" outline label="Reset" />
-          </BaseButtons>
-        </template>
+        <div v-if="form.showSucess == true">
+          <NotificationBar color="success" :icon="mdiInformation" :outline="notificationsOutline">
+            <b>Matériel ajouté avec succès</b>.
+          </NotificationBar>
+        </div>
+        <div v-if="form.showError == true">
+          <NotificationBar color="danger" :icon="mdiInformation" :outline="notificationsOutline">
+            <b>Une erreur est survenue {{ form.errMessage }}</b>.
+          </NotificationBar>
+        </div>
+        <div class="tab-bar">
+          <div v-for="(tab, index) in tabs" :key="index"
+            :class="{ 'active': state.activeTab === index, 'hover': state.hoverTab === index }"
+            @click="selectTab(index)">
+            {{ tab.name }}
+          </div>
+        </div>
+        <br>
+        <div class="tab-content">
+          <div v-for="(tab, index) in tabs" v-show="state.activeTab === index" :key="index">
+            <div v-if="index === 0">
+              <FormField label="">
+                <FormField label="Informations générale">
+                  <select v-model="form.depart" class="form-select bg-white dark:bg-slate-800" @change="searchArticle()">
+                    <option value="">Séléctionnez le stock de départ</option>
+                    <option v-for="(zone, index) in stocks.list" :key="index" :value="zone.id_entrepot">
+                      {{ zone.id_entrepot }}
+                    </option>
+                  </select>
+                  <select v-model="form.to" class="form-select bg-white dark:bg-slate-800">
+                    <option value="">Séléctionnez le stock d'arrivé</option>
+                    <option v-for="(zone, index) in stocks.list" :key="index" :value="zone._id">
+                      {{ zone.id_entrepot }}
+                    </option>
+                  </select>
+                  <FormField label="">
+                    <select v-model="form.to" class="form-select bg-white dark:bg-slate-800">
+                    <option value="">Séléctionnez le matériel</option>
+                    <option v-for="(zone, index) in articleFetch.list" :key="index" :value="zone.nom">
+                      {{ zone.description }}
+                    </option>
+                  </select>
+                  </FormField>
+                </FormField>
+              </FormField>
+            </div>
+            <div v-else>
+              Utilisation
+            </div>
+          </div>
+        </div>
       </CardBox>
     </SectionMain>
 
@@ -191,3 +134,34 @@ onMounted(() => {
     </SectionMain>
   </LayoutAuthenticated>
 </template>
+
+
+<style scoped>
+.tab-bar {
+  display: flex;
+}
+
+.tab-bar div {
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.tab-bar div.active {
+  background-color: #3498db;
+  border-radius: 15px;
+  color: #fff;
+}
+
+.tab-bar div.hover:hover {
+  background-color: #f1f1f1;
+}
+
+.tab-content div {
+  display: none;
+}
+
+.tab-content div {
+  display: block;
+}
+</style>

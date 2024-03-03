@@ -121,11 +121,11 @@ if (type == 'superviseur') {
           to: '/equipement/' + type + '/' + pass
         },
         {
-          label: 'Sotcks',
+          label: 'Stocks',
           to: '/equipement/list/' + type + '/' + pass
         },
         {
-          label: 'Entrées',
+          label: 'Mouvements',
           to: '/article/' + type + '/' + pass
         },
         {

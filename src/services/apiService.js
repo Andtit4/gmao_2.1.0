@@ -52,5 +52,15 @@ export default {
         'Access-Control-Allow-Origin': '*'
       }
     })
+  },
+
+  getArticleByStock(stock) {
+    return axios({
+      url: this.getUrl() + '/stock/search?stock=' + stock,
+      method: 'GET',
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      }
+    })
   }
 }

@@ -83,6 +83,7 @@ const submit = () => {
       article: form.article,
       description: form.description,
       stock_physique: form.stock_physique,
+      nombre_disponible: form.stock_physique,
       critical_low: form.critical_low
     }
   }).then((response) => {

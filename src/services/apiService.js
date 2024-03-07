@@ -62,5 +62,43 @@ export default {
         'Access-Control-Allow-Origin': '*'
       }
     })
+  },
+
+  getOneArticleByStock(stock, _id) {
+    return axios({
+      url: this.getUrl() + '/stock/search/one?stock=' + stock + '&_id=' + _id,
+      method: 'GET',
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      }
+    })
+  },
+
+  createShare(article, description, nombre_a_transferer, stock_depart, stock_arrive, motif) {
+    return axios({
+      url: this.getUrl() + '/share',
+      method: 'POST',
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      data: {
+        article: article,
+        description: description,
+        nombre_a_transferer: nombre_a_transferer,
+        stock_depart: stock_depart,
+        stock_arrive: stock_arrive,
+        motif: motif
+      }
+    })
+  },
+
+  updateArticleNombreDisponible(nombre_disponible, _id) {
+    return axios({
+      url: this.getUrl() + '/stock/modify/available/' + nombre_disponible + '/' + _id,
+      method: 'PUT',
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+    })
   }
 }

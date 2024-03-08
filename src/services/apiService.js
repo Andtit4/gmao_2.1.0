@@ -100,5 +100,15 @@ export default {
         'Access-Control-Allow-Origin': '*'
       },
     })
+  },
+
+  historyTransaction() {
+    return axios({
+      url: this.getUrl() + '/share',
+      method: 'GET',
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+    })
   }
 }

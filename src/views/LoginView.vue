@@ -95,17 +95,17 @@ const submit = () => {
           console.log('An error occured', err.message)
         })
     } else {
-      const id = response.data.admin._id
-      const email = response.data.admin.email
-      const nom = response.data.admin.nom
-      const prenom = response.data.admin.prenom
+      const id = response.data._id
+      const email = response.data.email
+      const nom = response.data.nom
+      const prenom = response.data.prenom
       Cookies.set('type', 'admin')
       Cookies.set('id', id)
       Cookies.set('email', email)
       Cookies.set('nom', nom)
       Cookies.set('prenom', prenom)
       Cookies.set('pass', hash)
-      useMainStore().setUser(response.data.admin)
+      useMainStore().setUser(response.data)
       router.push({
         // path: "/partner/dashboard/",
         name: 'Dashboard',

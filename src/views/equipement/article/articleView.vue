@@ -18,7 +18,8 @@ import generatePassword from '@/services/generatePassword.js'
 
 const tabs = reactive([
   { name: 'Tranfert', content: 'Contenu de l\'onglet 1' },
-  { name: 'Utilisation', content: 'Contenu de l\'onglet 2' }
+  { name: 'Utilisation', content: 'Contenu de l\'onglet 2' },
+  { name: 'Etat', content: 'Contenu de l\'état' }
 ]);
 
 const state = reactive({
@@ -136,8 +137,36 @@ const compare = () => {
   }
 }
 
+const sites = reactive({ list: [] })
+
+const getSites = () => {
+  axios({
+    url: apiService.getUrl() + '/site',
+    method: 'GET'
+  }).then((res) => {
+    sites.list = res.data;
+  }).catch((err) => {
+    form.showError = true;
+    form.errMessage = 'Une erreur est survenue ' + err;
+  })
+}
+
+const shares = reactive({ list: [] })
+const getHistory = async () => {
+  try {
+    const res = await apiService.historyTransaction()
+    shares.list = res.data
+  } catch (error) {
+    form.showError = true
+    form.errMessage = 'Une erreur est survenue lors de la capture des transfères ' + error;
+  }
+}
+
+
 onMounted(() => {
-  getStocks()
+  getStocks(),
+    getSites(),
+    getHistory()
 })
 </script>
 
@@ -191,12 +220,12 @@ onMounted(() => {
                         {{ zone.description }} || Nombre disponible : {{ zone.stock_physique }}
                       </option>
                     </select>
-                    <FormControl type="text" v-model="form.motif" placeholder="Motif du transfert" />
+                    <FormControl v-model="form.motif" type="text" placeholder="Motif du transfert" />
                   </FormField>
                   <FormField label="Nombre">
-                    <FormControl type="text" v-model="OneArticleToShare.stock_physique"
+                    <FormControl v-model="OneArticleToShare.stock_physique" type="text"
                       placeholder="Nombre disponible" />
-                    <FormControl type="number" v-model="form.numberShare" placeholder="Nombre à transférer"
+                    <FormControl v-model="form.numberShare" type="number" placeholder="Nombre à transférer"
                       @input="compare()" />
                   </FormField>
                 </FormField>
@@ -204,8 +233,80 @@ onMounted(() => {
               <BaseDivider />
               <BaseButton label="Transférer" color="info" @click="startShare()" />
             </div>
+            <div v-else-if="index === 1">
+              <FormField label="">
+                <select v-model="form.depart" class="form-select bg-white dark:bg-slate-800" @change="searchArticle()">
+                  <option value="">Séléctionnez le stock de départ</option>
+                  <option v-for="(zone, index) in stocks.list" :key="index" :value="zone.id_entrepot">
+                    {{ zone.id_entrepot }}
+                  </option>
+                </select>
+                <select v-model="form.materiel" class="form-select bg-white dark:bg-slate-800" @change="getNombre()">
+                  <option value="">Séléctionnez le matériel</option>
+                  <option v-for="(zone, index) in articleFetch.list" :key="index" :value="zone._id">
+                    {{ zone.description }} || Nombre disponible : {{ zone.stock_physique }}
+                  </option>
+                </select>
+              </FormField>
+              <FormField label="">
+                <FormControl v-model="OneArticleToShare.stock_physique" type="text" placeholder="Nombre disponible" />
+                <FormControl v-model="form.numberShare" type="number" placeholder="Nombre à transférer"
+                  @input="compare()" />
+              </FormField>
+              <FormField label="">
+                <FormControl v-model="form.motif" type="text" placeholder="Motif du transfert" />
+                <select v-model="form.to" class="form-select bg-white dark:bg-slate-800">
+                  <option value="">Séléctionnez le site d'arrivé</option>
+                  <option v-for="(zone, index) in sites.list" :key="index" :value="zone.nom_site">
+                    {{ zone.nom_site }}
+                  </option>
+                </select>
+              </FormField>
+              <BaseDivider />
+              <BaseButton label="Valider" color="info" @click="startShare()" />
+            </div>
             <div v-else>
-              Utilisation
+              <div class="max-h-[32rem] overflow-x-auto">
+                <table>
+                  <thead>
+                    <tr>
+                      <th v-if="checkable" />
+                      <th />
+                      <th>Article</th>
+                      <th>Date</th>
+                      <th>Ordre de transfert</th>
+                      <th>Motif</th>
+                      <th>Nombre transféré</th>
+                      <th />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(site, index) in shares.list" :key="index">
+                      <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
+                      <td class="border-b-0 lg:w-6 before:hidden">
+                        <!-- <UserAvatar :username="site.nom_site" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
+                      </td>
+                      <td data-label="Article">
+                        {{ site.article }}
+                      </td>
+                      <td data-label="Date">
+                        {{ site.ajouter_le ? new Date(site.ajouter_le).toISOString().split('T')[0] : '' }}
+                      </td>
+                      <td data-label="Ordre de transfert">
+                        De {{ site.stock_depart }} à {{ site.stock_arrive }}
+                      </td>
+                      <td data-label="Motif">
+                        {{ site.motif }}
+                      </td>
+                      <td data-label="Nombre transféré">
+                        {{ site.nombre_a_transferer }}
+                      </td>
+                      <td class="before:hidden lg:w-1 whitespace-nowrap">
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

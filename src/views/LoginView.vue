@@ -40,7 +40,9 @@ const submit = () => {
     url: apiService.getUrl() + `/admin/auth/${form.login}/${hash}`,
     method: 'GET'
   }).then((response) => {
-    if (response.data.admin._id == undefined) {
+    console.log('Response: ', response.data)
+
+    if (response.data._id == undefined) {
       /* form.showError = true
       form.err = "Utilisateur recherché n'existe pas" */
       axios({

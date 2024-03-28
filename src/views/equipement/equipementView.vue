@@ -36,6 +36,7 @@ const edit = reactive({
   article: '',
   description: '',
   stock_physique: '',
+  nombre_disponible: '',
   showSucess: false,
   showError: false,
   errMessage: '',
@@ -120,7 +121,8 @@ const show = (id) => {
     edit.article = res.data.article,
       edit.description = res.data.description,
       edit.stock_physique = res.data.stock_physique,
-      edit.critical_low = res.data.critical_low
+      edit.critical_low = res.data.critical_low,
+      edit.nombre_disponible = res.data.nombre_disponible
   })
 }
 const mainStore = useMainStore()
@@ -148,6 +150,9 @@ onMounted(() => {
         <FormField label="">
           <FormControl v-model="edit.stock_physique" />
           <FormControl v-model="edit.critical_low" />
+        </FormField>
+        <FormField label="Nombre disponible">
+          <FormControl v-model="edit.nombre_disponible" />
         </FormField>
         <FormField label="Equipe / Stock">
           <select v-model="form.stock" class="form-select bg-white dark:bg-slate-800">
@@ -216,8 +221,17 @@ onMounted(() => {
                 <td class="border-b-0 lg:w-6 before:hidden">
                   <UserAvatar :username="equipement.type_equipement" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
                 </td>
+
                 <td data-label="Article Id">
-                  {{ equipement.article }}
+                  <div v-if="parseInt(equipement.nombre_disponible) <= parseInt(equipement.critical_low)">
+                    <span style="color: orange;">{{ equipement.article }}</span>
+                  </div>
+                  <div v-else-if="parseInt(equipement.nombre_disponible) == 0">
+                    <span style="color: red">{{ equipement.article }}</span>
+                  </div>
+                  <div v-else>
+                    {{ equipement.article }}
+                  </div>
                 </td>
                 <div v-if="equipement.stock == ''">
                   <td data-label="Stock">
@@ -225,15 +239,44 @@ onMounted(() => {
                   </td>
                 </div>
                 <div v-else>
-                  <td data-label="Stock">
-                    {{ equipement.stock }}
-                  </td>
+                  <div v-if="parseInt(equipement.nombre_disponible) <= parseInt(equipement.critical_low)">
+                    <td data-label="Stock">
+                      <span style="color: orange;">{{ equipement.stock }}</span>
+                    </td>
+                  </div>
+                  <div v-else-if="parseInt(equipement.nombre_disponible) == 0">
+                    <td data-label="Stock">
+                      <span style="color: red">{{ equipement.stock }}</span>
+                    </td>
+                  </div>
+                  <div v-else>
+                    <td data-label="Stock">
+                      {{ equipement.stock }}
+                    </td>
+                  </div>
+
                 </div>
                 <td data-label="Description">
-                  {{ equipement.description }}
+                  <div v-if="parseInt(equipement.nombre_disponible) <= parseInt(equipement.critical_low)">
+                    <span style="color: orange;">{{ equipement.description }}</span>
+                  </div>
+                  <div v-else-if="parseInt(equipement.nombre_disponible) == 0">
+                    <span style="color: red">{{ equipement.description }}</span>
+                  </div>
+                  <div v-else>
+                    {{ equipement.description }}
+                  </div>
                 </td>
                 <td data-label="Nombre enregistré">
-                  {{ equipement.stock_physique }}
+                  <div v-if="parseInt(equipement.nombre_disponible) <= parseInt(equipement.critical_low)">
+                    <span style="color: orange;">{{ equipement.stock_physique }}</span>
+                  </div>
+                  <div v-else-if="parseInt(equipement.nombre_disponible) == 0">
+                    <span style="color: red">{{ equipement.stock_physique }}</span>
+                  </div>
+                  <div v-else>
+                    {{ equipement.stock_physique }}
+                  </div>
                 </td>
                 <td class="before:hidden lg:w-1 whitespace-nowrap">
                   <BaseButtons type="justify-start lg:justify-end" no-wrap>

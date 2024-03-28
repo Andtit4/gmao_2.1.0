@@ -69,7 +69,33 @@ if (type == 'superviseur') {
       label: 'Plannif.',
       icon: mdiLock,
       to: '/traiter/' + type + '/' + pass,
-    }
+    },
+    {
+      label: 'PDR',
+      icon: mdiViewList,
+      menu: [
+        {
+          label: 'Matériels',
+          to: '/equipement/' + type + '/' + pass
+        },
+        {
+          label: 'Stocks',
+          to: '/equipement/list/' + type + '/' + pass
+        },
+        {
+          label: 'Mouvements',
+          to: '/article/' + type + '/' + pass
+        },
+        /* {
+          label: 'Sortie',
+          to: '/sorti/' + type + '/' + pass
+        },
+        {
+          label: 'Historique',
+          to: '/historique/' + type + '/' + pass
+        } */
+      ]
+    },
   ]
 
 } else {
@@ -128,14 +154,14 @@ if (type == 'superviseur') {
           label: 'Mouvements',
           to: '/article/' + type + '/' + pass
         },
-        {
+        /* {
           label: 'Sortie',
           to: '/sorti/' + type + '/' + pass
         },
         {
           label: 'Historique',
           to: '/historique/' + type + '/' + pass
-        }
+        } */
       ]
     },
     {

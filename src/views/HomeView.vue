@@ -13,6 +13,7 @@ import apiService from '@/services/apiService'
 import { refreshPageOnceWithDelay, getStartAndEndOfWeek } from '@/services/document'
 import TogoMap from '@/layouts/TogoMapComponent.vue'
 import * as XLSX from 'xlsx'
+import CardZoneIntervention from '@/views/CardZoneIntervention.vue'
 
 const chartData = ref(null)
 
@@ -264,14 +265,19 @@ onMounted(() => {
       <CardBox class="mb-6">
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-4 mb-6">
           <CardBoxWidget color="text-emerald-500" :number="form.nbTotalFait" label="Sites faits" :icon="mdiSitemap" />
-          <CardBoxWidget color="text-yellow-500" :number="form.nbSiteTotalNonFait" label="Plannifiés non faits" :icon="mdiSitemap" />
+          <CardBoxWidget color="text-yellow-500" :number="form.nbSiteTotalNonFait" label="Plannifiés non faits"
+            :icon="mdiSitemap" />
           <CardBoxWidget color="text-red-500" :number="form.sitesRestants" label="Sites Restants" :icon="mdiSitemap" />
-          <CardBoxWidget color="text-blue-500" :number="form.progession" suffix='%' label="Progression" :icon="mdiChartPie" />
+          <CardBoxWidget color="text-blue-500" :number="form.progession" suffix='%' label="Progression"
+            :icon="mdiChartPie" />
         </div>
       </CardBox>
       <CardBox class="mb-6">
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
-          <TogoMap></TogoMap>
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-6">
+          <CardBox class="mb-6" title="Map">
+            <TogoMap></TogoMap>
+          </CardBox>
+          <CardZoneIntervention></CardZoneIntervention>
         </div>
       </CardBox>
     </SectionMain>

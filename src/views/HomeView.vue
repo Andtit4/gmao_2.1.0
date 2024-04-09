@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
-import { mdiChartTimelineVariant, mdiReload, mdiChartPie, mdiFileExcel } from '@mdi/js'
+import { mdiChartTimelineVariant, mdiReload, mdiChartPie, mdiFileExcel, mdiSitemap } from '@mdi/js'
 import * as chartConfig from '@/components/Charts/chart.config.js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBoxWidget from '@/components/CardBoxWidget.vue'
@@ -35,7 +35,7 @@ const form = reactive({
   nbAllSite: 0,
   sitesRestants: '',
   progession: '',
-  
+
   formattedEndOfWeek: '',
   formattedStartOfWeek: ''
 })
@@ -263,10 +263,10 @@ onMounted(() => {
 
       <CardBox class="mb-6">
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-4 mb-6">
-          <CardBoxWidget color="text-emerald-500" :number="form.nbTotalFait" label="Sites faits" />
-          <CardBoxWidget color="text-red-500" :number="form.nbSiteTotalNonFait" label="Plannifiés non faits" />
-          <CardBoxWidget color="text-red-500" :number="form.sitesRestants" label="Sites Restants" />
-          <CardBoxWidget color="text-red-500" :number="form.progession" suffix='%' label="Progression" />
+          <CardBoxWidget color="text-emerald-500" :number="form.nbTotalFait" label="Sites faits" :icon="mdiSitemap" />
+          <CardBoxWidget color="text-yellow-500" :number="form.nbSiteTotalNonFait" label="Plannifiés non faits" :icon="mdiSitemap" />
+          <CardBoxWidget color="text-red-500" :number="form.sitesRestants" label="Sites Restants" :icon="mdiSitemap" />
+          <CardBoxWidget color="text-blue-500" :number="form.progession" suffix='%' label="Progression" :icon="mdiChartPie" />
         </div>
       </CardBox>
       <CardBox class="mb-6">

@@ -84,7 +84,6 @@ const countAllSite = () => {
   }).then((res) => {
     form.nbAllSite = res.data[0].nb
     console.log('Sites   ',form.nbAllSite )
-
   })
 }
 

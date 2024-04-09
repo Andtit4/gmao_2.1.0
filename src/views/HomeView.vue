@@ -32,9 +32,36 @@ const form = reactive({
   nbSitePlannifie: 0,
   nbSiteNonFait: 0,
   nbSiteTotalNonFait: 0,
+  nbAllSite: 0,
+  sitesRestants: '',
+  progession: '',
+  
   formattedEndOfWeek: '',
   formattedStartOfWeek: ''
 })
+
+const countAllSite = () => {
+  axios({
+    url: apiService.getUrl() + '/site/all/nb',
+    method: 'GET'
+  }).then(async (res) => {
+    form.nbAllSite = res.data[0].nb
+    axios({
+      url: apiService.getUrl() + '/plannifie/done/nb',
+      method: 'GET',
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      }
+    }).then(async (res) => {
+      form.nbTotalFait = await res.data[0].nb
+      form.sitesRestants = parseInt(form.nbAllSite - form.nbTotalFait)
+      form.progession = Math.ceil(parseFloat(parseInt(form.nbTotalFait) * 100 / parseInt(form.nbAllSite)))
+      // form.progession = `${Math.ceil(parseFloat(parseInt(form.nbTotalFait) * 100 / parseInt(form.nbAllSite)))} %`
+
+      console.log('Sites restants   ', form.sitesRestants)
+    })
+  })
+}
 
 const getNbFait = async () => {
   axios({
@@ -180,7 +207,7 @@ const exportxlx = async () => {
       item.zone,
       item.site_id,
       item.site,
-      `SEMAINE DU ${item.date_debut ? new Date(item.date_debut).toISOString().split('T')[0] : ''} AU ${item.date_fin ? new Date(item.date_fin).toISOString().split('T')[0] : ''}` ,
+      `SEMAINE DU ${item.date_debut ? new Date(item.date_debut).toISOString().split('T')[0] : ''} AU ${item.date_fin ? new Date(item.date_fin).toISOString().split('T')[0] : ''}`,
       item.date_attente == '' ? 'NON FAIT' : item.date_prise_en_compte == '' ? 'NON PRIS EN COMPTE' : 'FAIT'
     ])
   ]
@@ -200,14 +227,15 @@ const exportxlx = async () => {
 onMounted(() => {
   initDate(),
     fillChartData(),
-    getNbFait(),
+    // getNbFait(),
     getNbEncours(),
     refreshPageOnceWithDelay(500),
     getNbSitePlannifie(),
     getNbSiteNonfait(),
     getNbNonFait(),
     getNbFaitSemaine(),
-    getSiteWeeklyPlan()
+    getSiteWeeklyPlan(),
+    countAllSite()
 })
 </script>
 
@@ -234,9 +262,11 @@ onMounted(() => {
       </SectionTitleLineWithButton>
 
       <CardBox class="mb-6">
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-4 mb-6">
           <CardBoxWidget color="text-emerald-500" :number="form.nbTotalFait" label="Sites faits" />
-          <CardBoxWidget color="text-red-500" :number="form.nbSiteTotalNonFait" label="Sites non faits" />
+          <CardBoxWidget color="text-red-500" :number="form.nbSiteTotalNonFait" label="Plannifiés non faits" />
+          <CardBoxWidget color="text-red-500" :number="form.sitesRestants" label="Sites Restants" />
+          <CardBoxWidget color="text-red-500" :number="form.progession" suffix='%' label="Progression" />
         </div>
       </CardBox>
       <CardBox class="mb-6">

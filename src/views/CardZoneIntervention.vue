@@ -1,4 +1,5 @@
 <script setup>
+import ProgressBarWidgetVue from "@/components/ProgressBarWidget.vue"
 import apiService from "@/services/apiService"
 import axios from "axios"
 import { onMounted, reactive } from 'vue'
@@ -8,7 +9,7 @@ const zones = reactive({ list: [] })
 
 const getAllZone = () => {
   axios({
-    url: apiService.getUrl() + '/zone',
+    url: apiService.getUrl() + '/preventive',
     method: 'GET'
   })
     .then((response) => {
@@ -31,6 +32,7 @@ onMounted(() => {
           <th v-if="checkable" />
           <th />
           <th>Zone</th>
+          <th>Progression</th>
           <th />
         </tr>
       </thead>
@@ -41,15 +43,10 @@ onMounted(() => {
             <!-- <UserAvatar :username="site.nom_site" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
           </td>
           <td data-label="Zone">
-            {{ site.nom }}
+            {{ site.zone }}
           </td>
-
           <td class="before:hidden lg:w-1 whitespace-nowrap">
-            <BaseButtons type="justify-start lg:justify-end" no-wrap>
-              <BaseButton color="success" :icon="mdiPencil" small @click="editSite(site._id)" />
-              <BaseButton color="info" :icon="mdiEye" small @click="showSite(site._id)" />
-              <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteSite(site._id)" />
-            </BaseButtons>
+            <ProgressBarWidgetVue :value="70" :maxValue="100" />
           </td>
         </tr>
       </tbody>

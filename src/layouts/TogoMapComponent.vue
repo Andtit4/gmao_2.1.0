@@ -128,7 +128,7 @@ onMounted(() => {
 
 <style scoped>
 #map {
-  height: 500px;
+  height: 600px;
 }
 </style>
 

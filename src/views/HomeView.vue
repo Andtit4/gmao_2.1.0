@@ -14,6 +14,7 @@ import { refreshPageOnceWithDelay, getStartAndEndOfWeek } from '@/services/docum
 import TogoMap from '@/layouts/TogoMapComponent.vue'
 import * as XLSX from 'xlsx'
 import CardZoneIntervention from '@/views/CardZoneIntervention.vue'
+import CardZoneGrid from '@/views/CardZoneGrid.vue'
 
 const chartData = ref(null)
 
@@ -277,7 +278,9 @@ onMounted(() => {
           <CardBox class="mb-6" title="Map">
             <TogoMap></TogoMap>
           </CardBox>
-          <CardZoneIntervention></CardZoneIntervention>
+        <CardBox class="mb-6" >
+          <CardZoneGrid></CardZoneGrid>
+          </CardBox>
         </div>
       </CardBox>
     </SectionMain>

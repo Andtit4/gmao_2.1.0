@@ -120,9 +120,10 @@ const submit = () => {
   <LayoutGuest>
     <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
       <CardBox :class="cardClass" is-form @submit.prevent="submit">
-        <div class="row">
-          <div class="col-md-4">
-            <img src="@/assets/logo.png" alt="" width="40" />
+        <div class="col">
+          <div class="col-md-4"  style="display: inline-block;">
+            <img src="@/assets/logo.png" alt="" width="40"  style="display: inline-block;"/>
+            <h1  style="display: inline-block; font-size: 24px; font-weight: bold; margin-left: 20px;">Energy Eye</h1>
           </div>
         </div>
         <br />

@@ -1,8 +1,8 @@
 <template>
   <div style="font-size: 10px;"></div>
         {{ progress }}%
-  <div class="progress-bar" :style="{ width: progress + '%' }" style="display: inline-block;">
-    <div class="progress-bar-inner">
+  <div class="progress-bar" :style="{ width: 100 + '%' }" style="display: inline-block; background-color: #74b7ff; ">
+    <div class="progress-bar-inner" :style="{ width: progress + '%' }">
     </div>
   </div>
 </template>
@@ -34,6 +34,7 @@ export default {
   background-color: #f0f0f0;
   border-radius: 5px;
   overflow: hidden;
+  background-color: #74b7ff
 }
 
 .progress-bar-inner {

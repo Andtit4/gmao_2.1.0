@@ -490,10 +490,9 @@ onMounted(() => {
   display: inline-block;
   width: calc(50% - 10px);
   /* Pour faire deux colonnes avec un espace de 20px entre */
-  margin-bottom: 5px;
   /* Espacement entre les lignes */
 
   font-size: 10px;
-  padding: 10px;
+  padding: 5px;
 }
 </style>

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
-import { mdiChartTimelineVariant, mdiReload, mdiChartPie, mdiFileExcel, mdiSitemap, mdiTools } from '@mdi/js'
+import { mdiChartTimelineVariant, mdiReload, mdiChartPie, mdiFileExcel, mdiSitemap, mdiTools, mdiOil } from '@mdi/js'
 import * as chartConfig from '@/components/Charts/chart.config.js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBoxWidget from '@/components/CardBoxWidget.vue'
@@ -15,8 +15,16 @@ import TogoMap from '@/layouts/TogoMapComponent.vue'
 import * as XLSX from 'xlsx'
 import CardZoneIntervention from '@/views/CardZoneIntervention.vue'
 import CardZoneGrid from '@/views/CardZoneGrid.vue'
+import TimeLine from '@/layouts/TimeLine.vue'
 
 const chartData = ref(null)
+
+const events = reactive({
+  list: [
+
+
+  ]
+})
 
 const initDate = () => {
   const result = getStartAndEndOfWeek()
@@ -226,6 +234,17 @@ const exportxlx = async () => {
   XLSX.writeFile(wb, 'PLANNIFICATION DE LA SEMAINE.xlsx')
 }
 
+const share = async () => {
+  axios({
+    url: apiService.getUrl() + '/share',
+    method: 'GET'
+  }).then((res) => {
+    events.list = res.data;
+  }).catch((err) => {
+    console.log('An error occured ', err.message)
+  })
+}
+
 onMounted(() => {
   initDate(),
     fillChartData(),
@@ -237,7 +256,8 @@ onMounted(() => {
     getNbNonFait(),
     getNbFaitSemaine(),
     getSiteWeeklyPlan(),
-    countAllSite()
+    countAllSite(),
+    share()
 })
 </script>
 
@@ -278,15 +298,21 @@ onMounted(() => {
           <CardBox class="mb-6" title="Map">
             <TogoMap></TogoMap>
           </CardBox>
-        <CardBox class="mb-6" >
-          <CardZoneGrid></CardZoneGrid>
+          <CardBox class="mb-6">
+            <CardZoneGrid></CardZoneGrid>
           </CardBox>
         </div>
       </CardBox>
       <SectionTitleLineWithButton :icon="mdiTools" title="Statistiques (Stocks)">
         <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
       </SectionTitleLineWithButton>
-      <CardBox class="mb-6" >
+      <CardBox class="mb-6" title="Historique transaction">
+        <TimeLine :events="events.list" />
+      </CardBox>
+      <SectionTitleLineWithButton :icon="mdiOil" title="Refueling">
+        <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
+      </SectionTitleLineWithButton>
+      <CardBox class="mb-6">
         <center>Indisponible pour le moment...</center>
       </CardBox>
     </SectionMain>

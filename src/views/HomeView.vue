@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
-import { mdiChartTimelineVariant, mdiReload, mdiChartPie, mdiFileExcel, mdiSitemap } from '@mdi/js'
+import { mdiChartTimelineVariant, mdiReload, mdiChartPie, mdiFileExcel, mdiSitemap, mdiTools } from '@mdi/js'
 import * as chartConfig from '@/components/Charts/chart.config.js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBoxWidget from '@/components/CardBoxWidget.vue'
@@ -259,7 +259,7 @@ onMounted(() => {
           label="Sites non faits" />
       </div>
 
-      <SectionTitleLineWithButton :icon="mdiChartPie" title="Statistiques">
+      <SectionTitleLineWithButton :icon="mdiChartPie" title="Statistiques (MP)">
         <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
       </SectionTitleLineWithButton>
 
@@ -282,6 +282,12 @@ onMounted(() => {
           <CardZoneGrid></CardZoneGrid>
           </CardBox>
         </div>
+      </CardBox>
+      <SectionTitleLineWithButton :icon="mdiTools" title="Statistiques (Stocks)">
+        <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
+      </SectionTitleLineWithButton>
+      <CardBox class="mb-6" >
+        <center>Indisponible pour le moment...</center>
       </CardBox>
     </SectionMain>
   </LayoutAuthenticated>

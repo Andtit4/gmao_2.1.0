@@ -9,6 +9,8 @@ import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
+import NotificationBar from '@/components/NotificationBar.vue'
+
 import * as XLSX from 'xlsx'
 // import UserAvatar from '@/components/UserAvatar.vue'
 import axios from 'axios'
@@ -24,7 +26,10 @@ const form = reactive({
   id_plannification: '',
   siteAddNb: '',
   showRestOfItem: true,
-  search: ''
+  search: '',
+  nbSiteAlreadyIn: 0,
+  showErr: false,
+  errMessage: ''
 })
 
 const sites = reactive({ list: [] })
@@ -57,10 +62,6 @@ const perPage = ref(5)
 const currentPage = ref(0)
 
 const checkedRows = ref([])
-
-/* const itemsPaginated = computed(() =>
-  items.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
-) */
 
 const numPages = computed(() => Math.ceil(items.value.length / perPage.value))
 
@@ -146,8 +147,59 @@ const controlNb = (nbPrevu, nbAjout) => {
   console.log('Showed === ', form.showRestOfItem)
 }
 
-const save = () => {
+const verify = (site) => {
   axios({
+    url: apiService.getUrl() + '/plannifie/' + site,
+    method: "GET"
+  }).then((res) => {
+    form.nbSiteAlreadyIn = res.data[0].nb;
+    console.log('\n\nSite répété ', + form.nbSiteAlreadyIn)
+  }).catch((err) => {
+    form.showErr = true;
+    form.errMessage = 'Une erreur est survenue ' + err.message;
+  })
+}
+
+const save = () => {
+  console.log('\nsave init')
+  //  verify(form.site)
+  axios({
+    url: apiService.getUrl() + '/plannifie/verify/' + form.site,
+    method: "GET"
+  }).then((res) => {
+    form.nbSiteAlreadyIn = res.data[0].nb;
+    console.log('\n\nSite répété ', + form.nbSiteAlreadyIn)
+
+    if (form.nbSiteAlreadyIn == 1) {
+      form.showErr = true;
+      form.errMessage = 'Site déjà plannifié.'
+    } else {
+      axios({
+        url: apiService.getUrl() + '/plannifie',
+        method: 'POST',
+        data: {
+          zone: oneZone.list.zone,
+          id_plannification: form.id_plannification,
+          date_ajoute: new Date(),
+          date_debut: oneZone.list.date_debut,
+          date_fin: oneZone.list.date_fin,
+          site: form.site
+        }
+      }).then((res) => {
+        console.log(res)
+        setTimeout(() => {
+          location.reload()
+        }, 500)
+      })
+    }
+  }).catch((err) => {
+    form.showErr = true;
+    form.errMessage = 'Une erreur est survenue ' + err.message;
+    console.log('Error ', err.message)
+  })
+  console.log('verify false')
+
+  /* axios({
     url: apiService.getUrl() + '/plannifie',
     method: 'POST',
     data: {
@@ -163,7 +215,7 @@ const save = () => {
     setTimeout(() => {
       location.reload()
     }, 500)
-  })
+  }) */
 }
 
 const getAllDone = async (zone) => {
@@ -189,7 +241,7 @@ const exportxlx = async (zone) => {
       item.date_attente,
       item.date_prise_en_compte,
       item.date_ajoute,
-      `SEMAINE DU ${item.date_debut ? new Date(item.date_debut).toISOString().split('T')[0] : ''} AU ${item.date_fin ? new Date(item.date_fin).toISOString().split('T')[0] : ''}` ,
+      `SEMAINE DU ${item.date_debut ? new Date(item.date_debut).toISOString().split('T')[0] : ''} AU ${item.date_fin ? new Date(item.date_fin).toISOString().split('T')[0] : ''}`,
       item.date_attente == '' ? 'NON FAIT' : item.date_prise_en_compte == '' ? 'NON PRIS EN COMPTE' : 'FAIT'
     ])
     // ... Ajoutez vos données ici
@@ -221,6 +273,9 @@ const searchMission = () => {
     })
 }
 
+// const notificationsOutline = computed(() => notificationSettingsModel.value.indexOf('outline') > -1)
+
+
 onMounted(() => {
   // sitesByZone()
 })
@@ -228,6 +283,11 @@ onMounted(() => {
 
 <template>
   <CardBoxModal v-model="isModalActive" title="Détails">
+    <div v-if="form.showErr == true">
+        <NotificationBar color="danger" :icon="mdiMonitorCellphone">
+          {{ form.errMessage }}
+        </NotificationBar>
+      </div>
     <p>
       Zone: <b>{{ oneZone.list.zone }}</b>
     </p>

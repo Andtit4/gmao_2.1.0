@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     formatDate(dateString) {
-      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' };
       return new Date(dateString).toLocaleDateString('fr-FR', options);
     }
   }

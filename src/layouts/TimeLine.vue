@@ -2,8 +2,8 @@
 <template>
   <div class="timeline">
     <div v-for="event in events" :key="event.date" class="timeline-event">
-      <div class="event-date">{{ formatDate(event.date) }}</div>
-      <div class="event-description">{{ event.description }}</div>
+      <div class="event-date">{{ formatDate(event.ajouter_le) }}</div>
+      <div class="event-description"> {{  event.motif }} de {{ event.description  }}</div>
     </div>
   </div>
 </template>

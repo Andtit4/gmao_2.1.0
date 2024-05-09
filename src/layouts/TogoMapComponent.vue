@@ -83,7 +83,7 @@ const createCard = () => {
   const map = L.map('map', {
     center: [togoCoordinates.latitude, togoCoordinates.longitude],
     zoom: 7
-  }) /* .setView(togoCoordinates.latitude, togoCoordinates.longitude, 8) */
+  })
 
   // Ajout d'une couche de carte OpenStreetMap
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -101,9 +101,10 @@ const createCard = () => {
     marker.bindPopup(data.nom_site)
   })
 
-  // Utiliser la zone ou d'autres informations pertinentes pour la popup
+  // var markers =  L.MarkerClusterGroup();
   cardSiteDoneList.list.forEach((data) => {
-    const marker = L.marker([data.latitude, data.longitude], { icon: greenMarkerIcon }).addTo(map)
+    // const marker = markers.addLayer(L.marker([data.latitude, data.longitude], { icon: greenMarkerIcon, maxZoom: 8 })).addTo(map)
+    const marker = L.marker([data.latitude, data.longitude], { icon: greenMarkerIcon, maxZoom: 8 }).addTo(map)
     marker.bindPopup(data.nom_site)
   })
 
@@ -115,7 +116,7 @@ const createCard = () => {
   })
 
   // Limiter la carte aux frontières du Togo
-  map.setMaxBounds(bounds)
+  // map.setMaxBounds(bounds)
   map.on('drag', () => {
     map.panInsideBounds(bounds, { animate: true })
   })

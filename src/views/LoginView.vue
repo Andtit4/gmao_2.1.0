@@ -40,12 +40,9 @@ const submit = () => {
     url: apiService.getUrl() + `/admin/auth/${form.login}/${hash}`,
     method: 'GET'
   }).then((response) => {
-    console.log('token: ', response.data.token)
-    localStorage.setItem('token', response.data.token)
+    console.log('id: ', response.data.admin._id)
 
-    if (response.data.admin._id == undefined) {
-      /* form.showError = true
-      form.err = "Utilisateur recherché n'existe pas" */
+    /* if (response.data.admin._id == undefined) {
       axios({
         url: apiService.getUrl() + `/intervenant/auth/${form.login}/${form.pass}`,
         method: 'GET'
@@ -56,19 +53,19 @@ const submit = () => {
             form.err = 'Email ou mot de passe incorrect'
             console.log('Supervisor not exist')
           } else {
-            const id = res.data._id
-            const email = res.data.email
-            const nom = res.data.nom
-            const prenom = res.data.prenom
-            const type_utilisateur = res.data.type_utilisateur
-
-            console.log('\n res :', res.data)
+            const id = res.data.intervenant._id
+            const email = res.data.intervenant.email
+            const nom = res.data.intervenant.nom
+            const prenom = res.data.intervenant.prenom
+            const type_utilisateur = res.data.intervenant.type_utilisateur
+            localStorage.setItem('token', response.data.token)
+            // console.log('\n res :', res.data.intervenant)
             Cookies.set('id', id)
             Cookies.set('email', email)
             Cookies.set('nom', nom)
             Cookies.set('prenom', prenom)
             Cookies.set('pass', hash)
-            useMainStore().setUser(res.data)
+            useMainStore().setUser(res.data.intervenant)
 
             if (type_utilisateur == 'USER') {
               Cookies.set('type', 'chef_equipe')
@@ -92,12 +89,12 @@ const submit = () => {
           console.log('An error occured', err.message)
         })
     } else {
-      // localStorage.setItem('token', response.data.token)
-      console.log(response.data.token)
+      // console.log(response.data.token)
       const id = response.data.admin._id
       const email = response.data.admin.email
       const nom = response.data.admin.nom
       const prenom = response.data.admin.prenom
+      localStorage.setItem('token', response.data.token)
       Cookies.set('type', 'admin')
       Cookies.set('id', id)
       Cookies.set('email', email)
@@ -109,6 +106,48 @@ const submit = () => {
         name: 'Dashboard',
         params: { type: 'admin', pass: hash }
       })
+    } */
+  }).catch((err) => {
+    console.log('Error admin! ', err.response.status)
+    if (err.response.status == 401) {
+      axios({
+        url: apiService.getUrl() + `/intervenant/auth/${form.login}/${form.pass}`,
+        method: 'GET'
+      }).then((res) => {
+        const id = res.data.intervenant._id
+        const email = res.data.intervenant.email
+        const nom = res.data.intervenant.nom
+        const prenom = res.data.intervenant.prenom
+        const type_utilisateur = res.data.intervenant.type_utilisateur
+        localStorage.setItem('token', res.data.token)
+        // console.log('\n res :', res.data.intervenant)
+
+        //todo ameliore cookies managing
+        Cookies.set('id', id)
+        Cookies.set('email', email)
+        Cookies.set('nom', nom)
+        Cookies.set('prenom', prenom)
+        Cookies.set('pass', hash)
+        useMainStore().setUser(res.data.intervenant)
+
+        if (type_utilisateur == 'USER') {
+          Cookies.set('type', 'chef_equipe')
+          router.push({
+            name: 'Dashboard',
+            params: { type: 'chef_equipe', pass: hash }
+          })
+        } else {
+          console.log('Superviseur ', type_utilisateur)
+          Cookies.set('type', 'superviseur')
+          router.push({
+            name: 'Dashboard',
+            params: { type: 'superviseur', pass: hash }
+          })
+        }
+      })
+    } else {
+      form.showError = true;
+      form.err = 'Identifiant ou mot de passe incorrect';
     }
   })
 }
@@ -119,9 +158,9 @@ const submit = () => {
     <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
       <CardBox :class="cardClass" is-form @submit.prevent="submit">
         <div class="col">
-          <div class="col-md-4"  style="display: inline-block;">
-            <img src="@/assets/logo.png" alt="" width="40"  style="display: inline-block;"/>
-            <h1  style="display: inline-block; font-size: 24px; font-weight: bold; margin-left: 20px;">Energy Eye</h1>
+          <div class="col-md-4" style="display: inline-block;">
+            <img src="@/assets/logo.png" alt="" width="40" style="display: inline-block;" />
+            <h1 style="display: inline-block; font-size: 24px; font-weight: bold; margin-left: 20px;">Energy Eye</h1>
           </div>
         </div>
         <br />

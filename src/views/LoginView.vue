@@ -40,7 +40,23 @@ const submit = () => {
     url: apiService.getUrl() + `/admin/auth/${form.login}/${hash}`,
     method: 'GET'
   }).then((response) => {
-    console.log('id: ', response.data.admin._id)
+    // console.log('id: ', response.data.admin._id)
+    const id = response.data.admin._id
+      const email = response.data.admin.email
+      const nom = response.data.admin.nom
+      const prenom = response.data.admin.prenom
+      localStorage.setItem('token', response.data.token)
+      Cookies.set('type', 'admin')
+      Cookies.set('id', id)
+      Cookies.set('email', email)
+      Cookies.set('nom', nom)
+      Cookies.set('prenom', prenom)
+      Cookies.set('pass', hash)
+      useMainStore().setUser(response.data.admin)
+      router.push({
+        name: 'Dashboard',
+        params: { type: 'admin', pass: hash }
+      })
 
     /* if (response.data.admin._id == undefined) {
       axios({

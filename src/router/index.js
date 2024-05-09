@@ -35,7 +35,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'Traiter'
+      title: 'Traiter',
+      requiresAuth: true
     },
     path: '/traiter/:type/:pass',
     name: 'Traiter',
@@ -44,6 +45,7 @@ const routes = [
   {
     meta: {
       title: 'Liste'
+      ,requiresAuth: true
     },
     path: '/plannification/site/:type/:pass',
     name: 'ListePlannificationSite',
@@ -63,6 +65,7 @@ const routes = [
   {
     meta: {
       title: 'Sites'
+      ,requiresAuth: true
     },
     path: '/site/:type/:pass',
     name: 'sites',
@@ -71,6 +74,7 @@ const routes = [
   {
     meta: {
       title: 'Zones'
+      ,requiresAuth: true
     },
     path: '/zone/:type/:pass',
     name: 'zone',
@@ -79,6 +83,7 @@ const routes = [
   {
     meta: {
       title: 'Sites'
+      ,requiresAuth: true
     },
     path: '/site/list/:type/:pass',
     name: 'List',
@@ -87,6 +92,7 @@ const routes = [
   {
     meta: {
       title: 'Intervenants'
+      ,requiresAuth: true
     },
     path: '/intervenant/:type/:pass',
     name: 'intervenant',
@@ -95,6 +101,7 @@ const routes = [
   {
     meta: {
       title: 'Intervenants'
+      ,requiresAuth: true
     },
     path: '/intervenant/list/:type/:pass',
     name: 'intervenants',
@@ -103,6 +110,7 @@ const routes = [
   {
     meta: {
       title: 'Equipements'
+      ,requiresAuth: true
     },
     path: '/equipement/:type/:pass',
     name: 'equipement',
@@ -111,6 +119,7 @@ const routes = [
   {
     meta: {
       title: 'Equipements'
+      ,requiresAuth: true
     },
     path: '/equipement/list/:type/:pass',
     name: 'equipement list',
@@ -119,6 +128,7 @@ const routes = [
   {
     meta: {
       title: 'Articles'
+      ,requiresAuth: true
     },
     path: '/article/:type/:pass',
     name: 'article',
@@ -127,6 +137,7 @@ const routes = [
   {
     meta: {
       title: 'Historiques'
+      ,requiresAuth: true
     },
     path: '/historique/:type/:pass',
     name: 'historique list',
@@ -135,22 +146,17 @@ const routes = [
   {
     meta: {
       title: 'Sortie'
+      ,requiresAuth: true
     },
     path: '/sorti/:type/:pass',
     name: 'sorti list',
     component: SortiEquipement
   },
-  {
-    meta: {
-      title: 'Tables'
-    },
-    path: '/tables',
-    name: 'tables',
-    component: Site
-  },
+
   {
     meta: {
       title: 'MP'
+      ,requiresAuth: true
     },
     path: '/preventive/classique/:type/:pass',
     name: 'preventiveClassique',
@@ -159,6 +165,7 @@ const routes = [
   {
     meta: {
       title: 'PLANNIFIE'
+      ,requiresAuth: true
     },
     path: '/preventive/plannifie/:type/:pass',
     name: 'plannifie',
@@ -167,60 +174,24 @@ const routes = [
   {
     meta: {
       title: 'PLANNIFICATION'
+      ,requiresAuth: true
     },
     path: '/preventive/plannification/:type/:pass',
     name: 'plannifications',
     component: PlanifieList
   },
-
-  {
-    meta: {
-      title: 'Forms'
-    },
-    path: '/forms',
-    name: 'forms',
-    component: () => import('@/views/FormsView.vue')
-  },
   {
     meta: {
       title: 'Profile'
+      ,requiresAuth: true
     },
     path: '/profile',
     name: 'profile',
     component: () => import('@/views/ProfileView.vue')
   },
-  {
-    meta: {
-      title: 'Ui'
-    },
-    path: '/ui',
-    name: 'ui',
-    component: () => import('@/views/UiView.vue')
-  },
-  {
-    meta: {
-      title: 'Responsive layout'
-    },
-    path: '/responsive',
-    name: 'responsive',
-    component: () => import('@/views/ResponsiveView.vue')
-  },
-  {
-    meta: {
-      title: 'Login'
-    },
-    path: '/login',
-    name: 'login',
-    component: () => import('@/views/LoginView.vue')
-  },
-  {
-    meta: {
-      title: 'Error'
-    },
-    path: '/error',
-    name: 'error',
-    component: () => import('@/views/ErrorView.vue')
-  }
+
+
+
 ]
 
 const router = createRouter({
@@ -235,10 +206,10 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // Vérifier l'authentification de l'utilisateur
-    const isAuthenticated = true;
-    if (!isAuthenticated) {
+    const token = localStorage.getItem('token')
+    if (!token) {
       // Rediriger vers la page de connexion si non authentifié
-      next('/login');
+      next('/');
     } else {
       next();
     }

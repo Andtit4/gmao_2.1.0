@@ -33,6 +33,7 @@ const menuClick = (event, item) => {
 
   if (item.isLogout) {
     //
+    localStorage.removeItem('token')
   }
 }
 </script>
@@ -74,7 +75,7 @@ const menuClick = (event, item) => {
       />
       <slot />
       <FooterBar>
-        
+
       </FooterBar>
     </div>
   </div>

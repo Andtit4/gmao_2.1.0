@@ -91,23 +91,27 @@ const createCard = () => {
   }).addTo(map)
 
   // Définir les limites pour afficher uniquement le Togo
-  const southWest = L.latLng(6.1, -0.25) // Coordonnées sud-ouest du Togo
-  const northEast = L.latLng(11.5, 1.8) // Coordonnées nord-est du Togo
+  const southWest = L.latLng(6.1, -0.25)
+  const northEast = L.latLng(11.5, 1.8)
   const bounds = L.latLngBounds(southWest, northEast)
 
+  // Utiliser la zone ou d'autres informations pertinentes pour la popu
   cardSiteList.list.forEach((data) => {
     const marker = L.marker([data.latitude, data.longitude], { icon: redMarkerIcon }).addTo(map)
-    marker.bindPopup(data.nom_site) // Utiliser la zone ou d'autres informations pertinentes pour la popup
+    marker.bindPopup(data.nom_site)
   })
 
+  // Utiliser la zone ou d'autres informations pertinentes pour la popup
   cardSiteDoneList.list.forEach((data) => {
     const marker = L.marker([data.latitude, data.longitude], { icon: greenMarkerIcon }).addTo(map)
-    marker.bindPopup(data.nom_site) // Utiliser la zone ou d'autres informations pertinentes pour la popup
+    marker.bindPopup(data.nom_site)
   })
 
+  // Utiliser la zone ou d'autres informations pertinentes pour la popup
+  // TODO add warning marker
   cardWaitingList.list.forEach((data) => {
     const marker = L.marker([data.latitude, data.longitude], { icon: warningMarkerIcon }).addTo(map)
-    marker.bindPopup(data.nom_site) // Utiliser la zone ou d'autres informations pertinentes pour la popup
+    marker.bindPopup(data.nom_site)
   })
 
   // Limiter la carte aux frontières du Togo

@@ -37,7 +37,7 @@ const submit = () => {
 
 
   axios({
-    url: apiService.getUrl() + `/admin/auth/${form.login}/${hash}`,
+    url: apiService.getUrl() + `/admins/auth?email=${form.login}&motdepasse=${hash}`,
     method: 'GET'
   }).then((response) => {
     // console.log('id: ', response.data.admin._id)

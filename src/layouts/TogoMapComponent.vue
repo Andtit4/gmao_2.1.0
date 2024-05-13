@@ -46,7 +46,9 @@ const cardSiteList = reactive({ list: [] })
 const cardSiteDoneList = reactive({ list: [] })
 const cardWaitingList = reactive({ list: [] })
 
+// Fait
 const siteNonFait = async () => {
+  // fait
   axios({
     url: apiService.getUrl() + '/plannifie/nonfait/for-map',
     method: 'GET'
@@ -55,6 +57,7 @@ const siteNonFait = async () => {
       cardSiteList.list = await res.data
       console.log('Res: ', cardSiteList.list)
 
+      // Fait
       axios({
         url: apiService.getUrl() + '/plannifie/all/done/for-map',
         method: 'GET'
@@ -62,6 +65,7 @@ const siteNonFait = async () => {
         .then((r) => {
           cardSiteDoneList.list = r.data
 
+          // Fait
           axios({
             url: apiService.getUrl() + '/plannifie/encours/for-map',
             method: 'GET'

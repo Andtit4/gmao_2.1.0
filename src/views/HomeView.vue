@@ -50,6 +50,8 @@ const form = reactive({
   formattedStartOfWeek: ''
 })
 
+
+// Fait
 const countAllSite = () => {
   axios({
     url: apiService.getUrl() + '/site/all/nb',
@@ -73,6 +75,7 @@ const countAllSite = () => {
   })
 }
 
+// Fait
 const getNbFait = async () => {
   axios({
     url: apiService.getUrl() + '/plannifie/done/nb',
@@ -85,6 +88,7 @@ const getNbFait = async () => {
   })
 }
 
+// Fait
 const getNbNonFait = async () => {
   axios({
     url: apiService.getUrl() + '/plannifie/nonfait/nb',
@@ -97,6 +101,7 @@ const getNbNonFait = async () => {
   })
 }
 
+// Fait
 const getNbFaitSemaine = async () => {
   axios({
     url:
@@ -114,6 +119,7 @@ const getNbFaitSemaine = async () => {
   })
 }
 
+// Fait
 const getNbEncours = async () => {
   axios({
     url: apiService.getUrl() + '/plannifie/encours/week/nb/' +
@@ -129,6 +135,7 @@ const getNbEncours = async () => {
   })
 }
 
+// Fait
 const getNbSitePlannifie = async () => {
   axios({
     url:
@@ -153,6 +160,7 @@ const getNbSitePlannifie = async () => {
 
 const sitesWeeklyPlan = reactive({ list: [] })
 
+// Fait
 const getSiteWeeklyPlan = async () => {
   axios({
     url:
@@ -176,6 +184,7 @@ const getSiteWeeklyPlan = async () => {
     })
 }
 
+// Fait
 const getSiteWeeklyPlanForXlx = async (zone) => {
   const response = await axios.get(apiService.getUrl() +
     '/plannifie/week/' +
@@ -185,6 +194,7 @@ const getSiteWeeklyPlanForXlx = async (zone) => {
   return response.data
 }
 
+// fait
 const getNbSiteNonfait = async () => {
   axios({
     url:

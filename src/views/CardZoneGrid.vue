@@ -8,6 +8,8 @@ const zones = reactive({ list: [] })
 // const router = useRouter()
 
 const getAllZone = () => {
+
+  // Fait
   axios({
     url: apiService.getUrl() + '/preventive',
     method: 'GET'
@@ -18,6 +20,7 @@ const getAllZone = () => {
 
       for (const i in zones.list) {
         // console.log('-yçççç ', zones.list[i].zone)
+        // Fait
         switch (zones.list[i].zone) {
           case 'KARA EST':
             axios({

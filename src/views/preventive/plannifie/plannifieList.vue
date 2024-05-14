@@ -130,7 +130,7 @@ const showZone = (id) => {
     url: apiService.getUrl() + '/mission/' + id,
     method: 'GET'
   }).then((response) => {
-    oneZone.list = response.data[0]
+    oneZone.list = response.data
     console.log('\n on zone ', oneZone.list)
     sitesByZone(oneZone.list.zone)
     controlNb(oneZone.list.quota, form.siteAddNb)

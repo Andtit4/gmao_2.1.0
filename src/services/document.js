@@ -48,3 +48,8 @@ export function getStartAndEndOfWeek() {
   }
 }
 
+export function isEmptyArray(element) {
+  // Vérifie si l'élément est un tableau et s'il est vide
+  return Array.isArray(element) && element.length === 0;
+}
+

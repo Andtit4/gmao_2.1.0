@@ -31,7 +31,7 @@ const notificationSettingsModel = ref([])
 const notificationsOutline = computed(() => notificationSettingsModel.value.indexOf('outline') > -1)
 
 // const router = useRouter()
-
+// Fait
 const getAllZone = () => {
   axios({
     url: apiService.getUrl() + '/zone',
@@ -45,6 +45,7 @@ const getAllZone = () => {
     })
 }
 
+// Fait
 const submit = (zone) => {
   isModalActive.value = true
   axios({
@@ -72,6 +73,7 @@ const ajouteDate = () => {
   }
 }
 
+// Fait
 const planif = () => {
   // form.showSucess = true
   axios({

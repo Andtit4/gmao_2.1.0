@@ -35,6 +35,7 @@ const form = reactive({
 const sites = reactive({ list: [] })
 // const router = useRouter()
 
+// Fait
 const getAllSite = () => {
   axios({
     url: apiService.getUrl() + '/mission',
@@ -97,6 +98,7 @@ const checked = (isChecked, client) => {
   }
 }
 
+// Fait
 const getCountNbSitePlannifier = (id) => {
   console.log('id === ', id)
   axios({
@@ -117,6 +119,7 @@ const siteDropDown = reactive({ list: [] })
 
 // const sites = reactive({ list: [] })
 
+// Fait
 const showZone = (id) => {
   isModalActive.value = true
   form.id_plannification = id
@@ -125,12 +128,16 @@ const showZone = (id) => {
     url: apiService.getUrl() + '/mission/' + id,
     method: 'GET'
   }).then((response) => {
-    oneZone.list = response.data
+    oneZone.list = response.data[0]
+    console.log('\n on zone ', oneZone.list)
     sitesByZone(oneZone.list.zone)
     controlNb(oneZone.list.quota, form.siteAddNb)
+  }).catch((err) => {
+    console.log('\nerror getting mission details ', err.message)
   })
 }
 
+// Fait
 const sitesByZone = (zone) => {
   axios({
     url: apiService.getUrl() + '/site/zone/search?zone=' + zone,
@@ -174,6 +181,7 @@ const save = () => {
       form.showErr = true;
       form.errMessage = 'Site déjà plannifié.'
     } else {
+
       axios({
         url: apiService.getUrl() + '/plannifie',
         method: 'POST',
@@ -260,6 +268,7 @@ const exportxlx = async (zone) => {
   XLSX.writeFile(wb, 'PLANNIFICATION.xlsx')
 }
 
+// Fait
 const searchMission = () => {
   axios({
     url: apiService.getUrl() + '/mission/search/dyn?zone=' + form.search.toUpperCase(),

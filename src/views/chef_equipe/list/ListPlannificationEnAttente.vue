@@ -35,6 +35,7 @@ const sitesPlannifies = reactive({
 
 
 
+// Fait
 const getAllSitePlannifie = () => {
   axios({
     url: apiService.getUrl() + '/plannifie',
@@ -44,6 +45,7 @@ const getAllSitePlannifie = () => {
   })
 }
 
+// Fait
 const search = () => {
   axios({
     url: apiService.getUrl() + '/plannifie/search/site/dyn?site=' + form.searchSite,
@@ -52,6 +54,8 @@ const search = () => {
     sitesPlannifies.list = res.data
   })
 }
+
+// Fait
 const searchEquipe = () => {
   axios({
     url: apiService.getUrl() + '/plannifie/search/zone/dyn?zone=' + form.searchEquipe,

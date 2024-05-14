@@ -44,6 +44,7 @@ const notificationsOutline = computed(() => notificationSettingsModel.value.inde
 
 // const router = useRouter()
 
+// Fait
 const getAllZone = () => {
   axios({
     url: apiService.getUrl() + '/preventive',
@@ -57,17 +58,6 @@ const getAllZone = () => {
     })
 }
 
-/* const submit = (zone) => {
-  isModalActive.value = true
-  axios({
-    url: apiService.getUrl() + '/site/nb?zone=' + zone,
-    method: 'GET'
-  }).then((response) => {
-    sites.list = response.data[0].nb
-    console.log('nb sites ', sites.list)
-    form.nbIntervention = Math.ceil(sites.list / 12)
-  })
-} */
 
 const ajouteDate = () => {
   if (form.date_debut) {
@@ -84,6 +74,7 @@ const ajouteDate = () => {
   }
 }
 
+// fait
 const getDate = (zone) => {
   console.log('Zone: ', zone)
   axios({
@@ -139,6 +130,7 @@ const extractDates = (text) => {
   }
 }
 
+// Fait
 const sitesByZone = () => {
   axios({
     url: apiService.getUrl() + '/site/zone/search?zone=' + form.zone,
@@ -148,6 +140,7 @@ const sitesByZone = () => {
   })
 }
 
+// Fait
 const submit = () => {
   axios({
     url: apiService.getUrl() + '/mission',

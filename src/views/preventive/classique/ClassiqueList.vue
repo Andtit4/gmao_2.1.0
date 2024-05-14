@@ -19,6 +19,7 @@ defineProps({
 const sites = reactive({ list: [] })
 // const router = useRouter()
 
+// Fait
 const getAllSite = () => {
   axios({
     url: apiService.getUrl() + '/preventive',

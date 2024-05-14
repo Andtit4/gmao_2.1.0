@@ -19,10 +19,12 @@ import ListPlannificationEnAttente from '@/views/chef_equipe/list/ListPlannifica
 
 let type = Cookies.get('type')
 
+// Fait
 const getAllsite = async () => {
   const response = await axios.get(apiService.getUrl() + '/plannifie/all/done')
   return response.data
 }
+// Fait
 const getAllPlannif = async () => {
   const response = await axios.get(apiService.getUrl() + '/plannifie/all')
   return response.data

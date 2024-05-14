@@ -130,7 +130,7 @@ const showZone = (id) => {
     url: apiService.getUrl() + '/mission/' + id,
     method: 'GET'
   }).then((response) => {
-    oneZone.list = response.data
+    oneZone.list = response.data[0]
     console.log('\n on zone ', oneZone.list)
     sitesByZone(oneZone.list.zone)
     controlNb(oneZone.list.quota, form.siteAddNb)
@@ -203,8 +203,10 @@ const save = () => {
           location.reload()
         }, 500)
       }).catch((err) => {
-        form.showErr = true
-        form.errMessage = 'Erreur lors de l\'ajout' + err.message
+        // form.showErr = true
+        form.showSuccess = true
+        // form.errMessage = 'Erreur lors de l\'ajout' + err.message
+        form.successMessage = 'Site Plannifié!'
         console.log('\nError while insert site ', err.message)
       })
     }
@@ -303,6 +305,11 @@ onMounted(() => {
     <div v-if="form.showErr == true">
       <NotificationBar color="danger" :icon="mdiMonitorCellphone">
         {{ form.errMessage }}
+      </NotificationBar>
+    </div>
+    <div v-if="form.showSuccess == true">
+      <NotificationBar color="success" :icon="mdiMonitorCellphone">
+        {{ form.successMessage }}
       </NotificationBar>
     </div>
     <p>

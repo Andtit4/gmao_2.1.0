@@ -29,7 +29,9 @@ const form = reactive({
   search: '',
   nbSiteAlreadyIn: 0,
   showErr: false,
-  errMessage: ''
+  errMessage: '',
+  showSuccess: false,
+  successMessage: ''
 })
 
 const sites = reactive({ list: [] })
@@ -201,6 +203,8 @@ const save = () => {
           location.reload()
         }, 500)
       }).catch((err) => {
+        form.showErr = true
+        form.errMessage = 'Erreur lors de l\'ajout' + err.message
         console.log('\nError while insert site ', err.message)
       })
     }

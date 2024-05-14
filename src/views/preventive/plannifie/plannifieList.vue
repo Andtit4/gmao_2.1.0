@@ -181,10 +181,12 @@ const save = () => {
       form.showErr = true;
       form.errMessage = 'Site déjà plannifié.'
     } else {
-
+      console.log('\n ajout de site')
+      // fAIT
       axios({
         url: apiService.getUrl() + '/plannifie',
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         data: {
           zone: oneZone.list.zone,
           id_plannification: form.id_plannification,
@@ -198,6 +200,8 @@ const save = () => {
         setTimeout(() => {
           location.reload()
         }, 500)
+      }).catch((err) => {
+        console.log('\nError while insert site ', err.message)
       })
     }
   }).catch((err) => {
@@ -293,10 +297,10 @@ onMounted(() => {
 <template>
   <CardBoxModal v-model="isModalActive" title="Détails">
     <div v-if="form.showErr == true">
-        <NotificationBar color="danger" :icon="mdiMonitorCellphone">
-          {{ form.errMessage }}
-        </NotificationBar>
-      </div>
+      <NotificationBar color="danger" :icon="mdiMonitorCellphone">
+        {{ form.errMessage }}
+      </NotificationBar>
+    </div>
     <p>
       Zone: <b>{{ oneZone.list.zone }}</b>
     </p>

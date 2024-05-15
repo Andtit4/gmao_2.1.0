@@ -26,7 +26,7 @@ const form = reactive({
   searchEquipe: '',
   date_attente: '',
   date_prise_en_compte: '',
-  numero_ticket: ''
+  numero_ticket: '0'
 })
 
 const sitesPlannifies = reactive({
@@ -57,11 +57,15 @@ const search = () => {
 
 // Fait
 const searchEquipe = () => {
+  console.log('\nseach zone ', form.searchEquipe)
   axios({
     url: apiService.getUrl() + '/plannifie/search/zone/dyn?zone=' + form.searchEquipe,
     method: 'GET'
   }).then((res) => {
     sitesPlannifies.list = res.data
+    console.log('Result ', res.data)
+  }).catch((err) => {
+    console.log('\nerror searching ', err.message)
   })
 }
 //  const isModalActive = ref(false)
@@ -83,7 +87,7 @@ const showComplete = (zone, id_plannification, site) => {
   form.site = site;
 }
 
-
+// Fait
 const priseEnCompte = () => {
   axios({
     url: apiService.getUrl() + '/mission/attente/web/' + form.date_attente + '/' + form.zone + '/' + form.id_plannification + '/' + form.site,
@@ -99,6 +103,7 @@ const priseEnCompte = () => {
 }
 
 const priseEnCompteC = () => {
+  console.log('complete')
   axios({
     url: apiService.getUrl() + '/mission/prise_en_compte/web/' + form.date_prise_en_compte + '/' + form.zone + '/' + form.id_plannification + '/' + form.site  + '/' + form.numero_ticket,
     method: 'PUT'

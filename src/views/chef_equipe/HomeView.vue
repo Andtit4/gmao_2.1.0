@@ -50,7 +50,7 @@ const getUserInfo = async () => {
     url: apiService.getUrl() + '/intervenant/get/' + form.currentEmail,
     method: 'GET'
   }).then(async (res) => {
-    form.currentZone = await res.data.zone;
+    form.currentZone = await res.data[0].zone;
     console.log('Zone = ', form.currentZone);
     if (form.isAdmin) {
       getPlannification()

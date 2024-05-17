@@ -79,6 +79,9 @@ const planif = () => {
   axios({
     url: apiService.getUrl() + '/preventive',
     method: 'POST',
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    },
     data: {
       zone: form.zone,
       nombre_total_site: sites.list,

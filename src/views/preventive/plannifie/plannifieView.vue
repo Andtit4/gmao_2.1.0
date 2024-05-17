@@ -145,11 +145,14 @@ const submit = () => {
   axios({
     url: apiService.getUrl() + '/mission',
     method: 'POST',
+    headers: {
+      'Access-Control-Allow-Origin':'*'
+    },
     data: {
       zone: form.zone,
       quota: form.quota_semaine,
       // nom_site: form.site,
-      date_ajout: new Date(),
+      date_ajoute: new Date(),
       date_debut: form.debut_semaine,
       date_fin: form.fin_semaine
     }

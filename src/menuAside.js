@@ -14,8 +14,8 @@ import {
 } from '@mdi/js'
 import Cookies from 'js-cookie'
 
-let type = await Cookies.get('type')
-let pass = Cookies.get('pass')
+let type = localStorage.getItem('type')
+let pass = localStorage.getItem('pass')
 let data
 
 console.log('\n\ntype = ', type)

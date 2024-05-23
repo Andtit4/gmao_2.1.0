@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import axios from 'axios'
 import { onMounted, reactive, ref, computed } from 'vue'
@@ -7,7 +7,7 @@ import apiService from '@/services/apiService'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import { mdiFileExcel, mdiPencil, } from '@mdi/js'
+import { mdiFileExcel, mdiPencil, mdiTools } from '@mdi/js'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
 import NotificationBar from '@/components/NotificationBar.vue'
@@ -30,6 +30,10 @@ const form = reactive({
   errMessage: '',
   isAdmin: false,
   tmpZone: '',
+  image: '',
+  showMore: false,
+  panneDesc: '',
+  file: ''
 })
 
 const getTypeUser = () => {
@@ -60,7 +64,7 @@ const getUserInfo = async () => {
   })
 }
 
-const getPlannificationByZone = async (zone) => {
+const getPlannificationByZone = async (zone: string) => {
   axios({
     url: apiService.getUrl() + '/mission/zone?zone=' + zone,
     method: 'GET'
@@ -86,9 +90,10 @@ const getPlannification = async () => {
 
 const isModalActive = ref(false)
 const treatModal = ref(false)
+const moreModal = ref(false)
 const sitePlannifie = reactive({ list: [] })
 
-const show = (zone, date_debut, date_fin,) => {
+const show = (zone: string, date_debut: string, date_fin: string,) => {
   form.date_debut = date_debut;
   form.date_fin = date_fin;
   isModalActive.value = true
@@ -103,7 +108,7 @@ const show = (zone, date_debut, date_fin,) => {
   })
 }
 
-const showDate = (site, id_plannification) => {
+const showDate = (site: string, id_plannification: string) => {
   // form.showDate = true
   isModalActive.value = false
   treatModal.value = true
@@ -127,6 +132,41 @@ const treat = () => {
   })
 }
 
+const uploadImg = async () => {
+  let img = (<HTMLInputElement>document.getElementById('file')).files[0]
+
+  /* const head3 = {
+    method: 'POST',
+    body: JSON.stringify({ 'imageUrl1': bigFile, 'imageUrl2': smallFile }),
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionStorage.token}` }
+  } */
+  console.log(img)
+  const newFileName = form.site_selected + Date.now() + '.png';
+  var formData = new FormData()
+  formData.append('file', img, newFileName)
+  console.log(formData)
+
+  await axios.post('http://localhost:3000/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+    .then((resp) => {
+      console.log(resp)
+    })
+    .catch((err) => {
+      console.log(err.response)
+    })
+}
+
+
+const activeMore = (site) => {
+  form.site_selected = site
+  isModalActive.value = false
+  moreModal.value = true
+}
+
+
 onMounted(() => {
   getTypeUser(),
     getUserInfo()
@@ -146,6 +186,14 @@ onMounted(() => {
     </NotificationBar>
   </div>
   <LayoutAuthenticated>
+    <CardBoxModal v-model="moreModal">
+      <form enctype="multipart/form-data">
+        <p>Panne sur <strong>{{ form.site_selected }}</strong> </p>
+        <FormControl type="file" v-model="form.file" id="file" ref="file" />
+        <FormControl type="text" placeholder="Description de la panne" v-model="form.panneDesc" />
+        <BaseButton color="info" label="Enregistrer" @click="uploadImg()" />
+      </form>
+    </CardBoxModal>
     <CardBoxModal v-model="treatModal">
       <p>Plannification du {{ form.date_debut ? new Date(form.date_debut).toISOString().split('T')[0] : '' }} au {{
         form.date_fin ? new Date(form.date_fin).toISOString().split('T')[0] : '' }}</p>
@@ -176,6 +224,7 @@ onMounted(() => {
           </tr>
         </thead>
         <tbody>
+
           <tr v-for="(site, index) in sitePlannifie.list" :key="index">
             <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
             <td class="border-b-0 lg:w-6 before:hidden">
@@ -187,7 +236,11 @@ onMounted(() => {
               {{ site.date_attente }}
             </td>
             <BaseButton color="info" :icon="mdiPencil" small @click="showDate(site.site, site.id_plannification)" />
+            <BaseButton color="warning" :icon="mdiTools" small @click="activeMore(site.site)" />
+
+            <!-- <FormControl type="file" @change="uploadImg($event)" accept="image/*" /> -->
           </tr>
+
         </tbody>
       </table>
 

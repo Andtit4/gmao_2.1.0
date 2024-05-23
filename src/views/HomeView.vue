@@ -21,8 +21,6 @@ const chartData = ref(null)
 
 const events = reactive({
   list: [
-
-
   ]
 })
 

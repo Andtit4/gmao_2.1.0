@@ -113,7 +113,7 @@ const createCard = () => {
   })
 
   // Utiliser la zone ou d'autres informations pertinentes pour la popup
-  // TODO add warning marker
+  //  warning marker
   cardWaitingList.list.forEach((data) => {
     const marker = L.marker([data.latitude, data.longitude], { icon: warningMarkerIcon }).addTo(map)
     marker.bindPopup(data.nom_site)

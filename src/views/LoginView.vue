@@ -35,9 +35,56 @@ const router = useRouter()
 const submit = () => {
   // router.push('/dashboard')
   const hash = CryptoJS.SHA256(form.pass)
-
-
   axios({
+    url: apiService.getLocal() + `/intervenant/auth?email=${form.login}&mot_de_passe=${form.pass}`,
+    method: 'GET'
+  }).then((res) => {
+    console.log(res.data)
+    if (res.data.error) {
+      form.showError = true;
+      form.err = res.data.error
+    } else {
+      console.log(res.data)
+      localStorage.setItem('token', res.data.token)
+      localStorage.setItem('pass', res.data.intervenant[0]._id)
+      localStorage.setItem('id', res.data.intervenant[0]._id)
+      localStorage.setItem('email', res.data.intervenant[0].email)
+      localStorage.setItem('nom', res.data.intervenant[0].nom)
+      localStorage.setItem('prenom', res.data.intervenant[0].prenom)
+      useMainStore().setUser(res.data.intervenant[0])
+      switch (res.data.type_utilisateur) {
+        case 'ADMIN':
+          localStorage.removeItem('type')
+          localStorage.setItem('type', 'admin')
+          return router.push({
+            name: 'Dashboard',
+            params: { type: 'admin', pass: res.data.intervenant[0]._id }
+          })
+        case 'USER':
+          // Cookies.remove('type')
+          localStorage.removeItem('type')
+          localStorage.setItem('type', 'chef_equipe')
+          return router.push({
+            name: 'Dashboard',
+            params: { type: 'chef_equipe', pass: res.data.intervenant[0]._id }
+          })
+        case 'SUPERVISEUR':
+          localStorage.removeItem('type')
+          localStorage.setItem('type', 'superviseur')
+          return router.push({
+            name: 'Dashboard',
+            params: { type: 'superviseur', pass: res.data.intervenant[0]._id }
+          })
+        default:
+          break;
+      }
+    }
+  }).catch((err) => {
+    console.error('Error occured ', err.message)
+  })
+
+
+  /* axios({
     url: apiService.getUrl() + `/admins/auth?email=${form.login}&motdepasse=${hash}`,
     method: 'GET'
   }).then((response) => {
@@ -100,55 +147,9 @@ const submit = () => {
           })
         }
         }
-        /* const id = res.data.intervenant._id
-        const email = res.data.intervenant.email
-        const nom = res.data.intervenant.nom
-        const prenom = res.data.intervenant.prenom
-        const type_utilisateur = res.data.intervenant.type_utilisateur
-        localStorage.setItem('token', res.data.token)
-        // console.log('\n res :', res.data.intervenant)
 
-        Cookies.set('id', id)
-        Cookies.set('email', email)
-        Cookies.set('nom', nom)
-        Cookies.set('prenom', prenom)
-        Cookies.set('pass', hash)
-        useMainStore().setUser(res.data.intervenant)
-
-        if (type_utilisateur == 'USER') {
-          Cookies.set('type', 'chef_equipe')
-          router.push({
-            name: 'Dashboard',
-            params: { type: 'chef_equipe', pass: hash }
-          })
-        } else {
-          console.log('Superviseur ', type_utilisateur)
-          Cookies.set('type', 'superviseur')
-          router.push({
-            name: 'Dashboard',
-            params: { type: 'superviseur', pass: hash }
-          })
-        } */
       })
     }
-    // console.log('id: ', response.data.admin._id)
-    /* const id = response.data.admin._id
-      const email = response.data.admin.email
-      const nom = response.data.admin.nom
-      const prenom = response.data.admin.prenom
-      localStorage.setItem('token', response.data.token)
-      Cookies.set('type', 'admin')
-      Cookies.set('id', id)
-      Cookies.set('email', email)
-      Cookies.set('nom', nom)
-      Cookies.set('prenom', prenom)
-      Cookies.set('pass', hash)
-      useMainStore().setUser(response.data.admin)
-      router.push({
-        name: 'Dashboard',
-        params: { type: 'admin', pass: hash }
-      }) */
-
 
   }).catch((err) => {
     console.log('Error admin! ', err.response.status)
@@ -158,41 +159,13 @@ const submit = () => {
         method: 'GET'
       }).then((res) => {
         console.log('\n intervenant ', res)
-        /* const id = res.data.intervenant._id
-        const email = res.data.intervenant.email
-        const nom = res.data.intervenant.nom
-        const prenom = res.data.intervenant.prenom
-        const type_utilisateur = res.data.intervenant.type_utilisateur
-        localStorage.setItem('token', res.data.token)
-        // console.log('\n res :', res.data.intervenant)
 
-        Cookies.set('id', id)
-        Cookies.set('email', email)
-        Cookies.set('nom', nom)
-        Cookies.set('prenom', prenom)
-        Cookies.set('pass', hash)
-        useMainStore().setUser(res.data.intervenant)
-
-        if (type_utilisateur == 'USER') {
-          Cookies.set('type', 'chef_equipe')
-          router.push({
-            name: 'Dashboard',
-            params: { type: 'chef_equipe', pass: hash }
-          })
-        } else {
-          console.log('Superviseur ', type_utilisateur)
-          Cookies.set('type', 'superviseur')
-          router.push({
-            name: 'Dashboard',
-            params: { type: 'superviseur', pass: hash }
-          })
-        } */
       })
     } else {
       form.showError = true;
       form.err = 'Identifiant ou mot de passe incorrect';
     }
-  })
+  }) */
 }
 </script>
 

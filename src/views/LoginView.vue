@@ -34,7 +34,7 @@ const router = useRouter()
 const submit = () => {
   // const hash = CryptoJS.SHA256(form.pass)
   axios({
-    url: apiService.getLocal() + `/intervenant/auth?email=${form.login}&mot_de_passe=${form.pass}`,
+    url: apiService.getUrl() + `/intervenant/auth?email=${form.login}&mot_de_passe=${form.pass}`,
     method: 'GET'
   }).then((res) => {
     console.log(res.data)

@@ -1,15 +1,7 @@
 import {
-  // mdiMenu,
-  // mdiClockOutline,
-  // mdiCloud,
-  // mdiCrop,
   mdiAccount,
-  mdiCogOutline,
-  mdiEmail,
   mdiLogout,
   mdiThemeLightDark,
-  // mdiGithub,
-  // mdiReact
 } from '@mdi/js'
 
 export default [
@@ -21,14 +13,6 @@ export default [
         label: 'My Profile',
         to: '/profile'
       },
-     /*  {
-        icon: mdiCogOutline,
-        label: 'Settings'
-      },
-      {
-        icon: mdiEmail,
-        label: 'Messages'
-      }, */
       {
         isDivider: true
       },

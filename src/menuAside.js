@@ -1,24 +1,13 @@
 import {
-  mdiAccountCircle,
   mdiMonitor,
-  mdiGithub,
   mdiLock,
-  mdiAlertCircle,
-  mdiSquareEditOutline,
   mdiTable,
   mdiViewList,
-  mdiTelevisionGuide,
-  mdiResponsive,
-  mdiPalette,
-  mdiReact
 } from '@mdi/js'
-import Cookies from 'js-cookie'
 
 let type = localStorage.getItem('type')
 let pass = localStorage.getItem('pass')
 let data
-
-console.log('\n\ntype = ', type)
 
 if (type == 'superviseur') {
   data = [
@@ -48,53 +37,10 @@ if (type == 'superviseur') {
       to: '/dashboard/' + type + '/' + pass,
       icon: mdiMonitor,
       label: 'Dashboard'
-    }, {
-      label: 'Sites',
-      icon: mdiTable,
-      menu: [
-        {
-          label: 'Zone',
-          to: '/zone/' + type + '/' + pass
-        },
-        {
-          label: 'Ajouter',
-          to: '/site/' + type + '/' + pass
-        },
-        {
-          label: 'Liste',
-          to: '/site/list/' + type + '/' + pass
-        }
-      ]
-    }, {
+    },  {
       label: 'Plannif.',
       icon: mdiLock,
       to: '/traiter/' + type + '/' + pass,
-    },
-    {
-      label: 'PDR',
-      icon: mdiViewList,
-      menu: [
-        {
-          label: 'Matériels',
-          to: '/equipement/' + type + '/' + pass
-        },
-        {
-          label: 'Stocks',
-          to: '/equipement/list/' + type + '/' + pass
-        },
-        {
-          label: 'Mouvements',
-          to: '/article/' + type + '/' + pass
-        },
-        /* {
-          label: 'Sortie',
-          to: '/sorti/' + type + '/' + pass
-        },
-        {
-          label: 'Historique',
-          to: '/historique/' + type + '/' + pass
-        } */
-      ]
     },
   ]
 

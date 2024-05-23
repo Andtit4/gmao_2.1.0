@@ -13,9 +13,9 @@ export const useMainStore = defineStore('main', () => {
 
 
 
-  let name = Cookies.get('nom')
-  let firstname = Cookies.get('prenom')
-  let email = Cookies.get('email')
+  let name = localStorage.getItem('nom')
+  let firstname = localStorage.getItem('prenom')
+  let email = localStorage.getItem('email')
 
 
   userName.value = name + ' ' + firstname

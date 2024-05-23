@@ -49,7 +49,7 @@ const notificationsOutline = computed(() => notificationSettingsModel.value.inde
 const plannifications = reactive({ list: [] })
 
 const getUserInfo = async () => {
-  form.currentEmail = Cookies.get('email')
+  form.currentEmail = localStorage.getItem('email')
   axios({
     url: apiService.getUrl() + '/intervenant/get/' + form.currentEmail,
     method: 'GET'

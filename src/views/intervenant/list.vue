@@ -23,7 +23,10 @@ const intervenants = reactive({ list: [] })
 const getAllIntervenant = () => {
   axios({
     url: apiService.getUrl() + '/intervenant',
-    method: 'GET'
+    method: 'GET',
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    },
   })
     .then((response) => {
       intervenants.list = response.data

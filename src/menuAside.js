@@ -129,21 +129,16 @@ if (type == 'superviseur') {
 
       ]
     },
-    /* {
-      label: 'Plannif.',
-      icon: mdiLock,
+    {
+      label: 'Centraux',
+      icon: mdiMonitor,
       menu: [
         {
-          label: 'Traiter',
-          to: '/traiter/' + type + '/' + pass,
-        },
-        {
-          label: 'Liste',
-          to: '/plannification/site/' + type + '/' + pass,
+          label: 'Central',
+          to: '/central/' + type + '/' + pass
         }
       ]
-    } */
-
+    }
   ]
 }
 

@@ -21,6 +21,16 @@ export default {
     })
   },
 
+  getAllSites() {
+    return axios({
+      url: this.getUrl() + '/site',
+      method: 'GET',
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      }
+    })
+  },
+
   getEntrepot() {
     return axios({
       url: this.getUrl() + '/entrepot',

@@ -19,6 +19,8 @@ import TraiterPlannif from '@/views/chef_equipe/HomeView.vue'
 import ListPlannificationVue from '@/views/chef_equipe/ListPlannification.vue'
 import ListPlannificationBySite from '@/views/chef_equipe/list/ListPlannification.vue'
 import NotFound from '@/views/NotFound.vue'
+import CentralView from '@/views/centraux/superviseur/CentralView.vue'
+import CentralList from '@/views/centraux/superviseur/CentralList.vue'
 
 const routes = [
   {
@@ -32,6 +34,14 @@ const routes = [
     path: '/',
     name: 'Login',
     component: Login
+  }, {
+    meta: {
+      title: 'Zone Central',
+      requiresAuth: true
+    },
+    path: '/central/:type/:pass',
+    name: 'CentralZone',
+    component: CentralView
   },
   {
     meta: {
@@ -45,7 +55,7 @@ const routes = [
   {
     meta: {
       title: 'Liste'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/plannification/site/:type/:pass',
     name: 'ListePlannificationSite',
@@ -65,7 +75,7 @@ const routes = [
   {
     meta: {
       title: 'Sites'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/site/:type/:pass',
     name: 'sites',
@@ -74,7 +84,7 @@ const routes = [
   {
     meta: {
       title: 'Zones'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/zone/:type/:pass',
     name: 'zone',
@@ -83,7 +93,7 @@ const routes = [
   {
     meta: {
       title: 'Sites'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/site/list/:type/:pass',
     name: 'List',
@@ -92,7 +102,7 @@ const routes = [
   {
     meta: {
       title: 'Intervenants'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/intervenant/:type/:pass',
     name: 'intervenant',
@@ -101,7 +111,7 @@ const routes = [
   {
     meta: {
       title: 'Intervenants'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/intervenant/list/:type/:pass',
     name: 'intervenants',
@@ -110,7 +120,7 @@ const routes = [
   {
     meta: {
       title: 'Equipements'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/equipement/:type/:pass',
     name: 'equipement',
@@ -119,7 +129,7 @@ const routes = [
   {
     meta: {
       title: 'Equipements'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/equipement/list/:type/:pass',
     name: 'equipement list',
@@ -128,7 +138,7 @@ const routes = [
   {
     meta: {
       title: 'Articles'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/article/:type/:pass',
     name: 'article',
@@ -137,7 +147,7 @@ const routes = [
   {
     meta: {
       title: 'Historiques'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/historique/:type/:pass',
     name: 'historique list',
@@ -146,7 +156,7 @@ const routes = [
   {
     meta: {
       title: 'Sortie'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/sorti/:type/:pass',
     name: 'sorti list',
@@ -156,7 +166,7 @@ const routes = [
   {
     meta: {
       title: 'MP'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/preventive/classique/:type/:pass',
     name: 'preventiveClassique',
@@ -165,7 +175,7 @@ const routes = [
   {
     meta: {
       title: 'PLANNIFIE'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/preventive/plannifie/:type/:pass',
     name: 'plannifie',
@@ -174,7 +184,7 @@ const routes = [
   {
     meta: {
       title: 'PLANNIFICATION'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/preventive/plannification/:type/:pass',
     name: 'plannifications',
@@ -183,7 +193,7 @@ const routes = [
   {
     meta: {
       title: 'Profile'
-      ,requiresAuth: true
+      , requiresAuth: true
     },
     path: '/profile',
     name: 'profile',

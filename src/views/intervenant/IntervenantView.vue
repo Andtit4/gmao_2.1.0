@@ -118,7 +118,7 @@ onMounted(() => {
               <option value="USER">CHEF DE ZONE</option>
               <option value="SUPERVISEUR">SUPERVISEUR</option>
               <option value="CHAUFFEUR">CHAUFFEUR</option>
-              
+              <option value="SUPERVISEUR-CENTRAUX">SUPERVISEUR-CENTRAUX</option>
             </select>
           </FormField>
         </FormField>

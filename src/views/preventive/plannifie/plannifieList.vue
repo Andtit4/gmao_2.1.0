@@ -386,10 +386,10 @@ onMounted(() => {
             {{ site.zone }}
           </td>
           <td data-label="Date de début">
-            {{ site.date_debut ? new Date(site.date_debut).toISOString().split('T')[0] : '' }}
+            {{ site.date_debut  }}
           </td>
           <td data-label="Date de fin">
-            {{ site.date_fin ? new Date(site.date_fin).toISOString().split('T')[0] : '' }}
+            {{ site.date_fin  }}
           </td>
           <td class="before:hidden lg:w-1 whitespace-nowrap">
             <BaseButtons type="justify-start lg:justify-end" no-wrap>

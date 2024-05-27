@@ -54,13 +54,13 @@ onMounted(() => {
               {{ mission.quota }}
             </td>
             <td data-label="Date d'ajout">
-              {{ mission.date_ajoute ? new Date(mission.date_ajoute).toISOString().split('T')[0] : '' }}
+              {{ mission.date_ajoute  }}
             </td>
             <td data-label="Date de début">
-              {{ mission.date_debut ? new Date(mission.date_debut).toISOString().split('T')[0] : '' }}
+              {{ mission.date_debut  }}
             </td>
             <td data-label="Date de fin">
-              {{ mission.date_fin ? new Date(mission.date_fin).toISOString().split('T')[0] : '' }}
+              {{ mission.date_fin  }}
             </td>
             <td class="before:hidden lg:w-1 whitespace-nowrap">
               <BaseButtons type="justify-start lg:justify-end" no-wrap>
@@ -71,6 +71,6 @@ onMounted(() => {
         </tbody>
       </table>
     </div>
-    
+
   </LayoutAuthenticated>
 </template>

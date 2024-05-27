@@ -195,8 +195,8 @@ onMounted(() => {
       </form>
     </CardBoxModal>
     <CardBoxModal v-model="treatModal">
-      <p>Plannification du {{ form.date_debut ? new Date(form.date_debut).toISOString().split('T')[0] : '' }} au {{
-        form.date_fin ? new Date(form.date_fin).toISOString().split('T')[0] : '' }}</p>
+      <p>Plannification du {{ form.date_debut  }} au {{
+        form.date_fin  }}</p>
       <p>Site selectionné: <strong>{{ form.site_selected }}</strong></p>
 
       <p>Date de traitement:
@@ -209,8 +209,8 @@ onMounted(() => {
       <BaseButton color="info" label="Traiter" @click="treat()" />
     </CardBoxModal>
     <CardBoxModal v-model="isModalActive">
-      <p>Plannification du {{ form.date_debut ? new Date(form.date_debut).toISOString().split('T')[0] : '' }} au {{
-        form.date_fin ? new Date(form.date_fin).toISOString().split('T')[0] : '' }}</p>
+      <p>Plannification du {{ form.date_debut  }} au {{
+        form.date_fin  }}</p>
       <br>
 
       <table>
@@ -268,13 +268,13 @@ onMounted(() => {
             {{ site.zone }}
           </td>
           <td data-label="Date de début">
-            {{ site.date_debut ? new Date(site.date_debut).toISOString().split('T')[0] : '' }}
+            {{ site.date_debut  }}
           </td>
           <td data-label="Date de fin">
-            {{ site.date_fin ? new Date(site.date_fin).toISOString().split('T')[0] : '' }}
+            {{ site.date_fin  }}
           </td>
           <td data-label="Date ajout">
-            {{ site.date_ajoute ? new Date(site.date_ajoute).toISOString().split('T')[0] : '' }}
+            {{ site.date_ajoute  }}
           </td>
           <td data-label="Quota de la semaine">
             {{ site.quota }}

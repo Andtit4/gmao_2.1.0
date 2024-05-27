@@ -148,7 +148,7 @@ onMounted(() => {
           <tr>
             <th v-if="checkable" />
             <th />
-            <th>Equipe</th>
+            <th>Equipes</th>
             <th>Site</th>
             <th>Semaine de plannification</th>
             <th>Status</th>

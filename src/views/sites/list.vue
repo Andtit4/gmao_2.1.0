@@ -78,13 +78,14 @@ const exportxlx = async () => {
 }
 
 const countAllSite = () => {
-  axios({
+  form.nbAllSite = localStorage.getItem('nbSites')
+  /* axios({
     url: apiService.getUrl() + '/site/all/nb',
     method: 'GET'
   }).then((res) => {
     form.nbAllSite = res.data[0].nb
     console.log('Sites   ',form.nbAllSite )
-  })
+  }) */
 }
 
 onMounted(() => {

@@ -142,6 +142,8 @@ const getAllSite = () => {
   })
     .then((response) => {
       sites.list = response.data
+      localStorage.setItem('nbSites', sites.list.length)
+      // console.log('\n site all ', sites.list.length)
     })
     .catch((e) => {
       console.log('An error occured ' + e)

@@ -10,8 +10,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'My Vue PWA',
-        short_name: 'VuePWA',
+        name: 'Energy Eye',
+        short_name: 'EnergyEye',
         theme_color: '#4DBA87',
         background_color: '#ffffff',
         display: 'standalone',
@@ -19,12 +19,12 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: 'img/icons/android-chrome-192x192.png',
+            src: 'public/favicon.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'img/icons/android-chrome-512x512.png',
+            src: 'public/favicon.png',
             sizes: '512x512',
             type: 'image/png'
           }

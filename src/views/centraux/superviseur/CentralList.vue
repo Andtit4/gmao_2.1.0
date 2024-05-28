@@ -89,6 +89,20 @@ const addEquipement = () => {
   })
 }
 
+const addIntervention = () => {
+  axios({
+    url: apiService.getUrl() + '/intervention/central',
+    method: 'POST',
+    data: {
+      equipement: form.equipement
+    }
+  }).then((res) => {
+    isModalActive.value = false
+  }).catch((err) => {
+    console.log('err ', err.message)
+  })
+}
+
 
 
 const mainStore = useMainStore()
@@ -183,7 +197,8 @@ onMounted(() => {
       </FormField>
     </div>
     <p>Utilisateur : {{ form.ajouter_par }}</p>
-
+    <BaseButton color="info" title="Actualiser"  label="Ajouter"
+        @click="addIntervention()" />
   </CardBoxModal>
 
   <div v-if="checkedRows.length" class="p-3 bg-gray-100/50 dark:bg-slate-800">

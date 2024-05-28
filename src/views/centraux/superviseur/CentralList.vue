@@ -1,12 +1,15 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useMainStore } from '@/stores/main'
-import { mdiEye, /* mdiTrashCan */ } from '@mdi/js'
+import { mdiEye, mdiPencil, mdiTrashCan, mdiPlus, mdiArrowUp, mdiRefresh } from '@mdi/js'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
+import FormControl from '@/components/FormControl.vue'
+import FormField from '@/components/FormField.vue'
+
 // import UserAvatar from '@/components/UserAvatar.vue'
 import axios from 'axios'
 // import { useRouter } from 'vue-router'
@@ -15,39 +18,78 @@ import apiService from '@/services/apiService'
 defineProps({
   checkable: Boolean
 })
+const form = reactive({
+  showErr: false,
+  showAdd: false,
+  errmessage: '',
+  equipement: '',
+  nom_equipement: '',
+  zone_name: '',
+  ajouter_par: '',
+  frequence: ''
+})
 
-const sites = reactive({ list: [] })
-// const router = useRouter()
+const zoneCentrale = reactive({ list: [] })
+const oneZoneCentrale = reactive({ list: [] })
+const equipementCentralList = reactive({ list: [] })
 
-// Fait
-const getAllSite = () => {
+const getCentralZone = async () => {
   axios({
-    url: apiService.getUrl() + '/preventive',
+    url: apiService.getUrl() + '/zone/central',
     method: 'GET'
+  }).then((res) => {
+    // console.log(res.data)
+    zoneCentrale.list = res.data
+  }).catch((err) => {
+    form.showErr = true;
+    form.errmessage = 'An error occured ' + err.message
   })
-    .then((response) => {
-      sites.list = response.data
-    })
-    .catch((e) => {
-      console.log('An error occured ' + e)
-    })
 }
 
-/* const deleteSite = (_id) => {
+const getEquipementCentralList = async () => {
+  axios({
+    url: apiService.getUrl() + '/equipement/central/' + oneZoneCentrale.list.nom,
+    method: 'GET'
+  }).then((res) => {
+    console.log('res.data',res.data)
+    equipementCentralList.list = res.data
+  }).catch((err) => {
+    form.showErr = true;
+    form.errmessage = 'An error occured ' + err.message
+  })
+}
+
+const editZone = (_id) => {
   axios({
     url: apiService.getUrl() + '/zone/' + _id,
-    method: 'DELETE'
+    method: 'GET'
+  }).then(async (res) => {
+    await getEquipementCentralList()
+    form.ajouter_par = localStorage.getItem('nom') + ' ' + localStorage.getItem('prenom')
+    oneZoneCentrale.list = res.data[0]
+    isModalActive.value = true;
   })
-    .then((response) => {
-      console.log(response)
-      setTimeout(() => {
-        location.reload()
-      }, 1000)
-    })
-    .catch((e) => {
-      console.log('An error occured ' + e)
-    })
-} */
+}
+
+const addEquipement = () => {
+  axios({
+    url: apiService.getUrl() + '/equipement/central',
+    method: 'POST',
+    data: {
+      nom: form.nom_equipement,
+      frequence: form.frequence,
+      zone: oneZoneCentrale.list.nom,
+      ajouter_par: form.ajouter_par
+    }
+  }).then((res) => {
+    form.showAdd = false;
+    form.nom_equipement = ''
+    form.frequence = ''
+    getEquipementCentralList()
+  })
+}
+
+
 
 const mainStore = useMainStore()
 
@@ -63,17 +105,12 @@ const currentPage = ref(0)
 
 const checkedRows = ref([])
 
-/* const itemsPaginated = computed(() =>
-  items.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
-) */
-
 const numPages = computed(() => Math.ceil(items.value.length / perPage.value))
 
 const currentPageHuman = computed(() => currentPage.value + 1)
 
 const pagesList = computed(() => {
   const pagesList = []
-  getAllSite()
   for (let i = 0; i < numPages.value; i++) {
     pagesList.push(i)
   }
@@ -101,31 +138,52 @@ const checked = (isChecked, client) => {
   }
 }
 
-const oneZone = reactive({ list: [] })
 
-const showZone = (id) => {
-  isModalActive.value = true
-  axios({
-    url: apiService.getUrl() + '/preventive/' + id,
-    method: 'GET'
-  }).then((response) => {
-    oneZone.list = response.data
-  })
-}
 
-onMounted(() => { })
+onMounted(() => {
+  getCentralZone()
+})
 </script>
 
 <template>
+  <p style="padding: 10px">{{ zoneCentrale.list.length }} Plannifications</p>
   <CardBoxModal v-model="isModalActive" title="Détails">
-    <p>
-      Zone: <b>{{ oneZone.list.zone }}</b>
-    </p>
-    <p>Nombre Total de Site: <b>{{ oneZone.list.nombre_total_site }}</b></p>
-    <p>Quotas par semaine : <b>{{ oneZone.list.quota_semaine }}</b></p>
-    <p>Nombre effectué cette semaine : <b>{{ oneZone.list.quota_semaine }}</b></p>
-    <p>Site(s) fait(s) : <b>0</b></p>
-    <p>Site(s) restant(s) : <b>0</b></p>
+    <p>Zone : <strong>{{ oneZoneCentrale.list.nom }}</strong> </p>
+    <div v-if="form.showAdd == true">
+      <BaseButton color="info" title="Actualiser" :icon="mdiRefresh" small
+        @click="getEquipementCentralList()" />
+      <BaseButton color="info" title="Ajouter un équipement" :icon="mdiArrowUp" small
+        @click="form.showAdd = !form.showAdd" />
+        <select v-model="form.equipement" class="form-select bg-white dark:bg-slate-800">
+      <option value="">Séléctionnez une Equipement</option>
+      <option v-for="(equipement, index) in equipementCentralList.list" :key="index" :value="equipement._id">
+        {{ equipement.nom }}
+      </option>
+    </select>
+    </div>
+
+    <div v-else>
+      <BaseButton color="info" title="Actualiser" :icon="mdiRefresh" small
+        @click="getEquipementCentralList()" />
+      <BaseButton color="info" title="Ajouter un équipement" :icon="mdiPlus" small
+        @click="form.showAdd = !form.showAdd" />
+        <select v-model="form.equipement" class="form-select bg-white dark:bg-slate-800">
+      <option value="">Séléctionnez une Equipement</option>
+      <option v-for="(equipement, index) in equipementCentralList.list" :key="index" :value="equipement._id">
+       {{ equipement._id }} | {{ equipement.nom }} |  {{  equipement.zone }}
+      </option>
+    </select>
+    </div>
+
+    <div v-if="form.showAdd == true">
+      <FormField label="Informations générale">
+        <FormControl v-model="form.nom_equipement" placeholder="Nom de l'équipement" />
+        <FormControl v-model="form.frequence" placeholder="Fréquence de maintenance" />
+        <BaseButton color="info" label="Enregistrer"  @click="addEquipement()" />
+      </FormField>
+    </div>
+    <p>Utilisateur : {{ form.ajouter_par }}</p>
+
   </CardBoxModal>
 
   <div v-if="checkedRows.length" class="p-3 bg-gray-100/50 dark:bg-slate-800">
@@ -141,15 +199,39 @@ onMounted(() => { })
           <th v-if="checkable" />
           <th />
           <th>Zone</th>
-          <th>Nombre de sites</th>
+          <th>Nombre d'équipements</th>
           <th>Quota par semaine</th>
           <th>Début</th>
           <th>Fin</th>
+          <th>Action</th>
           <th />
         </tr>
       </thead>
       <tbody>
-        
+        <tr v-for="(zone, index) in zoneCentrale.list" :key="index">
+          <TableCheckboxCell v-if="checkable" @checked="checked($event, zone)" />
+          <td class="border-b-0 lg:w-6 before:hidden">
+            <!-- <UserAvatar :username="zone._id" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
+          </td>
+          <td data-label="Zone">
+            {{ zone.nom }}
+          </td>
+          <td data-label="Nombre d'équipements">
+          </td>
+          <td data-label="Date début">
+          </td>
+          <td data-label="Date fin">
+          </td>
+          <td data-label="Date fin">
+          </td>
+          <td class="before:hidden lg:w-1 whitespace-nowrap">
+            <BaseButtons type="justify-start lg:justify-end" no-wrap>
+              <BaseButton color="success" :icon="mdiPencil" small @click="editZone(zone._id)" />
+              <BaseButton color="info" :icon="mdiEye" small @click="showSite(site._id)" />
+              <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteSite(site._id)" />
+            </BaseButtons>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>

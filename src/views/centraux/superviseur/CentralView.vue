@@ -11,6 +11,7 @@ import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.
 import BaseButton from '@/components/BaseButton.vue'
 import zoneList from '@/views/centraux/superviseur/CentralList.vue'
 import apiService from '@/services/apiService'
+import axios from 'axios'
 // import axios from 'axios'
 // import apiService from '@/services/apiService'
 
@@ -19,11 +20,16 @@ const isModalActive = ref(false)
 const form = reactive({
   zone: '',
   site: '',
+  nom: '',
+  type: 'CENTRAL',
   nbIntervention: '',
   date_debut: '',
   date_fin: '',
-  showSucess: false
+  errMessage: '',
+  showSucess: false,
+  showErr: false
 })
+
 const zones = reactive({ list: [] })
 const sites = reactive({ list: [] })
 const notificationSettingsModel = ref([])
@@ -32,6 +38,27 @@ const notificationsOutline = computed(() => notificationSettingsModel.value.inde
 const getSites = async () => {
   const data = await apiService.getAllSites();
   sites.list = data.data
+}
+
+const createZone = () => {
+  axios({
+    url: apiService.getUrl() + '/zone',
+    method: 'POST',
+    data: {
+      nom: form.nom,
+      type: form.type
+    }
+  }).then((res) => {
+    form.showSucess = true;
+
+    setTimeout(() => {
+      location.reload()
+    }, 1000)
+
+  }).catch((err) => {
+    form.showErr = true
+    form.errMessage = 'Une erreur est surevenue ' + err.message
+  })
 }
 
 onMounted(() => {
@@ -75,13 +102,13 @@ onMounted(() => {
       </SectionTitleLineWithButton>
       <CardBox>
         <FormField label="Informations générale">
-          <select v-model="form.site" class="form-select bg-white dark:bg-slate-800">
+          <select v-model="form.nom" class="form-select bg-white dark:bg-slate-800">
             <option value="">Séléctionnez une zone</option>
             <option v-for="(site, index) in sites.list" :key="index" :value="site.nom_site">
               {{ site.nom_site }}
             </option>
           </select>
-          <BaseButton color="info" small label="Submit" @click="submit(form.zone)" />
+          <BaseButton color="info" small label="Submit" @click="createZone()" />
         </FormField>
         <BaseDivider />
         <template #footer>

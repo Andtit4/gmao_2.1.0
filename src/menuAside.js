@@ -139,7 +139,7 @@ if (type == 'superviseur') {
       menu: [
         {
           icon: mdiPlus,
-          label: 'Ajouter',
+          label: 'Add - List',
           to: '/refueling/' + type + '/' + pass
         }
       ]

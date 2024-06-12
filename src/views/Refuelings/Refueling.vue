@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-
+import { mdiPlus } from '@mdi/js'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import apiService from '@/services/apiService'
 import axios from 'axios'
@@ -8,13 +8,21 @@ import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
+import BaseButton from '@/components/BaseButton.vue'
+import CardBoxModal from '@/components/CardBoxModal.vue'
+import LoadingButton from '@/layouts/LoadingButton.vue'
 
 
 const form = reactive({
   searchSite: '',
-  searchZone: ''
+  searchZone: '',
+  index: 0,
+  quantite_restante: 0,
+  date_releve: ''
 })
 const sites = reactive({ list: [] })
+const isModalActive = ref(false)
+const isLoading = ref(false)
 const search = () => {
   axios({
     url: apiService.getUrl() + '/site/search/dyn?nom_site=' + form.searchSite.toUpperCase(),
@@ -56,6 +64,22 @@ const getAllSite = () => {
     })
 }
 
+const oneSite = reactive({ list: [] })
+const addData = (id) => {
+  isModalActive.value = true
+  axios({
+    url: apiService.getUrl() + '/site/' + id,
+    method: 'GET'
+  }).then((res) => {
+    // console.log('site selected: ', res.data)
+    oneSite.list = res.data[0]
+  })
+}
+
+const createIndex = () => {
+  isLoading.value = true
+}
+
 onMounted(() => {
   getAllSite()
 })
@@ -64,12 +88,25 @@ onMounted(() => {
 
 <template>
   <LayoutAuthenticated>
+    <CardBoxModal v-model="isModalActive" title="Refueling">
+      <p>- Zone <strong>{{ oneSite.list.zone }}</strong> </p>
+      <p>- Site <strong>{{ oneSite.list.nom_site }}</strong></p>
+      <FormField label="Données refueling">
+        <FormControl v-model="form.index" placeholder="Index" type="number"  />
+        <FormControl v-model="form.quantite_restante" placeholder="Quantité restante" type="number" />
+      </FormField>
+      <FormField label="Date de relevé">
+        <FormControl v-model="form.date_releve" placeholder="Date de relevé" type="date"  />
+      </FormField>
+      <LoadingButton :buttonText="'Enregister'" :isLoading="isLoading" @click="createIndex()" />
+    </CardBoxModal>
     <SectionMain>
       <CardBox>
         <FormField label="Rechercher">
           <FormControl v-model="form.searchSite" placeholder="Entrez le nom du site" @input="search()" />
           <FormControl v-model="form.searchZone" placeholder="Entrez la zone" @input="searchZone()" />
         </FormField>
+
         <br />
         <div class="max-h-[32rem] overflow-x-auto">
           <table>
@@ -99,12 +136,7 @@ onMounted(() => {
                   {{ site.zone }} {{ site.typologie_energie }}
                 </td>
                 <td class="before:hidden lg:w-1 whitespace-nowrap">
-                  <BaseButtons type="justify-start lg:justify-end" no-wrap>
-                    <BaseButton color="success" :icon="mdiPencil" small @click="editSite(site._id)" />
-                    <BaseButton color="info" :icon="mdiEye" small @click="showSite(site._id)" />
-
-                    <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteSite(site._id)" />
-                  </BaseButtons>
+                  <BaseButton color="" :icon="mdiPlus" small @click="addData(site._id)" />
                 </td>
               </tr>
             </tbody>

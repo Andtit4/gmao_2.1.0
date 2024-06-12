@@ -78,6 +78,7 @@ const typologieOptions = [
   { id: 4, label: 'SOLAIRE+GE' },
   { id: 5, label: 'SOLAIRE+GE+GRID' }
 ]
+
 const configOptions = [
   {
     id: 1,

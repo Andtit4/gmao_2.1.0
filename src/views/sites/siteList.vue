@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useMainStore } from '@/stores/main'
-import { mdiEye, mdiTrashCan, mdiPencil } from '@mdi/js'
+import { mdiEye, mdiTrashCan, mdiPencil, mdiOil } from '@mdi/js'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
@@ -467,12 +467,13 @@ onMounted(() => {
             {{ site.nom_site }}
           </td>
           <td data-label="Zone">
-            {{ site.zone }}
+            {{ site.zone }} {{ site.typologie_energie }}
           </td>
           <td class="before:hidden lg:w-1 whitespace-nowrap">
             <BaseButtons type="justify-start lg:justify-end" no-wrap>
               <BaseButton color="success" :icon="mdiPencil" small @click="editSite(site._id)" />
               <BaseButton color="info" :icon="mdiEye" small @click="showSite(site._id)" />
+
               <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteSite(site._id)" />
             </BaseButtons>
           </td>

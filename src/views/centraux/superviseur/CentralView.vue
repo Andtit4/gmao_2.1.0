@@ -12,6 +12,9 @@ import BaseButton from '@/components/BaseButton.vue'
 import zoneList from '@/views/centraux/superviseur/CentralList.vue'
 import apiService from '@/services/apiService'
 import axios from 'axios'
+import Stepper from '@/layouts/Stepper.vue'
+import { mdiRefresh, mdiArrowUp } from '@mdi/js'
+import LoadingButton from '@/layouts/LoadingButton.vue'
 // import axios from 'axios'
 // import apiService from '@/services/apiService'
 
@@ -27,20 +30,36 @@ const form = reactive({
   date_fin: '',
   errMessage: '',
   showSucess: false,
-  showErr: false
+  showErr: false,
+  showAdd: true,
 })
 
 const zones = reactive({ list: [] })
 const sites = reactive({ list: [] })
+const oneZoneCentrale = reactive({ list: [] })
+const equipementCentralList = reactive({ list: [] })
 const notificationSettingsModel = ref([])
 const notificationsOutline = computed(() => notificationSettingsModel.value.indexOf('outline') > -1)
+const isDetailModal = ref(false)
 
 const getSites = async () => {
   const data = await apiService.getAllSites();
   sites.list = data.data
 }
 
+const isLoading = ref(false);
+
+/* const loadData = () => {
+      isLoading.value = true;
+      // Simulate an API call
+      setTimeout(() => {
+        isLoading.value = false;
+        // alert('Data loaded!');
+      }, 2000);
+    }; */
+
 const createZone = () => {
+  isLoading.value = true;
   axios({
     url: apiService.getUrl() + '/zone',
     method: 'POST',
@@ -50,10 +69,20 @@ const createZone = () => {
     }
   }).then((res) => {
     form.showSucess = true;
-
-    setTimeout(() => {
-      location.reload()
-    }, 1000)
+    isLoading.value = false;
+    // editZone(res.data.insertId)
+    // console.log('\n---', res.data)
+    axios({
+      url: apiService.getUrl() + '/zone/' + res.data.insertId,
+      method: 'GET'
+    }).then(async (res) => {
+      isDetailModal.value = true
+      await getEquipementCentralList()
+      form.ajouter_par = localStorage.getItem('nom') + ' ' + localStorage.getItem('prenom')
+      console.log()
+      form.id_zone = res.data.insertId;
+      // isModalActive.value = true;
+    })
 
   }).catch((err) => {
     form.showErr = true
@@ -61,61 +90,117 @@ const createZone = () => {
   })
 }
 
+
+
+
+const getEquipementCentralList = async () => {
+  axios({
+    url: apiService.getUrl() + '/equipement/central/' + oneZoneCentrale.list.nom,
+    method: 'GET'
+  }).then((res) => {
+    console.log('res.data', res.data)
+    equipementCentralList.list = res.data
+  }).catch((err) => {
+    form.showErr = true;
+    form.errmessage = 'An error occured ' + err.message
+  })
+}
+
+const state = reactive({
+  steps: ['Step 1', 'Step 2', 'Step 3']
+});
+// steps: ['Step 1', 'Step 2', 'Step 3']
+
 onMounted(() => {
   getSites()
 })
 </script>
 
 <template>
-  <CardBoxModal v-model="isModalActive" title="Détails">
-    <!-- Notification for success -->
-    <div v-if="form.showSucess == true">
-      <NotificationBar color="success" :icon="mdiInformation" :outline="notificationsOutline">
-        <b>Plannification initialisée</b>.
-      </NotificationBar>
-    </div>
-    <!-- End BLoc -->
-    <p>
-      Zone : <b>{{ form.zone }}</b>
-    </p>
-    <p>
-      Nombre total de sites : <b>{{ sites.list }}</b>
-    </p>
-    <p>
-      Quota : <b>{{ form.nbIntervention }} </b> Site(s) par Semaine
-    </p>
-    <p>
-      <FormField label="Début / Fin">
-        <FormControl v-model="form.date_debut" type="date" @change="ajouteDate()" />
-        <div v-if="form.date_debut != undefined || form.date_debut != ''">
-          <p>
-            Date fin: <b>{{ form.date_fin }}</b>
-          </p>
-        </div>
+  <div v-if="form.showSucess == true">
+
+  </div>
+  /* <CardBoxModal v-model="isDetailModal" title="Initialisation">
+    <p>Zone : <strong>{{ oneZoneCentrale.list.nom }}</strong> </p>
+    <div v-if="form.showAdd == true">
+      <FormField label="Informations générale">
+        <FormControl v-model="form.nom_equipement" placeholder="Nom de l'équipement" />
+        <FormControl v-model="form.frequence" placeholder="Fréquence de maintenance" />
+        <BaseButton color="info" label="Enregistrer" @click="addEquipement()" />
       </FormField>
-    </p>
-    <BaseButton color="success" label="Plannifier" @click="planif()" />
-  </CardBoxModal>
+    </div>
+    <p>Utilisateur : {{ form.ajouter_par }}</p>
+    <BaseButton color="info" title="Actualiser" label="Ajouter" @click="addIntervention()" />
+  </CardBoxModal> */
+
   <LayoutAuthenticated>
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Zone" main>
       </SectionTitleLineWithButton>
-      <CardBox>
-        <FormField label="Informations générale">
-          <select v-model="form.nom" class="form-select bg-white dark:bg-slate-800">
-            <option value="">Séléctionnez une zone</option>
-            <option v-for="(site, index) in sites.list" :key="index" :value="site.nom_site">
-              {{ site.nom_site }}
-            </option>
-          </select>
-          <BaseButton color="info" small label="Submit" @click="createZone()" />
-        </FormField>
-        <BaseDivider />
-        <template #footer>
-          <!-- <BaseButtons>
-            <BaseButton type="reset" color="info" outline label="Reset" />
-          </BaseButtons> -->
+      <Stepper :steps="state.steps">
+        <template v-slot:step-0>
+          <div>
+            <CardBox>
+              <NotificationBar color="success" :icon="mdiInformation" :outline="notificationsOutline">
+                <b>Plannification initialisée</b>. <i>Passez au suivant👉​</i>
+              </NotificationBar>
+              <FormField label="Informations générale">
+                <select v-model="form.nom" class="form-select bg-white dark:bg-slate-800">
+                  <option value="">Séléctionnez une zone</option>
+                  <option v-for="(site, index) in sites.list" :key="index" :value="site.nom_site">
+                    {{ site.nom_site }}
+                  </option>
+                </select>
+                <LoadingButton :buttonText="'Plannifer'" :isLoading="isLoading" @click="createZone()" />
+              </FormField>
+              <BaseDivider />
+            </CardBox>
+          </div>
         </template>
+        <template v-slot:step-1>
+          <p>Zone : <strong>{{ oneZoneCentrale.list.nom }}</strong> </p>
+          <br />
+          <hr />
+          <br />
+          <div v-if="form.showAdd == true">
+            <BaseButton color="info" title="Actualiser" :icon="mdiRefresh" small @click="getEquipementCentralList()" />
+            <BaseButton color="info" title="Ajouter un équipement" :icon="mdiArrowUp" small
+              @click="form.showAdd = !form.showAdd" />
+            <select v-model="form.equipement" class="form-select bg-white dark:bg-slate-800">
+              <option value="">Séléctionnez une Equipement</option>
+              <option v-for="(equipement, index) in equipementCentralList.list" :key="index" :value="equipement._id">
+                {{ equipement.nom }}
+              </option>
+            </select>
+          </div>
+
+          <div v-else>
+            <BaseButton color="info" title="Actualiser" :icon="mdiRefresh" small @click="getEquipementCentralList()" />
+            <BaseButton color="info" title="Ajouter un équipement" :icon="mdiPlus" small
+              @click="form.showAdd = !form.showAdd" />
+            <select v-model="form.equipement" class="form-select bg-white dark:bg-slate-800">
+              <option value="">Séléctionnez une Equipement</option>
+              <option v-for="(equipement, index) in equipementCentralList.list" :key="index" :value="equipement._id">
+                {{ equipement._id }} | {{ equipement.nom }} | {{ equipement.zone }}
+              </option>
+            </select>
+          </div>
+
+          <div v-if="form.showAdd == true">
+            <FormField label="Informations générale">
+              <FormControl v-model="form.nom_equipement" placeholder="Nom de l'équipement" />
+              <FormControl v-model="form.frequence" placeholder="Fréquence de maintenance" />
+              <BaseButton color="info" label="Enregistrer l'équipement" @click="addEquipement()" />
+            </FormField>
+          </div>
+          <p>Utilisateur : {{ form.ajouter_par }}</p>
+          <BaseButton color="info" title="Actualiser" label="Enregistrer l'intervention" @click="addIntervention()" />
+        </template>
+        <template v-slot:step-2>
+          <div>Content for Step 3</div>
+        </template>
+      </Stepper>
+      <CardBox>
       </CardBox>
     </SectionMain>
 

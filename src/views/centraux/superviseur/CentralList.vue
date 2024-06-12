@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useMainStore } from '@/stores/main'
-import { mdiEye, mdiPencil, mdiTrashCan, mdiPlus, mdiArrowUp, mdiRefresh } from '@mdi/js'
+import { mdiEye, mdiPencil, mdiTrashCan, mdiPlus, mdiArrowUp, mdiRefresh, mdiCalendar } from '@mdi/js'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
@@ -26,12 +26,18 @@ const form = reactive({
   nom_equipement: '',
   zone_name: '',
   ajouter_par: '',
-  frequence: ''
+  frequence: '',
+  id_zone: '',
+  date_debut: '',
+  date_fin: '',
+  quota: 0
 })
 
 const zoneCentrale = reactive({ list: [] })
 const oneZoneCentrale = reactive({ list: [] })
 const equipementCentralList = reactive({ list: [] })
+const equipementCentralForIntervention= reactive({ list: [] })
+
 
 const getCentralZone = async () => {
   axios({
@@ -40,11 +46,47 @@ const getCentralZone = async () => {
   }).then((res) => {
     // console.log(res.data)
     zoneCentrale.list = res.data
+    // getEquipementForInterventionFunc(res.data.)
   }).catch((err) => {
     form.showErr = true;
     form.errmessage = 'An error occured ' + err.message
   })
 }
+
+const zoneCentralPlanned = reactive({ list: []})
+const getCentralZonePlanned = async () => {
+  /* axios({
+    url: apiService.getUrl() + '/zone/plannifie/central',
+    method: 'GET'
+  }).then(async (res) => {
+    zoneCentralPlanned.list = await res.data
+    console.log(zoneCentralPlanned.list)
+    // getEquipementForInterventionFunc(res.data.)
+  }).catch((err) => {
+    form.showErr = true;
+    form.errmessage = 'An error occured ' + err.message
+  }) */
+
+  try {
+    const response = await axios({
+      url: apiService.getUrl() + '/zone/plannifie/central',
+      method: 'GET'
+    });
+
+    if (Array.isArray(response.data)) {
+      zoneCentralPlanned.list = response.data;
+      console.log(zoneCentralPlanned.list);
+    } else {
+      console.error('Unexpected response format:', response.data);
+      form.showErr = true;
+      form.errmessage = 'Unexpected response format';
+    }
+  } catch (err) {
+    form.showErr = true;
+    form.errmessage = 'An error occurred: ' + err.message;
+  }
+}
+
 
 const getEquipementCentralList = async () => {
   axios({
@@ -59,6 +101,15 @@ const getEquipementCentralList = async () => {
   })
 }
 
+const getEquipementForInterventionFunc = async (_id) => {
+  axios({
+    url: apiService.getUrl() + '/intervention/central/intervention/' + _id,
+    method: 'GET'
+  }).then((res) => {
+    equipementCentralForIntervention.list = res.data
+  })
+}
+
 const editZone = (_id) => {
   axios({
     url: apiService.getUrl() + '/zone/' + _id,
@@ -67,6 +118,7 @@ const editZone = (_id) => {
     await getEquipementCentralList()
     form.ajouter_par = localStorage.getItem('nom') + ' ' + localStorage.getItem('prenom')
     oneZoneCentrale.list = res.data[0]
+    form.id_zone = _id;
     isModalActive.value = true;
   })
 }
@@ -94,7 +146,8 @@ const addIntervention = () => {
     url: apiService.getUrl() + '/intervention/central',
     method: 'POST',
     data: {
-      equipement: form.equipement
+      equipement: form.equipement,
+      zone_central: form.id_zone
     }
   }).then((res) => {
     isModalActive.value = false
@@ -103,6 +156,20 @@ const addIntervention = () => {
   })
 }
 
+const equipementAddForIntervention = reactive({ list: []})
+
+const getEquipementForIntervention = () => {
+  axios({
+    url: apiService.getUrl() + '/equipement/central/intervention/' + form.id_zone,
+    method: 'GET',
+
+  }).then((res) => {
+    equipementAddForIntervention.list = res.data
+    console.log(res.data)
+  }).catch((err) => {
+    console.log('err ', err.message)
+  })
+}
 
 
 const mainStore = useMainStore()
@@ -110,6 +177,7 @@ const mainStore = useMainStore()
 const items = computed(() => mainStore.clients)
 
 const isModalActive = ref(false)
+const isShowDetailActive = ref(false)
 
 // const isModalDangerActive = ref(false)
 
@@ -152,16 +220,90 @@ const checked = (isChecked, client) => {
   }
 }
 
+const showDetails = ( nom) => {
+  isShowDetailActive.value = true
+  form.zone_name = nom
+  form.id_zone = nom
+  getEquipementForIntervention()
+}
+
+const isShowPlannifModal = ref(false)
+
+const addPlannif = (nom) => {
+  isShowPlannifModal.value = true
+  form.zone_name = nom
+}
+
+const createPlannif = () => {
+  axios({
+    url: apiService.getUrl() + '/plannif/central',
+    method: 'POST',
+    data: {
+      zone: form.zone_name,
+      date_debut: form.date_debut,
+      date_fin: form.date_fin,
+      quota: form.quota
+    }
+  }).then((res) => {
+    isShowPlannifModal.value = false
+  })
+}
+
 
 
 onMounted(() => {
   getCentralZone()
+  getCentralZonePlanned()
 })
 </script>
 
 <template>
   <p style="padding: 10px">{{ zoneCentrale.list.length }} Plannifications</p>
-  <CardBoxModal v-model="isModalActive" title="Détails">
+  <CardBoxModal v-model="isShowPlannifModal" title="Plannifier">
+      - Zone {{ form.zone_name }}
+      <p>- Quota {{ form.quota }}</p>
+      <FormField label="Date de plannification">
+        <FormControl v-model="form.date_debut" placeholder="Début" type="date"/>
+        <FormControl v-model="form.date_fin" placeholder="Fin" type="date" />
+        <BaseButton color="info" label="Enregistrer"  @click="createPlannif()" />
+      </FormField>
+    </CardBoxModal>
+  <CardBoxModal v-model="isShowDetailActive" title="Détails">
+    <p>{{ form.zone_name }}</p>
+    <p>Equipement(s) de la zone</p>
+    <div class="max-h-[32rem] overflow-x-auto">
+      <table>
+        <thead>
+        <tr>
+          <th v-if="checkable" />
+          <th />
+          <th>Equipement</th>
+          <th>Zone</th>
+          <th>0/0</th>
+          <th />
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(equipement, index) in equipementAddForIntervention.list" :key="index">
+          <TableCheckboxCell v-if="checkable" @checked="checked($event, zone)" />
+
+          <td data-label="id">
+            {{ equipement._id }}
+          </td>
+          <td data-label="Equipement">
+            {{ equipement.nom }}
+          </td>
+          <td data-label="Date fin">
+            {{ equipement.zone }}
+          </td>
+          <td class="before:hidden lg:w-1 whitespace-nowrap">
+          </td>
+        </tr>
+      </tbody>
+      </table>
+    </div>
+    </CardBoxModal>
+  <CardBoxModal v-model="isModalActive" title="Initialisation">
     <p>Zone : <strong>{{ oneZoneCentrale.list.nom }}</strong> </p>
     <div v-if="form.showAdd == true">
       <BaseButton color="info" title="Actualiser" :icon="mdiRefresh" small
@@ -214,7 +356,6 @@ onMounted(() => {
           <th v-if="checkable" />
           <th />
           <th>Zone</th>
-          <th>Nombre d'équipements</th>
           <th>Quota par semaine</th>
           <th>Début</th>
           <th>Fin</th>
@@ -223,27 +364,35 @@ onMounted(() => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(zone, index) in zoneCentrale.list" :key="index">
+        <tr v-for="(zone, index) in zoneCentralPlanned.list" :key="index">
           <TableCheckboxCell v-if="checkable" @checked="checked($event, zone)" />
           <td class="border-b-0 lg:w-6 before:hidden">
             <!-- <UserAvatar :username="zone._id" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
           </td>
           <td data-label="Zone">
-            {{ zone.nom }}
+            <div v-if="zoneCentralPlanned.list.nom == zone.nom">
+              {{ zone.zone }}
+            </div>
+            <div v-else>
+              <span style="color: yellow">
+                {{ zone.nom }}
+                </span>
+            </div>
           </td>
-          <td data-label="Nombre d'équipements">
+          <td data-label="Quota">
+            0/{{ zone.quota }}
           </td>
           <td data-label="Date début">
+            {{ zone.date_debut }}
           </td>
           <td data-label="Date fin">
-          </td>
-          <td data-label="Date fin">
+            {{ zone.date_fin }}
           </td>
           <td class="before:hidden lg:w-1 whitespace-nowrap">
             <BaseButtons type="justify-start lg:justify-end" no-wrap>
               <BaseButton color="success" :icon="mdiPencil" small @click="editZone(zone._id)" />
-              <BaseButton color="info" :icon="mdiEye" small @click="showSite(site._id)" />
-              <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteSite(site._id)" />
+              <BaseButton color="info" :icon="mdiEye" small @click="showDetails( zone.nom)" />
+              <BaseButton color="warning" :icon="mdiCalendar" small @click="addPlannif(zone.nom)" />
             </BaseButtons>
           </td>
         </tr>

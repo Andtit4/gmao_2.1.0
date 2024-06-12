@@ -3,6 +3,8 @@ import {
   mdiLock,
   mdiTable,
   mdiViewList,
+  mdiOil,
+  mdiPlus
 } from '@mdi/js'
 
 let type = localStorage.getItem('type')
@@ -100,14 +102,6 @@ if (type == 'superviseur') {
           label: 'Mouvements',
           to: '/article/' + type + '/' + pass
         },
-        /* {
-          label: 'Sortie',
-          to: '/sorti/' + type + '/' + pass
-        },
-        {
-          label: 'Historique',
-          to: '/historique/' + type + '/' + pass
-        } */
       ]
     },
     {
@@ -138,6 +132,18 @@ if (type == 'superviseur') {
           to: '/central/' + type + '/' + pass
         }
       ]
+    },
+    {
+      label: 'Refueling',
+      icon: mdiOil,
+      menu: [
+        {
+          icon: mdiPlus,
+          label: 'Ajouter',
+          to: '/refueling/' + type + '/' + pass
+        }
+      ]
+
     }
   ]
 }

@@ -21,6 +21,7 @@ import ListPlannificationBySite from '@/views/chef_equipe/list/ListPlannificatio
 import NotFound from '@/views/NotFound.vue'
 import CentralView from '@/views/centraux/superviseur/CentralView.vue'
 import CentralList from '@/views/centraux/superviseur/CentralList.vue'
+import RefuelingView from '@/views/Refuelings/Refueling.vue'
 
 const routes = [
   {
@@ -42,6 +43,15 @@ const routes = [
     path: '/central/:type/:pass',
     name: 'CentralZone',
     component: CentralView
+  },
+  {
+    meta: {
+      title: 'Refueling',
+      requiresAuth: true
+    },
+    path: '/refueling/:type/:pass',
+    name: 'RefuelingView',
+    component: RefuelingView
   },
   {
     meta: {

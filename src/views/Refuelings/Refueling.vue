@@ -278,7 +278,6 @@ onMounted(() => {
               <BaseButton v-for="page in pagesList" :key="page" :active="page === currentPage" :label="page + 1"
                 :color="page === currentPage ? 'lightDark' : 'whiteDark'" small @click="currentPage = page" />
             </BaseButtons>
-            <small>Page {{ currentPageHuman }} of {{ numPages }}</small>
           </BaseLevel>
         </div>
       </CardBox>

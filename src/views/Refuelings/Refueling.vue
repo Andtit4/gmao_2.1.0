@@ -11,18 +11,26 @@ import CardBox from '@/components/CardBox.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import LoadingButton from '@/layouts/LoadingButton.vue'
+import RefuelingList from '@/views/Refuelings/RefuelingList.vue'
 
 
 const form = reactive({
   searchSite: '',
   searchZone: '',
   index: 0,
-  quantite_restante: 0,
-  date_releve: ''
+  quantite: 0,
+  date_releve: '',
+  errMessage: '',
+  showError: false,
+  showSuccess: false,
+  successMessage: '',
+  nbExist: 0
 })
 const sites = reactive({ list: [] })
 const isModalActive = ref(false)
 const isLoading = ref(false)
+const showErrNotification = ref(false)
+
 const search = () => {
   axios({
     url: apiService.getUrl() + '/site/search/dyn?nom_site=' + form.searchSite.toUpperCase(),
@@ -56,13 +64,28 @@ const getAllSite = () => {
   })
     .then((response) => {
       sites.list = response.data
-      localStorage.setItem('nbSites', sites.list.length)
-      // console.log('\n site all ', sites.list.length)
     })
     .catch((e) => {
       console.log('An error occured ' + e)
     })
 }
+
+const sitesIndexed = reactive({ list: [] })
+
+const getSiteIndexed = () => {
+  axios({
+    url: apiService.getUrl() + '/refueling/index',
+    method: 'GET'
+  })
+    .then((response) => {
+      sitesIndexed.list = response.data
+    })
+    .catch((e) => {
+      console.log('An error occured ' + e)
+    })
+}
+
+// const getSiteIndexed = () => { }
 
 const oneSite = reactive({ list: [] })
 const addData = (id) => {
@@ -76,12 +99,64 @@ const addData = (id) => {
   })
 }
 
+
+
+
 const createIndex = () => {
   isLoading.value = true
+  axios({
+    url: apiService.getUrl() + '/refueling/exist/' + oneSite.list.nom_site,
+    method: 'GET',
+
+  }).then((res) => {
+    form.nbExist = res.data[0].nb
+    console.log('exist ', form.nbExist)
+
+    if (form.nbExist == 0) {
+      axios({
+        url: apiService.getUrl() + '/refueling',
+        method: 'POST',
+        data: {
+          site: oneSite.list.nom_site,
+          site_index: form.index,
+          date_releve: form.date_releve,
+          date_create: Date.now(),
+          quantite: form.quantite
+        }
+      }).then((res) => {
+        isLoading.value = false
+        isModalActive.value = false
+        form.showSuccess = true
+        form.successMessage = res.data
+        resetInput()
+        getSiteIndexed()
+      }).catch((err) => {
+        console.log('An error occured ', err.message)
+        form.showError = true,
+          form.errMessage = 'An error occured ' + err.message
+      })
+    } else {
+      form.showError = true
+      isLoading.value = false
+      form.errMessage = 'Index déjà enregistré pour ce site'
+    }
+  })
+
+
+
+}
+
+const resetInput = () => {
+  form.index = ''
+  form.date_releve = ''
+  form.successMessage = false
+  showErrNotification.value = false
+  form.quantite = ''
 }
 
 onMounted(() => {
   getAllSite()
+  getSiteIndexed()
 })
 
 </script>
@@ -89,16 +164,19 @@ onMounted(() => {
 <template>
   <LayoutAuthenticated>
     <CardBoxModal v-model="isModalActive" title="Refueling">
+      <div v-if="form.showError == true">
+        <p style="color: red;"> {{ form.errMessage }} </p>
+      </div>
       <p>- Zone <strong>{{ oneSite.list.zone }}</strong> </p>
       <p>- Site <strong>{{ oneSite.list.nom_site }}</strong></p>
       <FormField label="Données refueling">
-        <FormControl v-model="form.index" placeholder="Index" type="number"  />
-        <FormControl v-model="form.quantite_restante" placeholder="Quantité restante" type="number" />
+        <FormControl v-model="form.index" placeholder="Index" type="number" />
+        <FormControl v-model="form.quantite" placeholder="Quantité restante" type="number" />
       </FormField>
       <FormField label="Date de relevé">
-        <FormControl v-model="form.date_releve" placeholder="Date de relevé" type="date"  />
+        <FormControl v-model="form.date_releve" placeholder="Date de relevé" type="date" />
       </FormField>
-      <LoadingButton :buttonText="'Enregister'" :isLoading="isLoading" @click="createIndex()" />
+      <LoadingButton :button-text="'Enregister'" :is-loading="isLoading" @click="createIndex()" />
     </CardBoxModal>
     <SectionMain>
       <CardBox>
@@ -106,7 +184,6 @@ onMounted(() => {
           <FormControl v-model="form.searchSite" placeholder="Entrez le nom du site" @input="search()" />
           <FormControl v-model="form.searchZone" placeholder="Entrez la zone" @input="searchZone()" />
         </FormField>
-
         <br />
         <div class="max-h-[32rem] overflow-x-auto">
           <table>
@@ -146,5 +223,65 @@ onMounted(() => {
       </CardBox>
     </SectionMain>
 
+    <SectionMain>
+      <CardBox has-table>
+        <SectionMain>
+          <FormField label="Rechercher">
+            <FormControl placeholder="Entrez le nom du site" />
+            <FormControl placeholder="Entrez la zone" />
+          </FormField>
+        </SectionMain>
+        <table>
+          <thead>
+            <tr>
+              <th v-if="checkable" />
+              <th />
+              <th>Date de relevée</th>
+              <th>Sites</th>
+              <th>Zones</th>
+              <th>Quantité restante</th>
+              <th>Index</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(site, index) in sitesIndexed.list" :key="index">
+              <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
+              <td class="border-b-0 lg:w-6 before:hidden">
+                <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
+              </td>
+              <td data-label="Date relevée">
+                {{ site.date_releve ? new Date(site.date_releve).toISOString().split('T')[0] : '' }}
+              </td>
+              <td data-label="Site">
+                {{ site.site }}
+              </td>
+              <td data-label="Zone">
+                {{ site.zone }}
+              </td>
+              <td data-label="Quantité restante">
+                {{ site.quantite }}
+              </td>
+              <td data-label="Index">
+                {{ site.site_index }}
+              </td>
+              <td class="before:hidden lg:w-1 whitespace-nowrap">
+                <BaseButtons type="justify-start lg:justify-end" no-wrap>
+                </BaseButtons>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
+          <BaseLevel>
+            <BaseButtons>
+              <BaseButton v-for="page in pagesList" :key="page" :active="page === currentPage" :label="page + 1"
+                :color="page === currentPage ? 'lightDark' : 'whiteDark'" small @click="currentPage = page" />
+            </BaseButtons>
+            <small>Page {{ currentPageHuman }} of {{ numPages }}</small>
+          </BaseLevel>
+        </div>
+      </CardBox>
+    </SectionMain>
   </LayoutAuthenticated>
 </template>

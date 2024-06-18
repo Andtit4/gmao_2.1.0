@@ -43,11 +43,16 @@ const form = reactive({
   nbAllSite: 0,
   sitesRestants: '',
   progession: '',
-
+  week: '',
+  // textWeek: '',
   formattedEndOfWeek: '',
   formattedStartOfWeek: ''
 })
 
+const weekNumber = () => {
+  form.week = 'Semaine W' + apiService.getWeekNumber(Date.now())
+  // console.log(form.week)
+}
 
 // Fait
 const countAllSite = () => {
@@ -265,14 +270,15 @@ onMounted(() => {
     getNbFaitSemaine(),
     getSiteWeeklyPlan(),
     countAllSite(),
-    share()
+    share(),
+    weekNumber()
 })
 </script>
 
 <template>
   <LayoutAuthenticated>
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" title="Tableau de bord" main>
+      <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" :title="form.week" main>
         <BaseButton :icon="mdiFileExcel" color="success" label="Export" @click="exportxlx()" />
       </SectionTitleLineWithButton>
 

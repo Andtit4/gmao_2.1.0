@@ -24,7 +24,8 @@ const form = reactive({
   showError: false,
   showSuccess: false,
   successMessage: '',
-  nbExist: 0
+  nbExist: 0,
+  week: 0
 })
 const sites = reactive({ list: [] })
 const isModalActive = ref(false)
@@ -74,7 +75,7 @@ const sitesIndexed = reactive({ list: [] })
 
 const getSiteIndexed = () => {
   axios({
-    url: apiService.getUrl() + '/refueling/index',
+    url: apiService.getUrl() + '/refueling/week/' + form.week,
     method: 'GET'
   })
     .then((response) => {
@@ -121,7 +122,8 @@ const createIndex = () => {
           site_index: form.index,
           date_releve: form.date_releve,
           date_create: Date.now(),
-          quantite: form.quantite
+          quantite: form.quantite,
+          week: form.week
         }
       }).then((res) => {
         isLoading.value = false
@@ -141,9 +143,6 @@ const createIndex = () => {
       form.errMessage = 'Index déjà enregistré pour ce site'
     }
   })
-
-
-
 }
 
 const resetInput = () => {
@@ -154,7 +153,13 @@ const resetInput = () => {
   form.quantite = ''
 }
 
+const weekNumber = () => {
+  form.week = apiService.getWeekNumber(Date.now())
+  // console.log(form.week)
+}
+
 onMounted(() => {
+  weekNumber()
   getAllSite()
   getSiteIndexed()
 })
@@ -236,6 +241,7 @@ onMounted(() => {
             <tr>
               <th v-if="checkable" />
               <th />
+              <th>Week</th>
               <th>Date de relevée</th>
               <th>Sites</th>
               <th>Zones</th>
@@ -250,6 +256,9 @@ onMounted(() => {
               <td class="border-b-0 lg:w-6 before:hidden">
                 <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
               </td>
+              <td data-label="Week">
+                 Semaine {{ site.week }}
+                </td>
               <td data-label="Date relevée">
                 {{ site.date_releve ? new Date(site.date_releve).toISOString().split('T')[0] : '' }}
               </td>

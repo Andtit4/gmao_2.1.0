@@ -122,6 +122,14 @@ export default {
       },
     })
   },
-
+   getWeekNumber(uneDate) {
+		var d = new Date(uneDate);
+		var DoW = d.getDay();
+		d.setDate(d.getDate() - (DoW + 6) % 7 + 3);
+		var ms = d.valueOf(); // GMT
+		d.setMonth(0);
+		d.setDate(4); 
+		return Math.round((ms - d.valueOf()) / (7 * 864e5)) + 1;
+	}
 
 }

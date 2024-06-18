@@ -314,7 +314,7 @@ const siteDone = (zone) => {
     method: 'GET'
   }).then((res) => {
     number.ke = res.data[0].nb
-    console.log('\njijji = ' + res.data)
+    // console.log('\njijji = ' + res.data)
 
   }).catch((err) => {
     console.log('An error occured ' + err.message)

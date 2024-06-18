@@ -44,6 +44,11 @@ if (type == 'superviseur') {
       icon: mdiLock,
       to: '/traiter/' + type + '/' + pass,
     },
+    {
+      label: 'Refueling',
+      icon: mdiOil,
+      to: '/refueling/user/' + type + '/' + pass
+    }
   ]
 
 } else {
@@ -143,7 +148,6 @@ if (type == 'superviseur') {
           to: '/refueling/' + type + '/' + pass
         }
       ]
-
     }
   ]
 }

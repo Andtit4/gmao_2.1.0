@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
-import Cookies from 'js-cookie'
 
 
 export const useMainStore = defineStore('main', () => {

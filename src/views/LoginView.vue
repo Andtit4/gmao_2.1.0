@@ -49,6 +49,7 @@ const submit = () => {
       localStorage.setItem('email', res.data.intervenant[0].email)
       localStorage.setItem('nom', res.data.intervenant[0].nom)
       localStorage.setItem('prenom', res.data.intervenant[0].prenom)
+      // localStorage.setItem('zone')
       useMainStore().setUser(res.data.intervenant[0])
       switch (res.data.type_utilisateur) {
         case 'ADMIN':
@@ -62,6 +63,8 @@ const submit = () => {
           // Cookies.remove('type')
           localStorage.removeItem('type')
           localStorage.setItem('type', 'chef_equipe')
+          localStorage.removeItem('zone')
+          localStorage.setItem('zone',res.data.intervenant[0].zone )
           return router.push({
             name: 'Dashboard',
             params: { type: 'chef_equipe', pass: res.data.intervenant[0]._id }

@@ -1,6 +1,6 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
-import { mdiPlus } from '@mdi/js'
+import {  onMounted, reactive, ref } from 'vue'
+import { mdiPlus,  } from '@mdi/js'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import apiService from '@/services/apiService'
 import axios from 'axios'
@@ -11,7 +11,7 @@ import CardBox from '@/components/CardBox.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import LoadingButton from '@/layouts/LoadingButton.vue'
-import RefuelingList from '@/views/Refuelings/RefuelingList.vue'
+import * as XLSX from 'xlsx'
 
 
 const form = reactive({
@@ -100,7 +100,43 @@ const addData = (id) => {
   })
 }
 
+const getAllSiteIndex = async () => {
+  const response = await axios.get(apiService.getUrl() + '/refueling/index')
+  return response.data
+}
 
+const exportxlx =  async () => {
+  const apiData = await getAllSiteIndex()
+  const data = [
+    [
+      "Semaine",
+      "Date de relevé",
+      "Zone",
+      "Site",
+      "Quantité restante",
+      "Index"
+    ],
+    ...apiData.map((item) => [
+      item.week,
+      item.date_releve,
+      item.zone,
+      item.site,
+      item.quantite,
+      item.site_index
+    ])
+  ]
+
+  const wb = XLSX.utils.book_new()
+
+  // Créez une feuille avec vos données
+  const ws = XLSX.utils.aoa_to_sheet(data)
+
+  // Ajoutez la feuille au workbook
+  XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
+
+  // Générez le fichier Excel et téléchargez-le
+  XLSX.writeFile(wb, `REFUELING_INDEX_W${form.week}.xlsx`)
+}
 
 
 const createIndex = () => {
@@ -123,7 +159,8 @@ const createIndex = () => {
           date_releve: form.date_releve,
           date_create: Date.now(),
           quantite: form.quantite,
-          week: form.week
+          week: form.week,
+          zone: oneSite.list.zone
         }
       }).then((res) => {
         isLoading.value = false
@@ -184,6 +221,15 @@ onMounted(() => {
       <LoadingButton :button-text="'Enregister'" :is-loading="isLoading" @click="createIndex()" />
     </CardBoxModal>
     <SectionMain>
+    <BaseButton
+        target="_blank"
+        :icon="midExcel"
+        label="Export"
+        color="success"
+        rounded-full
+        small
+        @click="exportxlx()"
+      />
       <CardBox>
         <FormField label="Rechercher">
           <FormControl v-model="form.searchSite" placeholder="Entrez le nom du site" @input="search()" />

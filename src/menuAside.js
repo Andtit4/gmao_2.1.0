@@ -49,17 +49,7 @@ if (type == 'superviseur') {
       icon: mdiOil,
       to: '/refueling/user/' + type + '/' + pass
     },
-    {
-      label: 'Refueling',
-      icon: mdiOil,
-      menu: [
-        {
-          icon: mdiPlus,
-          label: 'Add - List',
-          to: '/refueling/' + type + '/' + pass
-        }
-      ]
-    }
+    
   ]
 
 } else {

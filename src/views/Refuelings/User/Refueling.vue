@@ -118,7 +118,8 @@ const createIndex = () => {
           date_releve: form.date_releve,
           date_create: Date.now(),
           quantite: form.quantite,
-          week: form.week
+          week: form.week,
+          zone: oneSite.list.zone
         }
       }).then((res) => {
         isLoading.value = false

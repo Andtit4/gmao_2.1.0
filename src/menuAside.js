@@ -30,7 +30,10 @@ if (type == 'superviseur') {
           label: 'Plannifications',
           to: '/preventive/plannification/' + type + '/' + pass
         },
-        {
+
+      ]
+    },
+    {
           label: 'Refueling',
           icon: mdiOil,
           menu: [
@@ -41,8 +44,6 @@ if (type == 'superviseur') {
             }
           ]
         }
-      ]
-    }
   ]
 } else if (type == "chef_equipe") {
   data = [

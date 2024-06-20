@@ -29,6 +29,17 @@ if (type == 'superviseur') {
         {
           label: 'Plannifications',
           to: '/preventive/plannification/' + type + '/' + pass
+        },
+        {
+          label: 'Refueling',
+          icon: mdiOil,
+          menu: [
+            {
+              icon: mdiPlus,
+              label: 'Add - List',
+              to: '/refueling/' + type + '/' + pass
+            }
+          ]
         }
       ]
     }
@@ -49,7 +60,7 @@ if (type == 'superviseur') {
       icon: mdiOil,
       to: '/refueling/user/' + type + '/' + pass
     },
-    
+
   ]
 
 } else {

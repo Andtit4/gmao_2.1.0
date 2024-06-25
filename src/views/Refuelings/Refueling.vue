@@ -141,45 +141,51 @@ const exportxlx =  async () => {
 
 const createIndex = () => {
   isLoading.value = true
-  axios({
-    url: apiService.getUrl() + '/refueling/exist/' + oneSite.list.nom_site,
-    method: 'GET',
+  if (form.index === "" || form.index === " ") {
+    form.showError = true
+    isLoading.value = false
+    form.errMessage = 'Index entré est vide'
+  } else {
+    axios({
+      url: apiService.getUrl() + '/refueling/exist/' + oneSite.list.nom_site,
+      method: 'GET',
 
-  }).then((res) => {
-    form.nbExist = res.data[0].nb
-    console.log('exist ', form.nbExist)
+    }).then((res) => {
+      form.nbExist = res.data[0].nb
+      console.log('exist ', form.nbExist)
 
-    if (form.nbExist == 0) {
-      axios({
-        url: apiService.getUrl() + '/refueling',
-        method: 'POST',
-        data: {
-          site: oneSite.list.nom_site,
-          site_index: form.index,
-          date_releve: form.date_releve,
-          date_create: Date.now(),
-          quantite: form.quantite,
-          week: form.week,
-          zone: oneSite.list.zone
-        }
-      }).then((res) => {
+      if (form.nbExist == 0) {
+        axios({
+          url: apiService.getUrl() + '/refueling',
+          method: 'POST',
+          data: {
+            site: oneSite.list.nom_site,
+            site_index: form.index,
+            date_releve: form.date_releve,
+            date_create: Date.now(),
+            quantite: form.quantite,
+            week: form.week,
+            zone: oneSite.list.zone
+          }
+        }).then((res) => {
+          isLoading.value = false
+          isModalActive.value = false
+          form.showSuccess = true
+          form.successMessage = res.data
+          resetInput()
+          getSiteIndexed()
+        }).catch((err) => {
+          console.log('An error occured ', err.message)
+          form.showError = true,
+            form.errMessage = 'An error occured ' + err.message
+        })
+      } else {
+        form.showError = true
         isLoading.value = false
-        isModalActive.value = false
-        form.showSuccess = true
-        form.successMessage = res.data
-        resetInput()
-        getSiteIndexed()
-      }).catch((err) => {
-        console.log('An error occured ', err.message)
-        form.showError = true,
-          form.errMessage = 'An error occured ' + err.message
-      })
-    } else {
-      form.showError = true
-      isLoading.value = false
-      form.errMessage = 'Index déjà enregistré pour ce site'
-    }
-  })
+        form.errMessage = 'Index déjà enregistré pour ce site'
+      }
+    })
+  }
 }
 
 const resetInput = () => {

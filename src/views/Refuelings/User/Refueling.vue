@@ -48,7 +48,7 @@ const search = () => {
 }
 
 const getZoneConnected = () => {
-   form.zoneConnected = localStorage.getItem('zone')
+  form.zoneConnected = localStorage.getItem('zone')
 }
 
 const searchZone = () => {
@@ -70,7 +70,7 @@ const sitesIndexed = reactive({ list: [] })
 
 const getSiteIndexed = () => {
   axios({
-    url: apiService.getUrl() + '/refueling/week/' + form.week,
+    url: apiService.getUrl() + '/refueling/zone/' + form.zoneConnected + '/' + form.week,
     method: 'GET'
   })
     .then((response) => {
@@ -100,45 +100,52 @@ const addData = (id) => {
 
 const createIndex = () => {
   isLoading.value = true
-  axios({
-    url: apiService.getUrl() + '/refueling/exist/' + oneSite.list.nom_site,
-    method: 'GET',
+  if (form.index === "" || form.index === " ") {
+    form.showError = true
+    isLoading.value = false
+    form.errMessage = 'Index entré est vide'
+  } else {
+    axios({
+      url: apiService.getUrl() + '/refueling/exist/' + oneSite.list.nom_site,
+      method: 'GET',
 
-  }).then((res) => {
-    form.nbExist = res.data[0].nb
-    console.log('exist ', form.nbExist)
+    }).then((res) => {
+      form.nbExist = res.data[0].nb
+      console.log('exist ', form.nbExist)
 
-    if (form.nbExist == 0) {
-      axios({
-        url: apiService.getUrl() + '/refueling',
-        method: 'POST',
-        data: {
-          site: oneSite.list.nom_site,
-          site_index: form.index,
-          date_releve: form.date_releve,
-          date_create: Date.now(),
-          quantite: form.quantite,
-          week: form.week,
-          zone: oneSite.list.zone
-        }
-      }).then((res) => {
+      if (form.nbExist == 0) {
+        axios({
+          url: apiService.getUrl() + '/refueling',
+          method: 'POST',
+          data: {
+            site: oneSite.list.nom_site,
+            site_index: form.index,
+            date_releve: form.date_releve,
+            date_create: Date.now(),
+            quantite: form.quantite,
+            week: form.week,
+            zone: oneSite.list.zone
+          }
+        }).then((res) => {
+          isLoading.value = false
+          isModalActive.value = false
+          form.showSuccess = true
+          form.successMessage = res.data
+          resetInput()
+          getSiteIndexed()
+        }).catch((err) => {
+          console.log('An error occured ', err.message)
+          form.showError = true,
+            form.errMessage = 'An error occured ' + err.message
+        })
+      } else {
+        form.showError = true
         isLoading.value = false
-        isModalActive.value = false
-        form.showSuccess = true
-        form.successMessage = res.data
-        resetInput()
-        getSiteIndexed()
-      }).catch((err) => {
-        console.log('An error occured ', err.message)
-        form.showError = true,
-          form.errMessage = 'An error occured ' + err.message
-      })
-    } else {
-      form.showError = true
-      isLoading.value = false
-      form.errMessage = 'Index déjà enregistré pour ce site'
-    }
-  })
+        form.errMessage = 'Index déjà enregistré pour ce site'
+      }
+    })
+  }
+
 }
 
 const resetInput = () => {
@@ -254,8 +261,8 @@ onMounted(() => {
                 <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
               </td>
               <td data-label="Week">
-                 Semaine {{ site.week }}
-                </td>
+                Semaine {{ site.week }}
+              </td>
               <td data-label="Date relevée">
                 {{ site.date_releve ? new Date(site.date_releve).toISOString().split('T')[0] : '' }}
               </td>

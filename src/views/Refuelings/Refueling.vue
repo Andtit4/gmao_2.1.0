@@ -1,6 +1,6 @@
 <script setup>
-import {  onMounted, reactive, ref } from 'vue'
-import { mdiPlus,  } from '@mdi/js'
+import { onMounted, reactive, ref } from 'vue'
+import { mdiPlus, } from '@mdi/js'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import apiService from '@/services/apiService'
 import axios from 'axios'
@@ -105,7 +105,7 @@ const getAllSiteIndex = async () => {
   return response.data
 }
 
-const exportxlx =  async () => {
+const exportxlx = async () => {
   const apiData = await getAllSiteIndex()
   const data = [
     [
@@ -227,15 +227,8 @@ onMounted(() => {
       <LoadingButton :button-text="'Enregister'" :is-loading="isLoading" @click="createIndex()" />
     </CardBoxModal>
     <SectionMain>
-    <BaseButton
-        target="_blank"
-        :icon="midExcel"
-        label="Export"
-        color="success"
-        rounded-full
-        small
-        @click="exportxlx()"
-      />
+      <BaseButton target="_blank" :icon="midExcel" label="Export" color="success" rounded-full small
+        @click="exportxlx()" />
       <CardBox>
         <FormField label="Rechercher">
           <FormControl v-model="form.searchSite" placeholder="Entrez le nom du site" @input="search()" />
@@ -288,51 +281,54 @@ onMounted(() => {
             <FormControl placeholder="Entrez la zone" />
           </FormField>
         </SectionMain>
-        <table>
-          <thead>
-            <tr>
-              <th v-if="checkable" />
-              <th />
-              <th>Week</th>
-              <th>Date de relevée</th>
-              <th>Sites</th>
-              <th>Zones</th>
-              <th>Quantité restante</th>
-              <th>Index</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(site, index) in sitesIndexed.list" :key="index">
-              <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
-              <td class="border-b-0 lg:w-6 before:hidden">
-                <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
-              </td>
-              <td data-label="Week">
-                 Semaine {{ site.week }}
+        <div class="max-h-[32rem] overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th v-if="checkable" />
+                <th />
+                <th>Week</th>
+                <th>Date de relevée</th>
+                <th>Sites</th>
+                <th>Zones</th>
+                <th>Quantité restante</th>
+                <th>Index</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(site, index) in sitesIndexed.list" :key="index">
+                <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
+                <td class="border-b-0 lg:w-6 before:hidden">
+                  <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
                 </td>
-              <td data-label="Date relevée">
-                {{ site.date_releve ? new Date(site.date_releve).toISOString().split('T')[0] : '' }}
-              </td>
-              <td data-label="Site">
-                {{ site.site }}
-              </td>
-              <td data-label="Zone">
-                {{ site.zone }}
-              </td>
-              <td data-label="Quantité restante">
-                {{ site.quantite }}
-              </td>
-              <td data-label="Index">
-                {{ site.site_index }}
-              </td>
-              <td class="before:hidden lg:w-1 whitespace-nowrap">
-                <BaseButtons type="justify-start lg:justify-end" no-wrap>
-                </BaseButtons>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                <td data-label="Week">
+                  Semaine {{ site.week }}
+                </td>
+                <td data-label="Date relevée">
+                  {{ site.date_releve ? new Date(site.date_releve).toISOString().split('T')[0] : '' }}
+                </td>
+                <td data-label="Site">
+                  {{ site.site }}
+                </td>
+                <td data-label="Zone">
+                  {{ site.zone }}
+                </td>
+                <td data-label="Quantité restante">
+                  {{ site.quantite }}
+                </td>
+                <td data-label="Index">
+                  {{ site.site_index }}
+                </td>
+                <td class="before:hidden lg:w-1 whitespace-nowrap">
+                  <BaseButtons type="justify-start lg:justify-end" no-wrap>
+                  </BaseButtons>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
           <BaseLevel>
             <BaseButtons>

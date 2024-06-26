@@ -118,7 +118,9 @@ onMounted(() => {
 
 <template>
   <div v-if="form.showSucess == true">
-
+    <NotificationBar color="success" :icon="mdiInformation" :outline="notificationsOutline">
+      <b>Plannification initialisée</b>. <i>Passez au suivant👉​</i>
+    </NotificationBar>
   </div>
   /* <CardBoxModal v-model="isDetailModal" title="Initialisation">
     <p>Zone : <strong>{{ oneZoneCentrale.list.nom }}</strong> </p>
@@ -141,9 +143,7 @@ onMounted(() => {
         <template v-slot:step-0>
           <div>
             <CardBox>
-              <NotificationBar color="success" :icon="mdiInformation" :outline="notificationsOutline">
-                <b>Plannification initialisée</b>. <i>Passez au suivant👉​</i>
-              </NotificationBar>
+
               <FormField label="Informations générale">
                 <select v-model="form.nom" class="form-select bg-white dark:bg-slate-800">
                   <option value="">Séléctionnez une zone</option>

@@ -264,7 +264,7 @@ onMounted(() => {
                 Semaine {{ site.week }}
               </td>
               <td data-label="Date relevée">
-                {{ site.date_releve ? new Date(site.date_releve).toISOString().split('T')[0] : '' }}
+                {{ site.date_releve }}
               </td>
               <td data-label="Site">
                 {{ site.site }}

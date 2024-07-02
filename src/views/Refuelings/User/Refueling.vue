@@ -106,7 +106,7 @@ const createIndex = () => {
     form.errMessage = 'Index entré est vide'
   } else {
     axios({
-      url: apiService.getUrl() + '/refueling/exist/' + oneSite.list.nom_site,
+      url: apiService.getUrl() + '/refueling/exist/' + oneSite.list.nom_site + '/' + form.week,
       method: 'GET',
 
     }).then((res) => {
@@ -145,7 +145,6 @@ const createIndex = () => {
       }
     })
   }
-
 }
 
 const resetInput = () => {

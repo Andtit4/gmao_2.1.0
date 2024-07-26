@@ -188,15 +188,30 @@ onMounted(() => {
   <LayoutAuthenticated>
     <CardBoxModal v-model="moreModal">
       <form enctype="multipart/form-data">
-        <p>Panne sur <strong>{{ form.site_selected }}</strong> </p>
+        <p><strong>{{ form.site_selected }}</strong> </p>
         <FormControl type="file" v-model="form.file" id="file" ref="file" />
-        <FormControl type="text" placeholder="Description de la panne" v-model="form.panneDesc" />
+        <FormField label="Informations générale du GE" help="Ses informations seront prise en compte une seule fois">
+            <FormControl type="text" placeholder="Nom du GE"></FormControl>
+            <FormControl type="text" placeholder="Type de Platine"></FormControl>
+            <FormField label="Batteries">
+            <FormControl type="text" placeholder="Nombre de battéries"></FormControl>
+            <FormControl type="text" placeholder="Capacité des battéries"></FormControl>
+          </FormField>
+          </FormField>
+          <FormField>
+            <FormControl type="text" placeholder="Puissance GE"></FormControl>
+          </FormField>
+
+          <FormField>
+            <FormControl type="text" placeholder="Panne/Equipement" v-model="form.panneDesc" />
+            <FormControl type="text" placeholder="Description de la panne" v-model="form.panneDesc" />
+          </FormField>
         <BaseButton color="info" label="Enregistrer" @click="uploadImg()" />
       </form>
     </CardBoxModal>
     <CardBoxModal v-model="treatModal">
-      <p>Plannification du {{ form.date_debut  }} au {{
-        form.date_fin  }}</p>
+      <p>Plannification du {{ form.date_debut }} au {{
+        form.date_fin }}</p>
       <p>Site selectionné: <strong>{{ form.site_selected }}</strong></p>
 
       <p>Date de traitement:
@@ -209,8 +224,8 @@ onMounted(() => {
       <BaseButton color="info" label="Traiter" @click="treat()" />
     </CardBoxModal>
     <CardBoxModal v-model="isModalActive">
-      <p>Plannification du {{ form.date_debut  }} au {{
-        form.date_fin  }}</p>
+      <p>Plannification du {{ form.date_debut }} au {{
+        form.date_fin }}</p>
       <br>
 
       <table>
@@ -268,13 +283,13 @@ onMounted(() => {
             {{ site.zone }}
           </td>
           <td data-label="Date de début">
-            {{ site.date_debut  }}
+            {{ site.date_debut }}
           </td>
           <td data-label="Date de fin">
-            {{ site.date_fin  }}
+            {{ site.date_fin }}
           </td>
           <td data-label="Date ajout">
-            {{ site.date_ajoute  }}
+            {{ site.date_ajoute }}
           </td>
           <td data-label="Quota de la semaine">
             {{ site.quota }}

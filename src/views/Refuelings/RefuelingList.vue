@@ -1,21 +1,17 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useMainStore } from '@/stores/main'
-import { mdiEye, mdiTrashCan } from '@mdi/js'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import UserAvatar from '@/components/UserAvatar.vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import apiService from '@/services/apiService'
 import FormControl from '@/components/FormControl.vue'
 import FormField from '@/components/FormField.vue'
 import SectionMain from '@/components/SectionMain.vue'
-import formatDate from '@/services/formatedDate'
-
 
 
 defineProps({
@@ -23,7 +19,6 @@ defineProps({
 })
 
 const sites = reactive({ list: [] })
-const router = useRouter()
 
 const getAllSite = () => {
   axios({

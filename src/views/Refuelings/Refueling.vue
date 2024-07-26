@@ -72,6 +72,9 @@ const getAllSite = () => {
 }
 
 const sitesIndexed = reactive({ list: [] })
+// const siteListed = reactive({ list: []})
+
+
 
 const getSiteIndexed = () => {
   axios({
@@ -205,6 +208,7 @@ onMounted(() => {
   weekNumber()
   getAllSite()
   getSiteIndexed()
+  // getSiteIndexList()
 })
 
 </script>
@@ -244,6 +248,7 @@ onMounted(() => {
                 <th>Site Id</th>
                 <th>Nom Site</th>
                 <th>Zone</th>
+                <th>Etat</th>
                 <th />
               </tr>
             </thead>
@@ -261,6 +266,9 @@ onMounted(() => {
                 </td>
                 <td data-label="Zone">
                   {{ site.zone }} {{ site.typologie_energie }}
+                </td>
+                <td data-label="Etat">
+                  
                 </td>
                 <td class="before:hidden lg:w-1 whitespace-nowrap">
                   <BaseButton color="" :icon="mdiPlus" small @click="addData(site._id)" />

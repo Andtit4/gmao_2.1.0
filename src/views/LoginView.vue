@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { mdiAccount, mdiAsterisk } from '@mdi/js'
 import SectionFullScreen from '@/components/SectionFullScreen.vue'
@@ -16,7 +16,8 @@ import NotificationBar from '@/components/NotificationBar.vue'
 // import CryptoJS from 'crypto-js'
 import { useMainStore } from '@/stores/main.js'
 // import { isEmptyArray } from '@/services/document'
-
+import LoadingButton from '@/layouts/LoadingButton.vue'
+const isLoading = ref(false)
 const form = reactive({
   login: '',
   pass: '',
@@ -33,6 +34,7 @@ const router = useRouter()
 
 const submit = () => {
   // const hash = CryptoJS.SHA256(form.pass)
+  isLoading.value = true;
   axios({
     url: apiService.getUrl() + `/intervenant/auth?email=${form.login}&mot_de_passe=${form.pass}`,
     method: 'GET'
@@ -41,6 +43,7 @@ const submit = () => {
     if (res.data.error) {
       form.showError = true;
       form.err = res.data.error
+      isLoading.value = false;
     } else {
       console.log(res.data)
       localStorage.setItem('token', res.data.token)
@@ -116,10 +119,8 @@ const submit = () => {
         <FormCheckRadio v-model="form.remember" name="remember" label="Remember" :input-value="true" />
 
         <template #footer>
-          <BaseButtons>
-            <BaseButton type="submit" color="info" label="Login" />
-            <BaseButton to="/dashboard" color="info" outline label="Back" />
-          </BaseButtons>
+          <LoadingButton :button-text="'Login'" :is-loading="isLoading" @click="submit()" />
+
         </template>
       </CardBox>
     </SectionFullScreen>

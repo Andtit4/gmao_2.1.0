@@ -188,7 +188,7 @@ const save = () => {
       axios({
         url: apiService.getUrl() + '/plannifie',
         method: 'POST',
-        headers: { 'Access-Control-Allow-Origin' : '*' },
+        headers: { 'Access-Control-Allow-Origin': '*' },
         data: {
           zone: oneZone.list.zone,
           id_plannification: form.id_plannification,
@@ -293,6 +293,30 @@ const searchMission = () => {
 }
 
 // const notificationsOutline = computed(() => notificationSettingsModel.value.indexOf('outline') > -1)
+const formatDate = (dateString) => {
+  if (!dateString) {
+    return 'Date invalide';
+  }
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return 'Date invalide';
+  }
+
+  const options = {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'UTC'
+  };
+  const formatter = new Intl.DateTimeFormat('fr-FR', options);
+  const formattedDate = formatter.format(date);
+  const formattedDateWithHours = formattedDate.replace(',', ' à');
+  return formattedDateWithHours;
+}
 
 
 onMounted(() => {
@@ -380,16 +404,16 @@ onMounted(() => {
             <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
           </td>
           <td data-label="Date de plannification">
-            {{ site.date_ajoute ? new Date(site.date_ajoute).toISOString().split('T')[0] : '' }}
+            {{ site.date_ajoute ? formatDate(site.date_ajoute) : 'Date invalide' }}
           </td>
           <td data-label="Equipe">
             {{ site.zone }}
           </td>
           <td data-label="Date de début">
-            {{ site.date_debut  }}
+            {{ site.date_debut ? formatDate(site.date_debut) : 'Date invalide' }}
           </td>
           <td data-label="Date de fin">
-            {{ site.date_fin  }}
+            {{ site.date_fin ? formatDate(site.date_fin) : 'Date invalide'}}
           </td>
           <td class="before:hidden lg:w-1 whitespace-nowrap">
             <BaseButtons type="justify-start lg:justify-end" no-wrap>

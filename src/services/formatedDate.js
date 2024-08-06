@@ -1,14 +1,29 @@
 export default {
-  formatDate(dateString) {
-    const months = [
-      "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-      "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
-    ];
+   formatDate(dateString) {
+    // Convertir la chaîne en objet Date
     const date = new Date(dateString);
-    const day = date.getUTCDate();
-    const month = months[date.getUTCMonth()];
-    const year = date.getUTCFullYear();
-    return `${day} ${month} ${year}`;
-  }
 
+    // Options pour le formateur de date
+    const options = {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: 'UTC'
+    };
+
+    // Créer un formateur de date avec les options spécifiées
+    const formatter = new Intl.DateTimeFormat('fr-FR', options);
+
+    // Formatter la date
+    const formattedDate = formatter.format(date);
+
+    // Remplacer le format des heures et minutes
+    const formattedDateWithHours = formattedDate.replace(',', ' à');
+    console.log(formattedDateWithHours)
+
+    return formattedDateWithHours;
+}
 }

@@ -19,6 +19,31 @@ const getAllMission = () => {
   })
 }
 
+const formatDate = (dateString) => {
+  if (!dateString) {
+    return 'Date invalide';
+  }
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return 'Date invalide';
+  }
+
+  const options = {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'UTC'
+  };
+  const formatter = new Intl.DateTimeFormat('fr-FR', options);
+  const formattedDate = formatter.format(date);
+  const formattedDateWithHours = formattedDate.replace(',', ' à');
+  return formattedDateWithHours;
+}
+
 onMounted(() => {
   getAllMission()
 })
@@ -54,13 +79,13 @@ onMounted(() => {
               {{ mission.quota }}
             </td>
             <td data-label="Date d'ajout">
-              {{ mission.date_ajoute  }}
+              {{ mission.date_ajoute ? formatDate(mission.date_ajoute) : 'Date invalide'  }}
             </td>
             <td data-label="Date de début">
-              {{ mission.date_debut  }}
+              {{ mission.date_debut ? formatDate(mission.date_debut) : 'Date invalide' }}
             </td>
             <td data-label="Date de fin">
-              {{ mission.date_fin  }}
+              {{ mission.date_fin ? formatDate(mission.date_fin) : 'Date invalide'  }}
             </td>
             <td class="before:hidden lg:w-1 whitespace-nowrap">
               <BaseButtons type="justify-start lg:justify-end" no-wrap>

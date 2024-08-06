@@ -179,6 +179,32 @@ const getAddGeInformation = () => {
 }
 
 
+const formatDate = (dateString) => {
+  if (!dateString) {
+    return 'Date invalide';
+  }
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return 'Date invalide';
+  }
+
+  const options = {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'UTC'
+  };
+  const formatter = new Intl.DateTimeFormat('fr-FR', options);
+  const formattedDate = formatter.format(date);
+  const formattedDateWithHours = formattedDate.replace(',', ' à');
+  return formattedDateWithHours;
+}
+
+
 onMounted(() => {
   getTypeUser(),
     getUserInfo()
@@ -222,7 +248,7 @@ onMounted(() => {
       </form>
     </CardBoxModal>
     <CardBoxModal v-model="treatModal">
-      <p>Plannification du {{ form.date_debut }} au {{
+      <p>Plannification du {{ form.date_debut ? formatDate(form.date_debut) : 'Date invalide' }} au {{
         form.date_fin }}</p>
       <p>Site selectionné: <strong>{{ form.site_selected }}</strong></p>
 
@@ -236,8 +262,8 @@ onMounted(() => {
       <BaseButton color="info" label="Traiter" @click="treat()" />
     </CardBoxModal>
     <CardBoxModal v-model="isModalActive">
-      <p>Plannification du {{ form.date_debut }} au {{
-        form.date_fin }}</p>
+      <p>Plannification du {{ form.date_debut ? formatDate(form.date_debut) : 'Date invalide' }} au {{
+        form.date_fin ? formatDate(form.date_fin) : 'Date invalide'}}</p>
       <br>
 
       <table>
@@ -277,10 +303,10 @@ onMounted(() => {
         <tr>
           <th v-if="checkable" />
           <th />
+          <th>Ajouté le</th>
           <th>Equipe</th>
           <th>Début</th>
           <th>Fin</th>
-          <th>Date ajout</th>
           <th>Quota de la semaine</th>
           <th />
         </tr>
@@ -291,17 +317,17 @@ onMounted(() => {
           <td class="border-b-0 lg:w-6 before:hidden">
             <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
           </td>
+          <td data-label="Ajouté le">
+            {{ site.date_ajoute ? formatDate(site.date_ajoute) : 'Date invalide' }}
+          </td>
           <td data-label="Equipe">
             {{ site.zone }}
           </td>
           <td data-label="Date de début">
-            {{ site.date_debut }}
+            {{ site.date_debut ? formatDate(site.date_debut) : 'Date invalide'}}
           </td>
           <td data-label="Date de fin">
-            {{ site.date_fin }}
-          </td>
-          <td data-label="Date ajout">
-            {{ site.date_ajoute }}
+            {{ site.date_fin ? formatDate(site.date_fin) : 'Date invalide' }}
           </td>
           <td data-label="Quota de la semaine">
             {{ site.quota }}

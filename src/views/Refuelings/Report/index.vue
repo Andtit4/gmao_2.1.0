@@ -17,7 +17,6 @@ import * as XLSX from 'xlsx'
 const form = reactive({
   searchSite: '',
   searchZone: '',
-  searchZoneIndex: '',
   index: 0,
   quantite: 0,
   date_releve: '',
@@ -205,17 +204,6 @@ const weekNumber = () => {
   // console.log(form.week)
 }
 
-const searchIndexByZone = () => {
-  axios({
-    url: apiService.getUrl() + '/refueling/search/zone/' + form.searchZoneIndex,
-    method: 'GET'
-  }).then((res) => {
-    sitesIndexed.list = res.data
-  }).catch((err) => {
-    console.log(err.message)
-  })
-}
-
 onMounted(() => {
   weekNumber()
   getAllSite()
@@ -298,7 +286,7 @@ onMounted(() => {
         <SectionMain>
           <FormField label="Rechercher">
             <FormControl placeholder="Entrez le nom du site" />
-            <FormControl v-model="form.searchZoneIndex" placeholder="Entrez la zone" @input="searchIndexByZone()"/>
+            <FormControl placeholder="Entrez la zone" />
           </FormField>
         </SectionMain>
         <div class="max-h-[32rem] overflow-x-auto">

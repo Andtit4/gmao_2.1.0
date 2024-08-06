@@ -26,7 +26,8 @@ const form = reactive({
   successMessage: '',
   nbExist: 0,
   week: 0,
-  zoneConnected: ''
+  zoneConnected: '',
+  searchSiteIndex: '',
 })
 const sites = reactive({ list: [] })
 const isModalActive = ref(false)
@@ -160,6 +161,21 @@ const weekNumber = () => {
   // console.log(form.week)
 }
 
+const searchIndexBySite = () => {
+  axios({
+    url: apiService.getUrl() + '/refueling/search/site/' + form.searchSiteIndex + '/' + form.zoneConnected + '/' + form.week,
+    method: 'GET'
+  }).then((res) => {
+    sitesIndexed.list = res.data
+
+    if (form.searchSiteIndex == '') {
+      getSiteIndexed()
+    }
+  }).catch((err) => {
+    console.log(err.message)
+  })
+}
+
 onMounted(() => {
   weekNumber()
   getZoneConnected()
@@ -235,8 +251,8 @@ onMounted(() => {
       <CardBox has-table>
         <SectionMain>
           <FormField label="Rechercher">
-            <FormControl placeholder="Entrez le nom du site" />
-            <FormControl placeholder="Entrez la zone" />
+            <FormControl v-model="form.searchSiteIndex" placeholder="Entrez le nom du site"
+              @input="searchIndexBySite()" />
           </FormField>
         </SectionMain>
         <table>

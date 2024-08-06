@@ -164,6 +164,18 @@ const activeMore = (site) => {
   form.site_selected = site
   isModalActive.value = false
   moreModal.value = true
+  getAddGeInformation()
+}
+
+const getAddGeInformation = () => {
+  axios({
+    url: apiService.getUrl() + '/ge/site/' + form.site_selected,
+    method: 'GET',
+  }).then((res) => {
+    console.log('bllll ', res.data)
+  }).catch((err) => {
+    console.log('An error occured d ', err.message)
+  })
 }
 
 
@@ -189,23 +201,23 @@ onMounted(() => {
     <CardBoxModal v-model="moreModal">
       <form enctype="multipart/form-data">
         <p><strong>{{ form.site_selected }}</strong> </p>
-        <FormControl type="file" v-model="form.file" id="file" ref="file" />
         <FormField label="Informations générale du GE" help="Ses informations seront prise en compte une seule fois">
-            <FormControl type="text" placeholder="Nom du GE"></FormControl>
-            <FormControl type="text" placeholder="Type de Platine"></FormControl>
-            <FormField label="Batteries">
+          <FormControl type="text" placeholder="Nom du GE"></FormControl>
+          <FormControl type="text" placeholder="Type de Platine"></FormControl>
+          <FormField label="Batteries">
             <FormControl type="text" placeholder="Nombre de battéries"></FormControl>
             <FormControl type="text" placeholder="Capacité des battéries"></FormControl>
           </FormField>
-          </FormField>
-          <FormField>
-            <FormControl type="text" placeholder="Puissance GE"></FormControl>
-          </FormField>
+        </FormField>
+        <FormField>
+          <FormControl type="text" placeholder="Puissance GE"></FormControl>
+        </FormField>
 
-          <FormField>
-            <FormControl type="text" placeholder="Panne/Equipement" v-model="form.panneDesc" />
-            <FormControl type="text" placeholder="Description de la panne" v-model="form.panneDesc" />
-          </FormField>
+        <FormControl type="file" v-model="form.file" id="file" ref="file" /><br>
+        <FormField>
+          <FormControl type="text" placeholder="Panne/Equipement" v-model="form.panneDesc" />
+          <FormControl type="text" placeholder="Description de la panne" v-model="form.panneDesc" />
+        </FormField>
         <BaseButton color="info" label="Enregistrer" @click="uploadImg()" />
       </form>
     </CardBoxModal>

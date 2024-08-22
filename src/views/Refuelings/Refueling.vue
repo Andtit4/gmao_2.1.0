@@ -281,13 +281,13 @@ const showGraph = async (siteId, nomSite) => {
           x: {
             title: {
               display: true,
-              text: 'Période'
+              text: 'Date'
             }
           },
           y: {
             title: {
               display: true,
-              text: 'Différence d\'index'
+              text: 'Heure de fonctionnement'
             },
             beginAtZero: true
           }

@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, computed } from 'vue'
 import { mdiPlus } from '@mdi/js'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import apiService from '@/services/apiService'
@@ -38,8 +38,19 @@ const isModalActive = ref(false)
 const isLoading = ref(false)
 const showErrNotification = ref(false)
 const nonCommonSites = ref([])
+const searchNonCommon = ref('')
 
 
+
+const filteredNonCommonSites = computed(() => {
+  if (!searchNonCommon.value) return nonCommonSites.value
+  const searchTerm = searchNonCommon.value.toLowerCase()
+  return nonCommonSites.value.filter(site => 
+    site.nom_site.toLowerCase().includes(searchTerm) ||
+    site.zone.toLowerCase().includes(searchTerm) ||
+    site.site_id.toString().includes(searchTerm)
+  )
+})
 // Fonctions API
 const fetchSites = async (url) => {
   try {
@@ -275,7 +286,10 @@ onMounted(initializeData)
     <SectionMain v-if="nonCommonSites.length > 0">
       <CardBox>
         <h3 class="font-bold mb-4">Sites non indexés</h3>
-        <div class="max-h-[32rem] overflow-x-auto">
+        <FormField label="Rechercher un site non indexé">
+          <FormControl v-model="searchNonCommon" placeholder="Rechercher par nom, zone ou ID" />
+        </FormField>
+        <div class="max-h-[32rem] overflow-x-auto mt-4">
           <table>
             <thead>
               <tr>
@@ -285,7 +299,7 @@ onMounted(initializeData)
               </tr>
             </thead>
             <tbody>
-              <tr v-for="site in nonCommonSites" :key="site._id">
+              <tr v-for="site in filteredNonCommonSites" :key="site._id">
                 <td>{{ site.site_id }}</td>
                 <td>{{ site.nom_site }}</td>
                 <td>{{ site.zone }}</td>

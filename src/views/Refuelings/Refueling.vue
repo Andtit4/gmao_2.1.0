@@ -11,8 +11,9 @@ import CardBox from '@/components/CardBox.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import LoadingButton from '@/layouts/LoadingButton.vue'
-import * as XLSX from 'xlsx'
+import BaseLevel from '@/components/BaseLevel.vue'
 
+import * as XLSX from 'xlsx'
 // État réactif
 const form = reactive({
   searchSite: '',
@@ -40,17 +41,149 @@ const showErrNotification = ref(false)
 const nonCommonSites = ref([])
 const searchNonCommon = ref('')
 
-
-
 const filteredNonCommonSites = computed(() => {
   if (!searchNonCommon.value) return nonCommonSites.value
   const searchTerm = searchNonCommon.value.toLowerCase()
-  return nonCommonSites.value.filter(site => 
+  return nonCommonSites.value.filter(site =>
     site.nom_site.toLowerCase().includes(searchTerm) ||
     site.zone.toLowerCase().includes(searchTerm) ||
     site.site_id.toString().includes(searchTerm)
   )
 })
+
+// Ajoutez ces nouvelles variables réactives
+const currentPage = ref(1)
+const itemsPerPage = 10
+
+// Ajoutez cette fonction calculée
+const paginatedSites = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return sites.list.slice(start, end)
+})
+
+const totalPages = computed(() => Math.ceil(sites.list.length / itemsPerPage))
+
+const displayedPages = computed(() => {
+  const maxDisplayedPages = 10
+  const pages = []
+  
+  if (totalPages.value <= maxDisplayedPages) {
+    for (let i = 1; i <= totalPages.value; i++) {
+      pages.push(i)
+    }
+  } else {
+    pages.push(1)
+    if (currentPage.value > 4) {
+      pages.push('...')
+    }
+    
+    const start = Math.max(2, currentPage.value - 2)
+    const end = Math.min(totalPages.value - 1, currentPage.value + 2)
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i)
+    }
+    
+    if (currentPage.value < totalPages.value - 3) {
+      pages.push('...')
+    }
+    pages.push(totalPages.value)
+  }
+  
+  return pages
+})
+
+// Nouvelles variables réactives pour la pagination des sites non indexés
+const currentPageNonCommon = ref(1)
+const itemsPerPageNonCommon = 10
+
+// Fonction calculée pour paginer les sites non indexés filtrés
+const paginatedNonCommonSites = computed(() => {
+  const start = (currentPageNonCommon.value - 1) * itemsPerPageNonCommon
+  const end = start + itemsPerPageNonCommon
+  return filteredNonCommonSites.value.slice(start, end)
+})
+
+// Calcul du nombre total de pages pour les sites non indexés
+const totalPagesNonCommon = computed(() => Math.ceil(filteredNonCommonSites.value.length / itemsPerPageNonCommon))
+
+// Calcul des pages à afficher pour la pagination
+const displayedPagesNonCommon = computed(() => {
+  const maxDisplayedPages = 10
+  const pages = []
+  
+  if (totalPagesNonCommon.value <= maxDisplayedPages) {
+    for (let i = 1; i <= totalPagesNonCommon.value; i++) {
+      pages.push(i)
+    }
+  } else {
+    pages.push(1)
+    if (currentPageNonCommon.value > 4) {
+      pages.push('...')
+    }
+    
+    const start = Math.max(2, currentPageNonCommon.value - 2)
+    const end = Math.min(totalPagesNonCommon.value - 1, currentPageNonCommon.value + 2)
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i)
+    }
+    
+    if (currentPageNonCommon.value < totalPagesNonCommon.value - 3) {
+      pages.push('...')
+    }
+    pages.push(totalPagesNonCommon.value)
+  }
+  
+  return pages
+})
+
+// Nouvelles variables réactives pour la pagination des sites indexés
+const currentPageIndexed = ref(1)
+const itemsPerPageIndexed = 10
+
+// Fonction calculée pour paginer les sites indexés
+const paginatedSitesIndexed = computed(() => {
+  const start = (currentPageIndexed.value - 1) * itemsPerPageIndexed
+  const end = start + itemsPerPageIndexed
+  return sitesIndexed.list.slice(start, end)
+})
+
+// Calcul du nombre total de pages pour les sites indexés
+const totalPagesIndexed = computed(() => Math.ceil(sitesIndexed.list.length / itemsPerPageIndexed))
+
+// Calcul des pages à afficher pour la pagination
+const displayedPagesIndexed = computed(() => {
+  const maxDisplayedPages = 10
+  const pages = []
+  
+  if (totalPagesIndexed.value <= maxDisplayedPages) {
+    for (let i = 1; i <= totalPagesIndexed.value; i++) {
+      pages.push(i)
+    }
+  } else {
+    pages.push(1)
+    if (currentPageIndexed.value > 4) {
+      pages.push('...')
+    }
+    
+    const start = Math.max(2, currentPageIndexed.value - 2)
+    const end = Math.min(totalPagesIndexed.value - 1, currentPageIndexed.value + 2)
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i)
+    }
+    
+    if (currentPageIndexed.value < totalPagesIndexed.value - 3) {
+      pages.push('...')
+    }
+    pages.push(totalPagesIndexed.value)
+  }
+  
+  return pages
+})
+
 // Fonctions API
 const fetchSites = async (url) => {
   try {
@@ -221,29 +354,43 @@ onMounted(initializeData)
           <FormControl v-model="form.searchZone" placeholder="Entrez la zone" @input="searchZone()" />
         </FormField>
         <br />
-        <div class="max-h-[32rem] overflow-x-auto">
-          <table>
-            <thead>
-              <tr>
-                <th>Site Id</th>
-                <th>Nom Site</th>
-                <th>Zone</th>
-                <th>Etat</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(site, index) in sites.list" :key="index">
-                <td data-label="Site Id">{{ site.site_id }}</td>
-                <td data-label="Nom site">{{ site.nom_site }}</td>
-                <td data-label="Zone">{{ site.zone }} {{ site.typologie_energie }}</td>
-                <td data-label="Etat"></td>
-                <td class="before:hidden lg:w-1 whitespace-nowrap">
-                  <BaseButton color="" :icon="mdiPlus" small @click="addData(site._id)" />
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <table>
+          <thead>
+            <tr>
+              <th>Site Id</th>
+              <th>Nom Site</th>
+              <th>Zone</th>
+              <th>Etat</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(site, index) in paginatedSites" :key="index">
+              <td data-label="Site Id">{{ site.site_id }}</td>
+              <td data-label="Nom site">{{ site.nom_site }}</td>
+              <td data-label="Zone">{{ site.zone }} {{ site.typologie_energie }}</td>
+              <td data-label="Etat"></td>
+              <td class="before:hidden lg:w-1 whitespace-nowrap">
+                <BaseButton color="" :icon="mdiPlus" small @click="addData(site._id)" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
+          <BaseLevel>
+            <BaseButtons>
+              <BaseButton 
+                v-for="page in displayedPages" 
+                :key="page" 
+                :active="page === currentPage"
+                :label="page === '...' ? page : page.toString()" 
+                :color="page === currentPage ? 'lightDark' : 'whiteDark'" 
+                small
+                @click="page !== '...' ? currentPage = page : null" 
+                :disabled="page === '...'"
+              />
+            </BaseButtons>
+          </BaseLevel>
         </div>
       </CardBox>
     </SectionMain>
@@ -256,7 +403,7 @@ onMounted(initializeData)
             <FormControl v-model="form.searchZoneIndex" placeholder="Entrez la zone" @input="searchIndexByZone()" />
           </FormField>
         </SectionMain>
-        <div class="max-h-[32rem] overflow-x-auto">
+        <div>
           <table>
             <thead>
               <tr>
@@ -269,7 +416,7 @@ onMounted(initializeData)
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(site, index) in sitesIndexed.list" :key="index">
+              <tr v-for="(site, index) in paginatedSitesIndexed" :key="index">
                 <td data-label="Week">Semaine {{ site.week }}</td>
                 <td data-label="Date relevée">{{ site.date_releve }}</td>
                 <td data-label="Site">{{ site.site }}</td>
@@ -280,6 +427,22 @@ onMounted(initializeData)
             </tbody>
           </table>
         </div>
+        <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
+          <BaseLevel>
+            <BaseButtons>
+              <BaseButton 
+                v-for="page in displayedPagesIndexed" 
+                :key="page" 
+                :active="page === currentPageIndexed"
+                :label="page === '...' ? page : page.toString()" 
+                :color="page === currentPageIndexed ? 'lightDark' : 'whiteDark'" 
+                small
+                @click="page !== '...' ? currentPageIndexed = page : null" 
+                :disabled="page === '...'"
+              />
+            </BaseButtons>
+          </BaseLevel>
+        </div>
       </CardBox>
     </SectionMain>
 
@@ -289,7 +452,7 @@ onMounted(initializeData)
         <FormField label="Rechercher un site non indexé">
           <FormControl v-model="searchNonCommon" placeholder="Rechercher par nom, zone ou ID" />
         </FormField>
-        <div class="max-h-[32rem] overflow-x-auto mt-4">
+        <div class="mt-4">
           <table>
             <thead>
               <tr>
@@ -299,13 +462,29 @@ onMounted(initializeData)
               </tr>
             </thead>
             <tbody>
-              <tr v-for="site in filteredNonCommonSites" :key="site._id">
+              <tr v-for="site in paginatedNonCommonSites" :key="site._id">
                 <td>{{ site.site_id }}</td>
                 <td>{{ site.nom_site }}</td>
                 <td>{{ site.zone }}</td>
               </tr>
             </tbody>
           </table>
+        </div>
+        <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
+          <BaseLevel>
+            <BaseButtons>
+              <BaseButton 
+                v-for="page in displayedPagesNonCommon" 
+                :key="page" 
+                :active="page === currentPageNonCommon"
+                :label="page === '...' ? page : page.toString()" 
+                :color="page === currentPageNonCommon ? 'lightDark' : 'whiteDark'" 
+                small
+                @click="page !== '...' ? currentPageNonCommon = page : null" 
+                :disabled="page === '...'"
+              />
+            </BaseButtons>
+          </BaseLevel>
         </div>
       </CardBox>
     </SectionMain>

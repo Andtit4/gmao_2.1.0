@@ -58,6 +58,8 @@ const pagesList = computed(() => {
 // Ajoutez ces nouvelles variables réactives
 const currentSitesPage = ref(0)
 const sitePageSize = 10
+const currentNonCommonPage = ref(0)
+const nonCommonPageSize = 10
 
 // Ajoutez cette propriété calculée
 const paginatedSites = computed(() => {
@@ -68,6 +70,17 @@ const paginatedSites = computed(() => {
 
 const sitesPagesList = computed(() => {
   const pageCount = Math.ceil(sites.value.length / sitePageSize)
+  return Array.from({ length: pageCount }, (_, i) => i)
+})
+
+const paginatedNonCommonSites = computed(() => {
+  const start = currentNonCommonPage.value * nonCommonPageSize
+  const end = start + nonCommonPageSize
+  return filteredNonCommonSites.value.slice(start, end)
+})
+
+const nonCommonPagesList = computed(() => {
+  const pageCount = Math.ceil(filteredNonCommonSites.value.length / nonCommonPageSize)
   return Array.from({ length: pageCount }, (_, i) => i)
 })
 
@@ -379,7 +392,7 @@ onMounted(initializeData)
         <FormField label="Rechercher un site non indexé">
           <FormControl v-model="searchNonCommon" placeholder="Rechercher par nom, zone ou ID" />
         </FormField>
-        <div class="max-h-[32rem] overflow-x-auto mt-4">
+        <div class="mt-4">
           <table>
             <thead>
               <tr>
@@ -389,13 +402,28 @@ onMounted(initializeData)
               </tr>
             </thead>
             <tbody>
-              <tr v-for="site in filteredNonCommonSites" :key="site._id">
+              <tr v-for="site in paginatedNonCommonSites" :key="site._id">
                 <td>{{ site.site_id }}</td>
                 <td>{{ site.nom_site }}</td>
                 <td>{{ site.zone }}</td>
               </tr>
             </tbody>
           </table>
+        </div>
+        <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
+          <BaseLevel>
+            <BaseButtons>
+              <BaseButton 
+                v-for="page in nonCommonPagesList" 
+                :key="page" 
+                :active="page === currentNonCommonPage" 
+                :label="page + 1"
+                :color="page === currentNonCommonPage ? 'lightDark' : 'whiteDark'" 
+                small 
+                @click="currentNonCommonPage = page" 
+              />
+            </BaseButtons>
+          </BaseLevel>
         </div>
       </CardBox>
     </SectionMain>

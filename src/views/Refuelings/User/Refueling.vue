@@ -1,6 +1,6 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
-import { mdiPlus } from '@mdi/js'
+import { computed, onMounted, reactive, ref, nextTick } from 'vue'
+import { mdiPlus, mdiChartLine } from '@mdi/js'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import apiService from '@/services/apiService'
 import axios from 'axios'
@@ -13,6 +13,7 @@ import CardBoxModal from '@/components/CardBoxModal.vue'
 import LoadingButton from '@/layouts/LoadingButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
+import Chart from 'chart.js/auto'
 
 // État réactif
 const form = reactive({
@@ -29,6 +30,8 @@ const form = reactive({
   week: 0,
   zoneConnected: '',
   searchSiteIndex: '',
+  siteByModal: '',
+  siteIdByModal: ''
 })
 
 const sites = ref([])
@@ -39,12 +42,32 @@ const searchNonCommon = ref('')
 
 const isModalActive = ref(false)
 const isLoading = ref(false)
+const isGraphModalActive = ref(false)
+const chartCanvas = ref(null)
+
+let currentChart = null
 
 // Pagination
 const currentPage = ref(0)
 const pageSize = 10
 const pagesList = computed(() => {
   const pageCount = Math.ceil(sitesIndexed.value.length / pageSize)
+  return Array.from({ length: pageCount }, (_, i) => i)
+})
+
+// Ajoutez ces nouvelles variables réactives
+const currentSitesPage = ref(0)
+const sitePageSize = 10
+
+// Ajoutez cette propriété calculée
+const paginatedSites = computed(() => {
+  const start = currentSitesPage.value * sitePageSize
+  const end = start + sitePageSize
+  return sites.value.slice(start, end)
+})
+
+const sitesPagesList = computed(() => {
+  const pageCount = Math.ceil(sites.value.length / sitePageSize)
   return Array.from({ length: pageCount }, (_, i) => i)
 })
 
@@ -58,6 +81,54 @@ const filteredNonCommonSites = computed(() => {
     site.site_id.toString().includes(searchTerm)
   )
 })
+
+const showGraph = async (siteId, nomSite) => {
+  isGraphModalActive.value = true
+  form.siteIdByModal = siteId
+  form.siteByModal = nomSite
+
+  // Données statiques pour le graphique
+  const staticData = {
+    labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin'],
+    data: [12, 19, 3, 5, 2, 3]
+  }
+
+  await nextTick()
+
+  if (chartCanvas.value) {
+    // Détruire le graphique existant s'il y en a un
+    if (currentChart) {
+      currentChart.destroy()
+    }
+
+    // Créer un nouveau graphique avec les données statiques
+    currentChart = new Chart(chartCanvas.value, {
+      type: 'line',
+      data: {
+        labels: staticData.labels,
+        datasets: [{
+          label: `Consommation mensuelle - ${nomSite} (ID: ${siteId})`,
+          data: staticData.data,
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: `Site : ${nomSite} (ID: ${siteId})`,
+            font: {
+              size: 16
+            }
+          }
+        }
+      }
+    })
+  }
+}
 
 const paginatedSitesIndexed = computed(() => {
   const start = currentPage.value * pageSize
@@ -194,6 +265,11 @@ onMounted(initializeData)
 
 <template>
   <LayoutAuthenticated>
+    <CardBoxModal v-model="isGraphModalActive" title="Heure de fonctionnement">
+      <div style="height: 300px; width: 100%;">
+        <canvas ref="chartCanvas"></canvas>
+      </div>
+    </CardBoxModal>
     <CardBoxModal v-model="isModalActive" title="Refueling">
       <div v-if="form.showError" class="text-red-500 mb-4">
         {{ form.errMessage }}
@@ -216,7 +292,7 @@ onMounted(initializeData)
           <FormControl v-model="form.searchSite" placeholder="Entrez le nom du site" @input="search()" />
           <FormControl v-model="form.searchZone" placeholder="Entrez la zone" @input="searchZone()" />
         </FormField>
-        <div class="max-h-[32rem] overflow-x-auto mt-4">
+        <div class="mt-4">
           <table>
             <thead>
               <tr>
@@ -227,16 +303,32 @@ onMounted(initializeData)
               </tr>
             </thead>
             <tbody>
-              <tr v-for="site in sites" :key="site._id">
+              <tr v-for="site in paginatedSites" :key="site._id">
                 <td>{{ site.site_id }}</td>
                 <td>{{ site.nom_site }}</td>
                 <td>{{ site.zone }} {{ site.typologie_energie }}</td>
                 <td>
                   <BaseButton color="info" :icon="mdiPlus" small @click="addData(site._id)" />
+                  <BaseButton color="success" :icon="mdiChartLine" small @click="showGraph(site._id, site.nom_site)" />
                 </td>
               </tr>
             </tbody>
           </table>
+        </div>
+        <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
+          <BaseLevel>
+            <BaseButtons>
+              <BaseButton 
+                v-for="page in sitesPagesList" 
+                :key="page" 
+                :active="page === currentSitesPage" 
+                :label="page + 1"
+                :color="page === currentSitesPage ? 'lightDark' : 'whiteDark'" 
+                small 
+                @click="currentSitesPage = page" 
+              />
+            </BaseButtons>
+          </BaseLevel>
         </div>
       </CardBox>
     </SectionMain>

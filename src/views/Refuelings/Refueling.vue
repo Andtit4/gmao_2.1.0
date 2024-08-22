@@ -1,6 +1,6 @@
 <script setup>
-import { onMounted, reactive, ref, computed } from 'vue'
-import { mdiPlus } from '@mdi/js'
+import { onMounted, reactive, ref, computed, nextTick } from 'vue'
+import { mdiPlus, mdiChartLine } from '@mdi/js'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import apiService from '@/services/apiService'
 import axios from 'axios'
@@ -12,6 +12,7 @@ import BaseButton from '@/components/BaseButton.vue'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import LoadingButton from '@/layouts/LoadingButton.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
+import Chart from 'chart.js/auto'
 
 import * as XLSX from 'xlsx'
 // État réactif
@@ -27,19 +28,26 @@ const form = reactive({
   showSuccess: false,
   successMessage: '',
   nbExist: 0,
-  week: 0
+  week: 0,
+  siteByModal: '',
+  siteIdByModal: ''
 })
 
 const sites = reactive({ list: [] })
 const sitesIndexed = reactive({ list: [] })
 const oneSite = reactive({ list: [] })
+const onSiteForGraph = reactive({ list: []})
 // const nonCommonIndex = reactive({ list: [] })
 
 const isModalActive = ref(false)
 const isLoading = ref(false)
 const showErrNotification = ref(false)
 const nonCommonSites = ref([])
+const isGraphModalActive = ref(false)
+const chartCanvas = ref(null)
 const searchNonCommon = ref('')
+let currentChart = null
+
 
 const filteredNonCommonSites = computed(() => {
   if (!searchNonCommon.value) return nonCommonSites.value
@@ -67,7 +75,7 @@ const totalPages = computed(() => Math.ceil(sites.list.length / itemsPerPage))
 const displayedPages = computed(() => {
   const maxDisplayedPages = 10
   const pages = []
-  
+
   if (totalPages.value <= maxDisplayedPages) {
     for (let i = 1; i <= totalPages.value; i++) {
       pages.push(i)
@@ -77,20 +85,20 @@ const displayedPages = computed(() => {
     if (currentPage.value > 4) {
       pages.push('...')
     }
-    
+
     const start = Math.max(2, currentPage.value - 2)
     const end = Math.min(totalPages.value - 1, currentPage.value + 2)
-    
+
     for (let i = start; i <= end; i++) {
       pages.push(i)
     }
-    
+
     if (currentPage.value < totalPages.value - 3) {
       pages.push('...')
     }
     pages.push(totalPages.value)
   }
-  
+
   return pages
 })
 
@@ -112,7 +120,7 @@ const totalPagesNonCommon = computed(() => Math.ceil(filteredNonCommonSites.valu
 const displayedPagesNonCommon = computed(() => {
   const maxDisplayedPages = 10
   const pages = []
-  
+
   if (totalPagesNonCommon.value <= maxDisplayedPages) {
     for (let i = 1; i <= totalPagesNonCommon.value; i++) {
       pages.push(i)
@@ -122,20 +130,20 @@ const displayedPagesNonCommon = computed(() => {
     if (currentPageNonCommon.value > 4) {
       pages.push('...')
     }
-    
+
     const start = Math.max(2, currentPageNonCommon.value - 2)
     const end = Math.min(totalPagesNonCommon.value - 1, currentPageNonCommon.value + 2)
-    
+
     for (let i = start; i <= end; i++) {
       pages.push(i)
     }
-    
+
     if (currentPageNonCommon.value < totalPagesNonCommon.value - 3) {
       pages.push('...')
     }
     pages.push(totalPagesNonCommon.value)
   }
-  
+
   return pages
 })
 
@@ -157,7 +165,7 @@ const totalPagesIndexed = computed(() => Math.ceil(sitesIndexed.list.length / it
 const displayedPagesIndexed = computed(() => {
   const maxDisplayedPages = 10
   const pages = []
-  
+
   if (totalPagesIndexed.value <= maxDisplayedPages) {
     for (let i = 1; i <= totalPagesIndexed.value; i++) {
       pages.push(i)
@@ -167,20 +175,20 @@ const displayedPagesIndexed = computed(() => {
     if (currentPageIndexed.value > 4) {
       pages.push('...')
     }
-    
+
     const start = Math.max(2, currentPageIndexed.value - 2)
     const end = Math.min(totalPagesIndexed.value - 1, currentPageIndexed.value + 2)
-    
+
     for (let i = start; i <= end; i++) {
       pages.push(i)
     }
-    
+
     if (currentPageIndexed.value < totalPagesIndexed.value - 3) {
       pages.push('...')
     }
     pages.push(totalPagesIndexed.value)
   }
-  
+
   return pages
 })
 
@@ -194,6 +202,82 @@ const fetchSites = async (url) => {
   }
 }
 
+const showGraph = async (siteId, nomSite) => {
+  isGraphModalActive.value = true
+  form.siteIdByModal = siteId
+  form.siteByModal = nomSite
+
+  await getSiteIndexedByName(nomSite)
+
+  // Trier les données par date
+  const sortedData = onSiteForGraph.list.sort((a, b) => new Date(a.date_releve) - new Date(b.date_releve))
+
+  // Calculer les différences d'index deux à deux
+  const differences = []
+  const labels = []
+
+  for (let i = 0; i < sortedData.length - 1; i++) {
+    const difference = sortedData[i + 1].site_index - sortedData[i].site_index
+    differences.push(difference)
+
+    // Créer le label pour cette paire
+    const startDate = new Date(sortedData[i].date_releve)
+    const endDate = new Date(sortedData[i + 1].date_releve)
+    const label = `${startDate.toLocaleDateString('fr-FR')} - ${endDate.toLocaleDateString('fr-FR')}`
+    labels.push(label)
+  }
+
+  await nextTick()
+
+  if (chartCanvas.value) {
+    if (currentChart) {
+      currentChart.destroy()
+    }
+
+    currentChart = new Chart(chartCanvas.value, {
+      type: 'bar', // Changé en graphique à barres pour mieux visualiser les différences
+      data: {
+        labels: labels,
+        datasets: [{
+          label: `Fonctionnement GE - ${nomSite} (ID: ${siteId})`,
+          data: differences,
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          borderColor: 'rgb(75, 192, 192)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: `Site : ${nomSite} (ID: ${siteId})`,
+            font: {
+              size: 16
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Période'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Différence d\'index'
+            },
+            beginAtZero: true
+          }
+        }
+      }
+    })
+  }
+}
+
 const search = () => fetchSites(`${apiService.getUrl()}/site/search/dyn?nom_site=${form.searchSite.toUpperCase()}`)
 const searchZone = () => fetchSites(`${apiService.getUrl()}/site/zone/search/dyn?zone=${form.searchZone.toUpperCase()}`)
 const getAllSite = () => fetchSites(`${apiService.getUrl()}/site`)
@@ -204,6 +288,15 @@ const getSiteIndexed = async () => {
     sitesIndexed.list = response.data
   } catch (error) {
     console.error('Une erreur est survenue:', error)
+  }
+}
+
+const getSiteIndexedByName = async (site)  => {
+  try {
+    const response = await axios.get(`${apiService.getUrl()}/refueling/search?site=${site}`)
+    onSiteForGraph.list = response.data
+  } catch (error) {
+    console.error('Une erreur est survenue: ', error)
   }
 }
 
@@ -313,7 +406,7 @@ const nonCommonItem = async () => {
   await getAllSite()
   await getSiteIndexed()
   findNonCommonSites()
-  console.log('Les sites non indexés:', nonCommonSites.value)
+  // console.log('Les sites non indexés:', nonCommonSites.value)
 }
 
 // Fonction d'initialisation
@@ -329,6 +422,11 @@ onMounted(initializeData)
 
 <template>
   <LayoutAuthenticated>
+    <CardBoxModal v-model="isGraphModalActive" title="Fonctionnement">
+      <div style="height: 300px; width: 100%;">
+        <canvas ref="chartCanvas"></canvas>
+      </div>
+    </CardBoxModal>
     <CardBoxModal v-model="isModalActive" title="Refueling">
       <div v-if="form.showError" style="color: red;">
         <p>{{ form.errMessage }}</p>
@@ -360,7 +458,6 @@ onMounted(initializeData)
               <th>Site Id</th>
               <th>Nom Site</th>
               <th>Zone</th>
-              <th>Etat</th>
               <th></th>
             </tr>
           </thead>
@@ -369,9 +466,11 @@ onMounted(initializeData)
               <td data-label="Site Id">{{ site.site_id }}</td>
               <td data-label="Nom site">{{ site.nom_site }}</td>
               <td data-label="Zone">{{ site.zone }} {{ site.typologie_energie }}</td>
-              <td data-label="Etat"></td>
               <td class="before:hidden lg:w-1 whitespace-nowrap">
                 <BaseButton color="" :icon="mdiPlus" small @click="addData(site._id)" />
+                <BaseButton color="success" :icon="mdiChartLine" small
+                  @click="showGraph(site.site_id, site.nom_site)" />
+
               </td>
             </tr>
           </tbody>
@@ -379,16 +478,10 @@ onMounted(initializeData)
         <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
           <BaseLevel>
             <BaseButtons>
-              <BaseButton 
-                v-for="page in displayedPages" 
-                :key="page" 
-                :active="page === currentPage"
-                :label="page === '...' ? page : page.toString()" 
-                :color="page === currentPage ? 'lightDark' : 'whiteDark'" 
-                small
-                @click="page !== '...' ? currentPage = page : null" 
-                :disabled="page === '...'"
-              />
+              <BaseButton v-for="page in displayedPages" :key="page" :active="page === currentPage"
+                :label="page === '...' ? page : page.toString()"
+                :color="page === currentPage ? 'lightDark' : 'whiteDark'" small
+                @click="page !== '...' ? currentPage = page : null" :disabled="page === '...'" />
             </BaseButtons>
           </BaseLevel>
         </div>
@@ -430,16 +523,10 @@ onMounted(initializeData)
         <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
           <BaseLevel>
             <BaseButtons>
-              <BaseButton 
-                v-for="page in displayedPagesIndexed" 
-                :key="page" 
-                :active="page === currentPageIndexed"
-                :label="page === '...' ? page : page.toString()" 
-                :color="page === currentPageIndexed ? 'lightDark' : 'whiteDark'" 
-                small
-                @click="page !== '...' ? currentPageIndexed = page : null" 
-                :disabled="page === '...'"
-              />
+              <BaseButton v-for="page in displayedPagesIndexed" :key="page" :active="page === currentPageIndexed"
+                :label="page === '...' ? page : page.toString()"
+                :color="page === currentPageIndexed ? 'lightDark' : 'whiteDark'" small
+                @click="page !== '...' ? currentPageIndexed = page : null" :disabled="page === '...'" />
             </BaseButtons>
           </BaseLevel>
         </div>
@@ -473,16 +560,10 @@ onMounted(initializeData)
         <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
           <BaseLevel>
             <BaseButtons>
-              <BaseButton 
-                v-for="page in displayedPagesNonCommon" 
-                :key="page" 
-                :active="page === currentPageNonCommon"
-                :label="page === '...' ? page : page.toString()" 
-                :color="page === currentPageNonCommon ? 'lightDark' : 'whiteDark'" 
-                small
-                @click="page !== '...' ? currentPageNonCommon = page : null" 
-                :disabled="page === '...'"
-              />
+              <BaseButton v-for="page in displayedPagesNonCommon" :key="page" :active="page === currentPageNonCommon"
+                :label="page === '...' ? page : page.toString()"
+                :color="page === currentPageNonCommon ? 'lightDark' : 'whiteDark'" small
+                @click="page !== '...' ? currentPageNonCommon = page : null" :disabled="page === '...'" />
             </BaseButtons>
           </BaseLevel>
         </div>

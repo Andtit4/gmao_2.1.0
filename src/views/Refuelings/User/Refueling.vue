@@ -278,7 +278,7 @@ onMounted(initializeData)
 
 <template>
   <LayoutAuthenticated>
-    <CardBoxModal v-model="isGraphModalActive" title="Heure de fonctionnement">
+    <CardBoxModal v-model="isGraphModalActive" title="Fonctionnement">
       <div style="height: 300px; width: 100%;">
         <canvas ref="chartCanvas"></canvas>
       </div>

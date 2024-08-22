@@ -212,6 +212,11 @@ const showGraph = async (siteId, nomSite) => {
   // Trier les données par date
   const sortedData = onSiteForGraph.list.sort((a, b) => new Date(a.date_releve) - new Date(b.date_releve))
 
+  // Fonction pour formater la date
+  const formatDate = (date) => {
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  }
+
   // Calculer les différences d'index deux à deux
   const differences = []
   const labels = []
@@ -223,7 +228,7 @@ const showGraph = async (siteId, nomSite) => {
     // Créer le label pour cette paire
     const startDate = new Date(sortedData[i].date_releve)
     const endDate = new Date(sortedData[i + 1].date_releve)
-    const label = `${startDate.toLocaleDateString('fr-FR')} - ${endDate.toLocaleDateString('fr-FR')}`
+    const label = `${formatDate(startDate)} - ${formatDate(endDate)}`
     labels.push(label)
   }
 
@@ -235,11 +240,11 @@ const showGraph = async (siteId, nomSite) => {
     }
 
     currentChart = new Chart(chartCanvas.value, {
-      type: 'bar', // Changé en graphique à barres pour mieux visualiser les différences
+      type: 'line',
       data: {
         labels: labels,
         datasets: [{
-          label: `Fonctionnement GE - ${nomSite} (ID: ${siteId})`,
+          label: `Différence d'index - ${nomSite} (ID: ${siteId})`,
           data: differences,
           backgroundColor: 'rgba(75, 192, 192, 0.6)',
           borderColor: 'rgb(75, 192, 192)',
@@ -255,6 +260,20 @@ const showGraph = async (siteId, nomSite) => {
             text: `Site : ${nomSite} (ID: ${siteId})`,
             font: {
               size: 16
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                let label = context.dataset.label || '';
+                if (label) {
+                  label += ': ';
+                }
+                if (context.parsed.y !== null) {
+                  label += context.parsed.y + ' h';
+                }
+                return label;
+              }
             }
           }
         },

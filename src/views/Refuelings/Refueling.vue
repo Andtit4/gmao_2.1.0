@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
-import { mdiPlus, } from '@mdi/js'
+import { mdiPlus } from '@mdi/js'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import apiService from '@/services/apiService'
 import axios from 'axios'
@@ -13,7 +13,7 @@ import CardBoxModal from '@/components/CardBoxModal.vue'
 import LoadingButton from '@/layouts/LoadingButton.vue'
 import * as XLSX from 'xlsx'
 
-
+// État réactif
 const form = reactive({
   searchSite: '',
   searchZone: '',
@@ -28,98 +28,60 @@ const form = reactive({
   nbExist: 0,
   week: 0
 })
+
 const sites = reactive({ list: [] })
+const sitesIndexed = reactive({ list: [] })
+const oneSite = reactive({ list: [] })
+// const nonCommonIndex = reactive({ list: [] })
+
 const isModalActive = ref(false)
 const isLoading = ref(false)
 const showErrNotification = ref(false)
+const nonCommonSites = ref([])
 
-const search = () => {
-  axios({
-    url: apiService.getUrl() + '/site/search/dyn?nom_site=' + form.searchSite.toUpperCase(),
-    method: 'GET'
-  })
-    .then((response) => {
-      sites.list = response.data
-    })
-    .catch((e) => {
-      console.log('An error occured ' + e)
-    })
+
+// Fonctions API
+const fetchSites = async (url) => {
+  try {
+    const response = await axios.get(url)
+    sites.list = response.data
+  } catch (error) {
+    console.error('Une erreur est survenue:', error)
+  }
 }
 
-const searchZone = () => {
-  axios({
-    url: apiService.getUrl() + '/site/zone/search/dyn?zone=' + form.searchZone.toUpperCase(),
-    method: 'GET'
-  })
-    .then((response) => {
-      sites.list = response.data
-    })
-    .catch((e) => {
-      console.log('An  ' + e)
-    })
+const search = () => fetchSites(`${apiService.getUrl()}/site/search/dyn?nom_site=${form.searchSite.toUpperCase()}`)
+const searchZone = () => fetchSites(`${apiService.getUrl()}/site/zone/search/dyn?zone=${form.searchZone.toUpperCase()}`)
+const getAllSite = () => fetchSites(`${apiService.getUrl()}/site`)
+
+const getSiteIndexed = async () => {
+  try {
+    const response = await axios.get(`${apiService.getUrl()}/refueling/week/${form.week}`)
+    sitesIndexed.list = response.data
+  } catch (error) {
+    console.error('Une erreur est survenue:', error)
+  }
 }
 
-const getAllSite = () => {
-  axios({
-    url: apiService.getUrl() + '/site',
-    method: 'GET'
-  })
-    .then((response) => {
-      sites.list = response.data
-    })
-    .catch((e) => {
-      console.log('An error occured ' + e)
-    })
-}
-
-const sitesIndexed = reactive({ list: [] })
-// const siteListed = reactive({ list: []})
-
-
-
-const getSiteIndexed = () => {
-  axios({
-    url: apiService.getUrl() + '/refueling/week/' + form.week,
-    method: 'GET'
-  })
-    .then((response) => {
-      sitesIndexed.list = response.data
-    })
-    .catch((e) => {
-      console.log('An error occured ' + e)
-    })
-}
-
-// const getSiteIndexed = () => { }
-
-const oneSite = reactive({ list: [] })
-const addData = (id) => {
+const addData = async (id) => {
   isModalActive.value = true
-  axios({
-    url: apiService.getUrl() + '/site/' + id,
-    method: 'GET'
-  }).then((res) => {
-    // console.log('site selected: ', res.data)
-    oneSite.list = res.data[0]
-  })
+  try {
+    const response = await axios.get(`${apiService.getUrl()}/site/${id}`)
+    oneSite.list = response.data[0]
+  } catch (error) {
+    console.error('Une erreur est survenue:', error)
+  }
 }
 
 const getAllSiteIndex = async () => {
-  const response = await axios.get(apiService.getUrl() + '/refueling/index')
+  const response = await axios.get(`${apiService.getUrl()}/refueling/index`)
   return response.data
 }
 
 const exportxlx = async () => {
   const apiData = await getAllSiteIndex()
   const data = [
-    [
-      "Semaine",
-      "Date de relevé",
-      "Zone",
-      "Site",
-      "Quantité restante",
-      "Index"
-    ],
+    ["Semaine", "Date de relevé", "Zone", "Site", "Quantité restante", "Index"],
     ...apiData.map((item) => [
       item.week,
       item.date_releve,
@@ -131,64 +93,50 @@ const exportxlx = async () => {
   ]
 
   const wb = XLSX.utils.book_new()
-
-  // Créez une feuille avec vos données
   const ws = XLSX.utils.aoa_to_sheet(data)
-
-  // Ajoutez la feuille au workbook
   XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
-
-  // Générez le fichier Excel et téléchargez-le
   XLSX.writeFile(wb, `REFUELING_INDEX_W${form.week}.xlsx`)
 }
 
-
-const createIndex = () => {
+const createIndex = async () => {
   isLoading.value = true
   if (form.index === "" || form.index === " ") {
     form.showError = true
     isLoading.value = false
     form.errMessage = 'Index entré est vide'
-  } else {
-    axios({
-      url: apiService.getUrl() + '/refueling/exist/' + oneSite.list.nom_site + '/' + form.week,
-      method: 'GET',
+    return
+  }
 
-    }).then((res) => {
-      form.nbExist = res.data[0].nb
-      console.log('exist ', form.nbExist)
+  try {
+    const existResponse = await axios.get(`${apiService.getUrl()}/refueling/exist/${oneSite.list.nom_site}/${form.week}`)
+    form.nbExist = existResponse.data[0].nb
 
-      if (form.nbExist == 0) {
-        axios({
-          url: apiService.getUrl() + '/refueling',
-          method: 'POST',
-          data: {
-            site: oneSite.list.nom_site,
-            site_index: form.index,
-            date_releve: form.date_releve,
-            date_create: Date.now(),
-            quantite: form.quantite,
-            week: form.week,
-            zone: oneSite.list.zone
-          }
-        }).then((res) => {
-          isLoading.value = false
-          isModalActive.value = false
-          form.showSuccess = true
-          form.successMessage = res.data
-          resetInput()
-          getSiteIndexed()
-        }).catch((err) => {
-          console.log('An error occured ', err.message)
-          form.showError = true,
-            form.errMessage = 'An error occured ' + err.message
-        })
-      } else {
-        form.showError = true
-        isLoading.value = false
-        form.errMessage = 'Index déjà enregistré pour ce site'
-      }
-    })
+    if (form.nbExist == 0) {
+      const createResponse = await axios.post(`${apiService.getUrl()}/refueling`, {
+        site: oneSite.list.nom_site,
+        site_index: form.index,
+        date_releve: form.date_releve,
+        date_create: Date.now(),
+        quantite: form.quantite,
+        week: form.week,
+        zone: oneSite.list.zone
+      })
+
+      isLoading.value = false
+      isModalActive.value = false
+      form.showSuccess = true
+      form.successMessage = createResponse.data
+      resetInput()
+      await getSiteIndexed()
+    } else {
+      form.showError = true
+      isLoading.value = false
+      form.errMessage = 'Index déjà enregistré pour ce site'
+    }
+  } catch (error) {
+    console.error('Une erreur est survenue:', error)
+    form.showError = true
+    form.errMessage = `Une erreur est survenue: ${error.message}`
   }
 }
 
@@ -202,36 +150,46 @@ const resetInput = () => {
 
 const weekNumber = () => {
   form.week = apiService.getWeekNumber(Date.now())
-  // console.log(form.week)
 }
 
-const searchIndexByZone = () => {
-  axios({
-    url: apiService.getUrl() + '/refueling/search/zone/' + form.searchZoneIndex,
-    method: 'GET'
-  }).then((res) => {
-    sitesIndexed.list = res.data
-  }).catch((err) => {
-    console.log(err.message)
-  })
+const searchIndexByZone = async () => {
+  try {
+    const response = await axios.get(`${apiService.getUrl()}/refueling/search/zone/${form.searchZoneIndex}`)
+    sitesIndexed.list = response.data
+  } catch (error) {
+    console.error('Une erreur est survenue:', error)
+  }
+}
+const findNonCommonSites = () => {
+  const indexedSites = sitesIndexed.list.map(item => item.site)
+  nonCommonSites.value = sites.list.filter(site => !indexedSites.includes(site.nom_site))
 }
 
-onMounted(() => {
+const nonCommonItem = async () => {
+  await getAllSite()
+  await getSiteIndexed()
+  findNonCommonSites()
+  console.log('Les sites non indexés:', nonCommonSites.value)
+}
+
+// Fonction d'initialisation
+const initializeData = async () => {
   weekNumber()
-  getAllSite()
-  getSiteIndexed()
-  // getSiteIndexList()
-})
+  await Promise.all([getAllSite(), getSiteIndexed()])
+  await nonCommonItem()
+}
+
+onMounted(initializeData)
 
 </script>
 
 <template>
   <LayoutAuthenticated>
     <CardBoxModal v-model="isModalActive" title="Refueling">
-      <div v-if="form.showError == true">
-        <p style="color: red;"> {{ form.errMessage }} </p>
+      <div v-if="form.showError" style="color: red;">
+        <p>{{ form.errMessage }}</p>
       </div>
-      <p>- Zone <strong>{{ oneSite.list.zone }}</strong> </p>
+      <p>- Zone <strong>{{ oneSite.list.zone }}</strong></p>
       <p>- Site <strong>{{ oneSite.list.nom_site }}</strong></p>
       <FormField label="Données refueling">
         <FormControl v-model="form.index" placeholder="Index" type="number" />
@@ -240,10 +198,11 @@ onMounted(() => {
       <FormField label="Date de relevé">
         <FormControl v-model="form.date_releve" placeholder="Date de relevé" type="date" />
       </FormField>
-      <LoadingButton :button-text="'Enregister'" :is-loading="isLoading" @click="createIndex()" />
+      <LoadingButton :button-text="'Enregistrer'" :is-loading="isLoading" @click="createIndex()" />
     </CardBoxModal>
+
     <SectionMain>
-      <BaseButton target="_blank" :icon="midExcel" label="Export" color="success" rounded-full small
+      <BaseButton target="_blank" :icon="mdiPlus" label="Export" color="success" rounded-full small
         @click="exportxlx()" />
       <CardBox>
         <FormField label="Rechercher">
@@ -255,33 +214,19 @@ onMounted(() => {
           <table>
             <thead>
               <tr>
-                <th v-if="checkable" />
-                <th />
                 <th>Site Id</th>
                 <th>Nom Site</th>
                 <th>Zone</th>
                 <th>Etat</th>
-                <th />
+                <th></th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(site, index) in sites.list" :key="index">
-                <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
-                <td class="border-b-0 lg:w-6 before:hidden">
-                  <!-- <UserAvatar :username="site.nom_site" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
-                </td>
-                <td data-label="Site Id">
-                  {{ site.site_id }}
-                </td>
-                <td data-label="Nom site">
-                  {{ site.nom_site }}
-                </td>
-                <td data-label="Zone">
-                  {{ site.zone }} {{ site.typologie_energie }}
-                </td>
-                <td data-label="Etat">
-
-                </td>
+                <td data-label="Site Id">{{ site.site_id }}</td>
+                <td data-label="Nom site">{{ site.nom_site }}</td>
+                <td data-label="Zone">{{ site.zone }} {{ site.typologie_energie }}</td>
+                <td data-label="Etat"></td>
                 <td class="before:hidden lg:w-1 whitespace-nowrap">
                   <BaseButton color="" :icon="mdiPlus" small @click="addData(site._id)" />
                 </td>
@@ -289,7 +234,6 @@ onMounted(() => {
             </tbody>
           </table>
         </div>
-
       </CardBox>
     </SectionMain>
 
@@ -298,64 +242,56 @@ onMounted(() => {
         <SectionMain>
           <FormField label="Rechercher">
             <FormControl placeholder="Entrez le nom du site" />
-            <FormControl v-model="form.searchZoneIndex" placeholder="Entrez la zone" @input="searchIndexByZone()"/>
+            <FormControl v-model="form.searchZoneIndex" placeholder="Entrez la zone" @input="searchIndexByZone()" />
           </FormField>
         </SectionMain>
         <div class="max-h-[32rem] overflow-x-auto">
           <table>
             <thead>
               <tr>
-                <th v-if="checkable" />
-                <th />
                 <th>Week</th>
                 <th>Date de relevée</th>
                 <th>Sites</th>
                 <th>Zones</th>
                 <th>Quantité restante</th>
                 <th>Index</th>
-                <th />
               </tr>
             </thead>
             <tbody>
               <tr v-for="(site, index) in sitesIndexed.list" :key="index">
-                <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
-                <td class="border-b-0 lg:w-6 before:hidden">
-                  <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
-                </td>
-                <td data-label="Week">
-                  Semaine {{ site.week }}
-                </td>
-                <td data-label="Date relevée">
-                  {{ site.date_releve }}
-                </td>
-                <td data-label="Site">
-                  {{ site.site }}
-                </td>
-                <td data-label="Zone">
-                  {{ site.zone }}
-                </td>
-                <td data-label="Quantité restante">
-                  {{ site.quantite }}
-                </td>
-                <td data-label="Index">
-                  {{ site.site_index }}
-                </td>
-                <td class="before:hidden lg:w-1 whitespace-nowrap">
-                  <BaseButtons type="justify-start lg:justify-end" no-wrap>
-                  </BaseButtons>
-                </td>
+                <td data-label="Week">Semaine {{ site.week }}</td>
+                <td data-label="Date relevée">{{ site.date_releve }}</td>
+                <td data-label="Site">{{ site.site }}</td>
+                <td data-label="Zone">{{ site.zone }}</td>
+                <td data-label="Quantité restante">{{ site.quantite }}</td>
+                <td data-label="Index">{{ site.site_index }}</td>
               </tr>
             </tbody>
           </table>
         </div>
+      </CardBox>
+    </SectionMain>
 
-        <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
-          <BaseLevel>
-            <BaseButtons>
-              <BaseButton v-for="page in pagesList" :key="page" :active="page === currentPage" :label="page + 1"
-                :color="page === currentPage ? 'lightDark' : 'whiteDark'" small @click="currentPage = page" />
-            </BaseButtons>
-          </BaseLevel>
+    <SectionMain v-if="nonCommonSites.length > 0">
+      <CardBox>
+        <h3 class="font-bold mb-4">Sites non indexés</h3>
+        <div class="max-h-[32rem] overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Site Id</th>
+                <th>Nom Site</th>
+                <th>Zone</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="site in nonCommonSites" :key="site._id">
+                <td>{{ site.site_id }}</td>
+                <td>{{ site.nom_site }}</td>
+                <td>{{ site.zone }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </CardBox>
     </SectionMain>

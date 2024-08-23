@@ -13,6 +13,7 @@ import CardBoxModal from '@/components/CardBoxModal.vue'
 import LoadingButton from '@/layouts/LoadingButton.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
 import Chart from 'chart.js/auto'
+import { saveAs } from 'file-saver'
 
 import * as XLSX from 'xlsx'
 // État réactif
@@ -366,7 +367,7 @@ const exportxlx = async () => {
   })
 
   const data = [
-    ["SITE", "DATE DE RELEVE 1", "DATE DE RELEVE 2", "NOMBRE DE JOURS", "INDEX 1", "INDEX 2", "DIFFERENCE D'INDEX (HEURES)", "SEMAINE", "ZONE", "QUANTITE RESTANTE"],
+    ["SITE ID", "SITE", "DATE DE RELEVE 1", "DATE DE RELEVE 2", "NOMBRE DE JOURS", "INDEX 1", "INDEX 2", "DIFFERENCE D'INDEX (HEURES)", "SEMAINE", "ZONE", "QUANTITE RESTANTE"],
   ]
 
   const formatDate = (dateString) => {
@@ -382,6 +383,7 @@ const exportxlx = async () => {
       const diffIndex = apiData[i + 1].site_index - apiData[i].site_index
 
       data.push([
+        apiData[i].site_id, // Ajout de l'ID du site
         apiData[i].site,
         formatDate(apiData[i].date_releve),
         formatDate(apiData[i + 1].date_releve),
@@ -406,17 +408,28 @@ const exportxlx = async () => {
     if (!ws[address]) continue
     ws[address].s = {
       font: { bold: true, color: { rgb: "FFFFFF" } },
-      fill: { fgColor: { rgb: "4F81BD" } },
+      fill: { patternType: "solid", fgColor: { rgb: "4F81BD" } },
       alignment: { horizontal: "center", vertical: "center" }
     }
   }
 
   // Ajuster la largeur des colonnes
-  const colWidths = [20, 15, 15, 15, 10, 10, 25, 10, 15, 20]
+  const colWidths = [10, 20, 15, 15, 15, 10, 10, 25, 10, 15, 20]
   ws['!cols'] = colWidths.map(w => ({ wch: w }))
 
+  // Appliquer les styles
+  ws['!rows'] = [{ hpt: 30 }] // Hauteur de la première ligne
+
   XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
-  XLSX.writeFile(wb, `REFUELING_INDEX_DETAILS_W${form.week}.xlsx`)
+
+  // Générer le fichier Excel
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+
+  // Créer un Blob à partir du fichier
+  const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+
+  // Utiliser file-saver pour télécharger le fichier
+  saveAs(blob, `REFUELING_INDEX_DETAILS_W${form.week}.xlsx`)
 }
 
 const createIndex = async () => {

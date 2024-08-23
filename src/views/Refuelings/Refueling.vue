@@ -151,15 +151,30 @@ const displayedPagesNonCommon = computed(() => {
 const currentPageIndexed = ref(1)
 const itemsPerPageIndexed = 10
 
-// Fonction calculée pour paginer les sites indexés
+// Ajoutez ces nouvelles variables réactives
+const searchSiteIndex = ref('')
+const searchZoneIndex = ref('')
+
+// Ajoutez cette fonction calculée
+const filteredSitesIndexed = computed(() => {
+  if (!searchSiteIndex.value && !searchZoneIndex.value) return sitesIndexed.list
+  const searchSiteTerm = searchSiteIndex.value.toLowerCase()
+  const searchZoneTerm = searchZoneIndex.value.toLowerCase()
+  return sitesIndexed.list.filter(site =>
+    (searchSiteTerm ? site.site.toLowerCase().includes(searchSiteTerm) : true) &&
+    (searchZoneTerm ? site.zone.toLowerCase().includes(searchZoneTerm) : true)
+  )
+})
+
+// Modifiez la fonction paginatedSitesIndexed pour utiliser filteredSitesIndexed
 const paginatedSitesIndexed = computed(() => {
   const start = (currentPageIndexed.value - 1) * itemsPerPageIndexed
   const end = start + itemsPerPageIndexed
-  return sitesIndexed.list.slice(start, end)
+  return filteredSitesIndexed.value.slice(start, end)
 })
 
-// Calcul du nombre total de pages pour les sites indexés
-const totalPagesIndexed = computed(() => Math.ceil(sitesIndexed.list.length / itemsPerPageIndexed))
+// Modifiez totalPagesIndexed pour utiliser filteredSitesIndexed
+const totalPagesIndexed = computed(() => Math.ceil(filteredSitesIndexed.value.length / itemsPerPageIndexed))
 
 // Calcul des pages à afficher pour la pagination
 const displayedPagesIndexed = computed(() => {
@@ -212,7 +227,6 @@ const showGraph = async (siteId, nomSite) => {
   // Trier les données par date
   const sortedData = onSiteForGraph.list.sort((a, b) => new Date(a.date_releve) - new Date(b.date_releve))
 
-  // Fonction pour formater la date
   const formatDate = (date) => {
     return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
   }
@@ -244,7 +258,7 @@ const showGraph = async (siteId, nomSite) => {
       data: {
         labels: labels,
         datasets: [{
-          label: `Différence d'index - ${nomSite} (ID: ${siteId})`,
+          label: `Temps d'activité GE - ${nomSite} (ID: ${siteId})`,
           data: differences,
           backgroundColor: 'rgba(75, 192, 192, 0.6)',
           borderColor: 'rgb(75, 192, 192)',
@@ -408,14 +422,6 @@ const weekNumber = () => {
   form.week = apiService.getWeekNumber(Date.now())
 }
 
-const searchIndexByZone = async () => {
-  try {
-    const response = await axios.get(`${apiService.getUrl()}/refueling/search/zone/${form.searchZoneIndex}`)
-    sitesIndexed.list = response.data
-  } catch (error) {
-    console.error('Une erreur est survenue:', error)
-  }
-}
 const findNonCommonSites = () => {
   const indexedSites = sitesIndexed.list.map(item => item.site)
   nonCommonSites.value = sites.list.filter(site => !indexedSites.includes(site.nom_site))
@@ -441,8 +447,8 @@ onMounted(initializeData)
 
 <template>
   <LayoutAuthenticated>
-    <CardBoxModal v-model="isGraphModalActive" title="Fonctionnement">
-      <div style="height: 300px; width: 100%;">
+    <CardBoxModal v-model="isGraphModalActive" title="Fonctionnement" >
+      <div style="height: 300px; ">
         <canvas ref="chartCanvas"></canvas>
       </div>
     </CardBoxModal>
@@ -511,8 +517,8 @@ onMounted(initializeData)
       <CardBox has-table>
         <SectionMain>
           <FormField label="Rechercher">
-            <FormControl placeholder="Entrez le nom du site" />
-            <FormControl v-model="form.searchZoneIndex" placeholder="Entrez la zone" @input="searchIndexByZone()" />
+            <FormControl v-model="searchSiteIndex" placeholder="Entrez le nom du site" />
+            <FormControl v-model="searchZoneIndex" placeholder="Entrez la zone" />
           </FormField>
         </SectionMain>
         <div>

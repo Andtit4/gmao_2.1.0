@@ -287,6 +287,14 @@ const showGraph = async (siteId, nomSite) => {
                   label += context.parsed.y + ' h';
                 }
                 return label;
+              },
+              afterLabel: function(context) {
+                const index = context.dataIndex;
+                const startDate = new Date(sortedData[index].date_releve);
+                const endDate = new Date(sortedData[index + 1].date_releve);
+                const diffTime = Math.abs(endDate - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return `Nombre de jours : ${diffDays}`;
               }
             }
           }
@@ -350,22 +358,65 @@ const getAllSiteIndex = async () => {
 
 const exportxlx = async () => {
   const apiData = await getAllSiteIndex()
+  
+  // Trier les données par site et date
+  apiData.sort((a, b) => {
+    if (a.site !== b.site) return a.site.localeCompare(b.site)
+    return new Date(a.date_releve) - new Date(b.date_releve)
+  })
+
   const data = [
-    ["Semaine", "Date de relevé", "Zone", "Site", "Quantité restante", "Index"],
-    ...apiData.map((item) => [
-      item.week,
-      item.date_releve,
-      item.zone,
-      item.site,
-      item.quantite,
-      item.site_index
-    ])
+    ["SITE", "DATE DE RELEVE 1", "DATE DE RELEVE 2", "NOMBRE DE JOURS", "INDEX 1", "INDEX 2", "DIFFERENCE D'INDEX (HEURES)", "SEMAINE", "ZONE", "QUANTITE RESTANTE"],
   ]
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  }
+
+  for (let i = 0; i < apiData.length - 1; i++) {
+    if (apiData[i].site === apiData[i + 1].site) {
+      const date1 = new Date(apiData[i].date_releve)
+      const date2 = new Date(apiData[i + 1].date_releve)
+      const diffDays = Math.ceil((date2 - date1) / (1000 * 60 * 60 * 24))
+      const diffIndex = apiData[i + 1].site_index - apiData[i].site_index
+
+      data.push([
+        apiData[i].site,
+        formatDate(apiData[i].date_releve),
+        formatDate(apiData[i + 1].date_releve),
+        diffDays,
+        apiData[i].site_index,
+        apiData[i + 1].site_index,
+        diffIndex,
+        apiData[i].week,
+        apiData[i].zone,
+        apiData[i].quantite
+      ])
+    }
+  }
 
   const wb = XLSX.utils.book_new()
   const ws = XLSX.utils.aoa_to_sheet(data)
+
+  // Styliser l'en-tête
+  const headerRange = XLSX.utils.decode_range(ws['!ref'])
+  for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+    const address = XLSX.utils.encode_col(C) + "1"
+    if (!ws[address]) continue
+    ws[address].s = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "4F81BD" } },
+      alignment: { horizontal: "center", vertical: "center" }
+    }
+  }
+
+  // Ajuster la largeur des colonnes
+  const colWidths = [20, 15, 15, 15, 10, 10, 25, 10, 15, 20]
+  ws['!cols'] = colWidths.map(w => ({ wch: w }))
+
   XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
-  XLSX.writeFile(wb, `REFUELING_INDEX_W${form.week}.xlsx`)
+  XLSX.writeFile(wb, `REFUELING_INDEX_DETAILS_W${form.week}.xlsx`)
 }
 
 const createIndex = async () => {

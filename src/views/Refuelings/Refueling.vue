@@ -432,6 +432,113 @@ const exportxlx = async () => {
   saveAs(blob, `REFUELING_INDEX_DETAILS_W${form.week}.xlsx`)
 }
 
+const exportxlxLatest = async () => {
+  const apiData = await getAllSiteIndex()
+  
+  // Vérifier si les données sont récupérées correctement
+  if (!apiData || apiData.length === 0) {
+    console.error('Aucune donnée récupérée')
+    return
+  }
+
+  // Trier les données par site et date
+  apiData.sort((a, b) => {
+    if (a.site !== b.site) return a.site.localeCompare(b.site)
+    return new Date(a.date_releve) - new Date(b.date_releve)
+  })
+
+  const data = [
+    ["SITE ID", "SITE", "DATE DE RELEVE 1", "DATE DE RELEVE 2", "NOMBRE DE JOURS", "INDEX 1", "INDEX 2", "DIFFERENCE D'INDEX (HEURES)", "SEMAINE", "ZONE", "QUANTITE RESTANTE"],
+  ]
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  }
+
+  // Filtrer les données pour ne garder que les deux dernières dates de relevé par site
+  const filteredData = apiData.reduce((acc, curr) => {
+    if (!acc[curr.site]) {
+      acc[curr.site] = []
+    }
+    acc[curr.site].push(curr)
+    return acc
+  }, {})
+
+  for (const site in filteredData) {
+    const siteData = filteredData[site]
+    if (siteData.length >= 2) {
+      const lastTwoEntries = siteData.slice(-2)
+      const date1 = new Date(lastTwoEntries[0].date_releve)
+      const date2 = new Date(lastTwoEntries[1].date_releve)
+      const diffDays = Math.ceil((date2 - date1) / (1000 * 60 * 60 * 24))
+      const diffIndex = lastTwoEntries[1].site_index - lastTwoEntries[0].site_index
+
+      data.push([
+        lastTwoEntries[0].site_id, // Ajout de l'ID du site
+        lastTwoEntries[0].site,
+        formatDate(lastTwoEntries[0].date_releve),
+        formatDate(lastTwoEntries[1].date_releve),
+        diffDays,
+        lastTwoEntries[0].site_index,
+        lastTwoEntries[1].site_index,
+        diffIndex,
+        lastTwoEntries[1].week,
+        lastTwoEntries[1].zone,
+        lastTwoEntries[1].quantite
+      ])
+    } else {
+      // Si moins de deux relevés, ajouter une ligne avec des valeurs par défaut
+      data.push([
+        siteData[0].site_id,
+        siteData[0].site,
+        formatDate(siteData[0].date_releve),
+        'N/A',
+        'N/A',
+        siteData[0].site_index,
+        'N/A',
+        'N/A',
+        siteData[0].week,
+        siteData[0].zone,
+        siteData[0].quantite
+      ])
+    }
+  }
+
+  const wb = XLSX.utils.book_new()
+  const ws = XLSX.utils.aoa_to_sheet(data)
+
+  // Styliser l'en-tête
+  const headerRange = XLSX.utils.decode_range(ws['!ref'])
+  for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+    const address = XLSX.utils.encode_col(C) + "1"
+    if (!ws[address]) continue
+    ws[address].s = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { patternType: "solid", fgColor: { rgb: "4F81BD" } },
+      alignment: { horizontal: "center", vertical: "center" }
+    }
+  }
+
+  // Ajuster la largeur des colonnes
+  const colWidths = [10, 20, 15, 15, 15, 10, 10, 25, 10, 15, 20]
+  ws['!cols'] = colWidths.map(w => ({ wch: w }))
+
+  // Appliquer les styles
+  ws['!rows'] = [{ hpt: 30 }] // Hauteur de la première ligne
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
+
+  // Générer le fichier Excel
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+
+  // Créer un Blob à partir du fichier
+  const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+
+  // Utiliser file-saver pour télécharger le fichier
+  saveAs(blob, `REFUELING_INDEX_DETAILS_W${form.week}.xlsx`)
+}
+
 const createIndex = async () => {
   isLoading.value = true
   if (form.index === "" || form.index === " ") {
@@ -535,6 +642,8 @@ onMounted(initializeData)
     <SectionMain>
       <BaseButton target="_blank" :icon="mdiPlus" label="Export" color="success" rounded-full small
         @click="exportxlx()" />
+        <BaseButton target="_blank" :icon="mdiPlus" label="Export Latest" color="success" rounded-full small
+        @click="exportxlxLatest()" />
       <CardBox>
         <FormField label="Rechercher">
           <FormControl v-model="form.searchSite" placeholder="Entrez le nom du site" @input="search()" />

@@ -155,13 +155,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <input v-model="searchQuery" @input="searchSites" placeholder="Rechercher un site..." class="search-input">
     <div id="map"></div>
-    <div class="legend">
-      <div><img :src="redMarkerIcon.options.iconUrl" alt="À faire" class="legend-icon"> Sites à visiter</div>
-      <div><img :src="greenMarkerIcon.options.iconUrl" alt="Terminé" class="legend-icon"> Sites visités</div>
-      <div><img :src="warningMarkerIcon.options.iconUrl" alt="En cours" class="legend-icon"> Sites en cours</div>
-    </div>
   </div>
 </template>
 
@@ -169,32 +163,6 @@ onMounted(() => {
 #map {
   height: 600px;
   width: 100%;
-}
-
-.search-input {
-  position: absolute;
-  top: 10px;
-  left: 50px;
-  z-index: 1000;
-  padding: 5px;
-  width: 200px;
-}
-
-.legend {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  background: white;
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-  z-index: 1000;
-}
-
-.legend-icon {
-  width: 12px;
-  height: 12px;
-  margin-right: 5px;
 }
 </style>
 

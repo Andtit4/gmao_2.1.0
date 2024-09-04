@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted } from 'vue'
 import { mdiChartTimelineVariant, mdiReload, mdiChartPie, mdiFileExcel, mdiSitemap, mdiTools, mdiOil } from '@mdi/js'
 import * as chartConfig from '@/components/Charts/chart.config.js'
 import SectionMain from '@/components/SectionMain.vue'
@@ -13,27 +13,14 @@ import apiService from '@/services/apiService'
 import { refreshPageOnceWithDelay, getStartAndEndOfWeek } from '@/services/document'
 import TogoMap from '@/layouts/TogoMapComponent.vue'
 import * as XLSX from 'xlsx'
-import CardZoneIntervention from '@/views/CardZoneIntervention.vue'
 import CardZoneGrid from '@/views/CardZoneGrid.vue'
 import TimeLine from '@/layouts/TimeLine.vue'
 
 const chartData = ref(null)
+const events = ref([])
+const sitesWeeklyPlan = ref([])
 
-const events = reactive({
-  list: [
-  ]
-})
-
-const initDate = () => {
-  const result = getStartAndEndOfWeek()
-  form.formattedStartOfWeek = result.dateDebut
-  form.formattedEndOfWeek = result.dateFin
-}
-
-const fillChartData = () => {
-  chartData.value = chartConfig.sampleChartData()
-}
-const form = reactive({
+const form = ref({
   nbFait: 0,
   nbTotalFait: 0,
   nbEncours: 0,
@@ -41,237 +28,106 @@ const form = reactive({
   nbSiteNonFait: 0,
   nbSiteTotalNonFait: 0,
   nbAllSite: 0,
-  sitesRestants: '',
-  progession: '',
+  sitesRestants: 0,
+  progession: 0,
   week: '',
-  // textWeek: '',
   formattedEndOfWeek: '',
   formattedStartOfWeek: ''
 })
 
+const initDate = () => {
+  const { dateDebut, dateFin } = getStartAndEndOfWeek()
+  form.value.formattedStartOfWeek = dateDebut
+  form.value.formattedEndOfWeek = dateFin
+}
+
+const fillChartData = () => {
+  chartData.value = chartConfig.sampleChartData()
+}
+
 const weekNumber = () => {
-  form.week = 'Semaine W' + apiService.getWeekNumber(Date.now())
-  // console.log(form.week)
+  form.value.week = 'Semaine W' + apiService.getWeekNumber(Date.now())
 }
 
-// Fait
-const countAllSite = () => {
-  axios({
-    url: apiService.getUrl() + '/site/all/nb',
-    method: 'GET'
-  }).then(async (res) => {
-    form.nbAllSite = res.data[0].nb
-    axios({
-      url: apiService.getUrl() + '/plannifie/done/nb',
-      method: 'GET',
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      }
-    }).then(async (res) => {
-      form.nbTotalFait = await res.data[0].nb
-      form.sitesRestants = parseInt(form.nbAllSite - form.nbTotalFait)
-      form.progession = Math.ceil(parseFloat(parseInt(form.nbTotalFait) * 100 / parseInt(form.nbAllSite)))
-      // form.progession = `${Math.ceil(parseFloat(parseInt(form.nbTotalFait) * 100 / parseInt(form.nbAllSite)))} %`
+const fetchData = async () => {
+  try {
+    console.log('Début de fetchData')
+    const [allSites, doneSites, nonFaitSites, faitSemaine, encours, sitePlannifie, siteNonFait, weeklyPlan, shareData] = await Promise.all([
+      axios.get(`${apiService.getUrl()}/site/all/nb`),
+      axios.get(`${apiService.getUrl()}/plannifie/done/nb`),
+      axios.get(`${apiService.getUrl()}/plannifie/nonfait/nb`),
+      axios.get(`${apiService.getUrl()}/plannifie/done/week/nb/${form.value.formattedStartOfWeek}/${form.value.formattedEndOfWeek}`),
+      axios.get(`${apiService.getUrl()}/plannifie/encours/week/nb/${form.value.formattedStartOfWeek}/${form.value.formattedEndOfWeek}`),
+      axios.get(`${apiService.getUrl()}/plannifie/week/nb/${form.value.formattedStartOfWeek}/${form.value.formattedEndOfWeek}`),
+      axios.get(`${apiService.getUrl()}/plannifie/nonfait/week/nb/${form.value.formattedStartOfWeek}/${form.value.formattedEndOfWeek}`),
+      axios.get(`${apiService.getUrl()}/plannifie/week/${form.value.formattedStartOfWeek}/${form.value.formattedEndOfWeek}`),
+      // axios.get(`${apiService.getUrl()}/share`)
+    ])
 
-      console.log('Sites restants   ', form.sitesRestants)
-    })
-  })
-}
+    console.log('Données récupérées:', { allSites, doneSites, nonFaitSites, faitSemaine, encours, sitePlannifie, siteNonFait, weeklyPlan, shareData })
 
-// Fait
-const getNbFait = async () => {
-  axios({
-    url: apiService.getUrl() + '/plannifie/done/nb',
-    method: 'GET',
-    headers: {
-      'Access-Control-Allow-Origin': '*'
+    form.value.nbAllSite = parseInt(allSites.data[0].nb) || 0
+    form.value.nbTotalFait = parseInt(doneSites.data[0].nb) || 0
+    form.value.nbSiteTotalNonFait = parseInt(nonFaitSites.data[0].nb) || 0
+    form.value.nbFait = parseInt(faitSemaine.data[0].nb) || 0
+    form.value.nbEncours = parseInt(encours.data[0].nb) || 0
+    form.value.nbSitePlannifie = parseInt(sitePlannifie.data[0].nb) || 0
+    form.value.nbSiteNonFait = parseInt(siteNonFait.data[0].nb) || 0
+    sitesWeeklyPlan.value = weeklyPlan.data
+    // events.value = shareData.data
+
+    // Calcul des sites restants
+    form.value.sitesRestants = Math.max(0, form.value.nbAllSite - form.value.nbTotalFait)
+
+    // Calcul de la progression
+    if (form.value.nbAllSite > 0) {
+      form.value.progession = Math.min(100, Math.ceil((form.value.nbTotalFait * 100) / form.value.nbAllSite))
+    } else {
+      form.value.progession = 0
     }
-  }).then(async (res) => {
-    form.nbTotalFait = await res.data[0].nb
-  })
-}
 
-// Fait
-const getNbNonFait = async () => {
-  axios({
-    url: apiService.getUrl() + '/plannifie/nonfait/nb',
-    method: 'GET',
-    headers: {
-      'Access-Control-Allow-Origin': '*'
+    console.log('Données mises à jour:', form.value)
+  } catch (error) {
+    console.error('Erreur lors de la récupération des données:', error)
+    if (error.response) {
+      console.error('Réponse d\'erreur:', error.response.data)
     }
-  }).then(async (res) => {
-    form.nbSiteTotalNonFait = await res.data[0].nb
-  })
-}
-
-// Fait
-const getNbFaitSemaine = async () => {
-  axios({
-    url:
-      apiService.getUrl() +
-      '/plannifie/done/week/nb/' +
-      form.formattedStartOfWeek +
-      '/' +
-      form.formattedEndOfWeek,
-    method: 'GET',
-    headers: {
-      'Access-Control-Allow-Origin': '*'
-    }
-  }).then(async (res) => {
-    form.nbFait = await res.data[0].nb
-  })
-}
-
-// Fait
-const getNbEncours = async () => {
-  axios({
-    url: apiService.getUrl() + '/plannifie/encours/week/nb/' +
-      form.formattedStartOfWeek +
-      '/' +
-      form.formattedEndOfWeek,
-    method: 'GET',
-    headers: {
-      'Access-Control-Allow-Origin': '*'
-    }
-  }).then(async (res) => {
-    form.nbEncours = await res.data[0].nb
-  })
-}
-
-// Fait
-const getNbSitePlannifie = async () => {
-  axios({
-    url:
-      apiService.getUrl() +
-      '/plannifie/week/nb/' +
-      form.formattedStartOfWeek +
-      '/' +
-      form.formattedEndOfWeek,
-    method: 'GET',
-    headers: {
-      'Access-Control-Allow-Origin': '*'
-    }
-  })
-    .then(async (res) => {
-      form.nbSitePlannifie = await res.data[0].nb
-      console.log('Site prévus à la semaine: ', form.nbSitePlannifie)
-    })
-    .catch((err) => {
-      console.log('Erreur sites prévus à la semaine: ', err.message)
-    })
-}
-
-const sitesWeeklyPlan = reactive({ list: [] })
-
-// Fait
-const getSiteWeeklyPlan = async () => {
-  axios({
-    url:
-      apiService.getUrl() +
-      '/plannifie/week/' +
-      form.formattedStartOfWeek +
-      '/' +
-      form.formattedEndOfWeek,
-    method: 'GET',
-    headers: {
-      'Access-Control-Allow-Origin': '*'
-    }
-  })
-    .then(async (res) => {
-      sitesWeeklyPlan.list = res.data
-      // console.log('Site prévus à la semaine: ', form.nbSitePlannifie)
-
-    })
-    .catch((err) => {
-      console.log('Erreur sites prévus à la semaine: ', err.message)
-    })
-}
-
-// Fait
-const getSiteWeeklyPlanForXlx = async (zone) => {
-  const response = await axios.get(apiService.getUrl() +
-    '/plannifie/week/' +
-    form.formattedStartOfWeek +
-    '/' +
-    form.formattedEndOfWeek,)
-  return response.data
-}
-
-// fait
-const getNbSiteNonfait = async () => {
-  axios({
-    url:
-      apiService.getUrl() +
-      '/plannifie/nonfait/week/nb/' +
-      form.formattedStartOfWeek +
-      '/' +
-      form.formattedEndOfWeek,
-    method: 'GET',
-    headers: {
-      'Access-Control-Allow-Origin': '*'
-    }
-  }).then(async (res) => {
-    form.nbSiteNonFait = await res.data[0].nb
-  })
+  }
 }
 
 const exportxlx = async () => {
-  console.log('Export init')
-  const apiData = await getSiteWeeklyPlanForXlx();
-  const data = [
-    [
-      'EQUIPE',
-      'SITE ID',
-      'SITE',
-      'SEMAINE',
-      'STATUT',
-    ],
-    ...apiData.map((item) => [
-      item.zone,
-      item.site_id,
-      item.site,
-      `SEMAINE DU ${item.date_debut ? new Date(item.date_debut).toISOString().split('T')[0] : ''} AU ${item.date_fin ? new Date(item.date_fin).toISOString().split('T')[0] : ''}`,
-      item.date_attente == '' ? 'NON FAIT' : item.date_prise_en_compte == '' ? 'NON PRIS EN COMPTE' : 'FAIT'
-    ])
-  ]
-  // Créez un objet workbook
-  const wb = XLSX.utils.book_new()
+  try {
+    const apiData = sitesWeeklyPlan.value
+    const data = [
+      ['EQUIPE', 'SITE ID', 'SITE', 'SEMAINE', 'STATUT'],
+      ...apiData.map((item) => [
+        item.zone,
+        item.site_id,
+        item.site,
+        `SEMAINE DU ${formatDate(item.date_debut)} AU ${formatDate(item.date_fin)}`,
+        getStatus(item)
+      ])
+    ]
 
-  // Créez une feuille avec vos données
-  const ws = XLSX.utils.aoa_to_sheet(data)
-
-  // Ajoutez la feuille au workbook
-  XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
-
-  // Générez le fichier Excel et téléchargez-le
-  XLSX.writeFile(wb, 'PLANNIFICATION DE LA SEMAINE.xlsx')
+    const wb = XLSX.utils.book_new()
+    const ws = XLSX.utils.aoa_to_sheet(data)
+    XLSX.utils.book_append_sheet(wb, ws, 'Feuille 1')
+    XLSX.writeFile(wb, 'PLANNIFICATION DE LA SEMAINE.xlsx')
+  } catch (error) {
+    console.error('Erreur lors de l\'export Excel:', error)
+  }
 }
 
-const share = async () => {
-  axios({
-    url: apiService.getUrl() + '/share',
-    method: 'GET'
-  }).then((res) => {
-    events.list = res.data;
-  }).catch((err) => {
-    console.log('An error occured ', err.message)
-  })
-}
+const formatDate = (date) => date ? new Date(date).toISOString().split('T')[0] : ''
+const getStatus = (item) => item.date_attente === '' ? 'NON FAIT' : item.date_prise_en_compte === '' ? 'NON PRIS EN COMPTE' : 'FAIT'
 
-onMounted(() => {
-  initDate(),
-    fillChartData(),
-    // getNbFait(),
-    getNbEncours(),
-    refreshPageOnceWithDelay(500),
-    getNbSitePlannifie(),
-    getNbSiteNonfait(),
-    getNbNonFait(),
-    getNbFaitSemaine(),
-    getSiteWeeklyPlan(),
-    countAllSite(),
-    share(),
-    weekNumber()
+onMounted(async () => {
+  console.log('Composant monté')
+  initDate()
+  fillChartData()
+  weekNumber()
+  await fetchData()
+  refreshPageOnceWithDelay(500)
 })
 </script>
 
@@ -279,7 +135,7 @@ onMounted(() => {
   <LayoutAuthenticated>
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" :title="form.week" main>
-        <BaseButton :icon="mdiFileExcel" color="success" label="Export" @click="exportxlx()" />
+        <BaseButton :icon="mdiFileExcel" color="success" label="Export" @click="exportxlx" />
       </SectionTitleLineWithButton>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-4 mb-6">
@@ -294,7 +150,7 @@ onMounted(() => {
       </div>
 
       <SectionTitleLineWithButton :icon="mdiChartPie" title="Statistiques (MP)">
-        <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
+        <BaseButton :icon="mdiReload" color="whiteDark" @click="fetchData" />
       </SectionTitleLineWithButton>
 
       <CardBox class="mb-6">
@@ -318,13 +174,13 @@ onMounted(() => {
         </div>
       </CardBox>
       <SectionTitleLineWithButton :icon="mdiTools" title="Statistiques (Stocks)">
-        <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
+        <BaseButton :icon="mdiReload" color="whiteDark" @click="fetchData" />
       </SectionTitleLineWithButton>
       <CardBox class="mb-6" title="Historique transaction">
-        <TimeLine :events="events.list" />
+        <TimeLine :events="events" />
       </CardBox>
       <SectionTitleLineWithButton :icon="mdiOil" title="Refueling">
-        <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
+        <BaseButton :icon="mdiReload" color="whiteDark" @click="fetchData" />
       </SectionTitleLineWithButton>
       <CardBox class="mb-6">
         <center>Indisponible pour le moment...</center>

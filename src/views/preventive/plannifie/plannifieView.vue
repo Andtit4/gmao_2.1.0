@@ -1,23 +1,19 @@
 <script setup>
-// import { mdiMonitorCellphone, mdiTableBorder, mdiTableOff, mdiGithub, mdiAccount } from '@mdi/js'
+import { onMounted, reactive, ref, computed } from 'vue'
+import axios from 'axios'
+import moment from 'moment'
+import { mdiInformation, mdiBallotOutline } from '@mdi/js'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
-import { onMounted, reactive, ref, computed } from 'vue'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import SectionMain from '@/components/SectionMain.vue'
 import NotificationBar from '@/components/NotificationBar.vue'
-// import TableSampleClients from '@/components/TableSampleClients.vue'
 import CardBox from '@/components/CardBox.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import BaseButton from '@/components/BaseButton.vue'
-// import PlannifieList from '@/views/preventive/plannifie/plannifieList.vue'
-// import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
-import axios from 'axios'
+import BaseDivider from '@/components/BaseDivider.vue'
 import apiService from '@/services/apiService'
-import moment from 'moment'
-// import FormField from '@/components/FormField.vue'
-
 
 const isModalActive = ref(false)
 
@@ -42,9 +38,6 @@ const sites = reactive({ list: [] })
 const notificationSettingsModel = ref([])
 const notificationsOutline = computed(() => notificationSettingsModel.value.indexOf('outline') > -1)
 
-// const router = useRouter()
-
-// Fait
 const getAllZone = () => {
   axios({
     url: apiService.getUrl() + '/preventive',
@@ -58,42 +51,44 @@ const getAllZone = () => {
     })
 }
 
-
 const ajouteDate = () => {
   if (form.date_debut) {
-    // Convertir la date saisie en objet Date
     const dateSaisie = new Date(form.date_debut)
-
-    // Ajouter 3 mois à la date
     dateSaisie.setMonth(dateSaisie.getMonth() + 3)
-
-    // Mettre à jour la propriété pour afficher le résultat
     form.date_fin = dateSaisie.toISOString().split('T')[0]
   } else {
-    form.date_fin = '' // Réinitialiser si aucune date n'est saisie
+    form.date_fin = ''
   }
 }
 
-// fait
 const getDate = (zone) => {
-  console.log('Zone: ', zone)
+  if (!zone) return
+  
   axios({
-    url: apiService.getUrl() + '/preventive/zone?zone=' + zone,
+    url: `${apiService.getUrl()}/preventive/zone?zone=${encodeURIComponent(zone)}`,
     method: 'GET'
   }).then((response) => {
-    console.log('Response: ', response.data)
-    if (response.data.length == 0) {
-      console.log('empty')
-    } else {
-      console.log('not empty')
+    const data = response.data[0]
+    if (data) {
       form.showInformation = true
-      form.nnbSites = response.data[0].nombre_total_site
-      form.date_debut = response.data[0].date_debut
-      form.date_fin = response.data[0].date_fin
-      form.quota_semaine = response.data[0].quota_semaine
+      form.nnbSites = data.nombre_total_site
+      form.date_debut = data.date_debut
+      form.date_fin = data.date_fin
+      form.quota_semaine = data.quota_semaine
       getNbWeek(form.date_debut, form.date_fin)
       sitesByZone()
+    } else {
+      form.showInformation = false
+      form.nnbSites = ''
+      form.date_debut = ''
+      form.date_fin = ''
+      form.quota_semaine = ''
+      semaines.list = []
+      sites.list = []
     }
+  }).catch((error) => {
+    console.error('Erreur lors de la récupération des données:', error)
+    // Gérer l'erreur (par exemple, afficher un message à l'utilisateur)
   })
 }
 
@@ -113,24 +108,20 @@ const getNbWeek = (date_debut, date_fin) => {
     )
     currentWeekStart.add(7, 'days')
   }
-  // console.log(semaines.list)
 }
-const extractDates = (text) => {
-  // console.log('\nmatches[1] ', text)
 
+const extractDates = (text) => {
   const regex = /Semaine du (\d{4}-\d{2}-\d{2}) au (\d{4}-\d{2}-\d{2})/
   const matches = text.match(regex)
 
   if (matches && matches.length === 3) {
     form.debut_semaine = matches[1]
     form.fin_semaine = matches[2]
-    console.log('\nmatches[1] ', matches[1])
   } else {
     console.error('Format de période invalide')
   }
 }
 
-// Fait
 const sitesByZone = () => {
   axios({
     url: apiService.getUrl() + '/site/zone/search?zone=' + form.zone,
@@ -140,27 +131,36 @@ const sitesByZone = () => {
   })
 }
 
-// Fait
 const submit = () => {
+  if (!form.zone || !form.quota_semaine || !form.debut_semaine || !form.fin_semaine) {
+    // Afficher un message d'erreur à l'utilisateur
+    return
+  }
+
   axios({
     url: apiService.getUrl() + '/mission',
     method: 'POST',
     headers: {
+      'Content-Type': 'application/json',
       'Access-Control-Allow-Origin':'*'
     },
     data: {
       zone: form.zone,
       quota: form.quota_semaine,
-      // nom_site: form.site,
-      date_ajoute: new Date(),
+      date_ajoute: new Date().toISOString(),
       date_debut: form.debut_semaine,
       date_fin: form.fin_semaine
     }
   }).then((res) => {
     console.log(res)
+    form.showSucess = true
     setTimeout(() => {
-      location.reload()
-    }, 500)
+      form.showSucess = false
+      // Réinitialiser le formulaire ou recharger les données
+    }, 3000)
+  }).catch((error) => {
+    console.error('Erreur lors de la soumission:', error)
+    // Afficher un message d'erreur à l'utilisateur
   })
 }
 
@@ -171,13 +171,11 @@ onMounted(() => {
 
 <template>
   <CardBoxModal v-model="isModalActive" title="Détails">
-    <!-- Notification for success -->
     <div v-if="form.showSucess == true">
       <NotificationBar color="success" :icon="mdiInformation" :outline="notificationsOutline">
         <b>Sortie enregistrée</b>.
       </NotificationBar>
     </div>
-    <!-- End BLoc -->
     <p>
       Zone : <b>{{ form.zone }}</b>
     </p>
@@ -204,14 +202,14 @@ onMounted(() => {
       <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Plannifier" main>
       </SectionTitleLineWithButton>
       <CardBox>
-        <FormField label="Informations générale">
+        <FormField label="Informations générales">
           <select
             v-model="form.zone"
             class="form-select bg-white dark:bg-slate-800"
             @change="getDate(form.zone)"
           >
-            <option value="">Séléctionnez une zone</option>
-            <option v-for="(zone, index) in zones.list" :key="index" :value="zone.zone">
+            <option value="">Sélectionnez une zone</option>
+            <option v-for="zone in zones.list" :key="zone.id" :value="zone.zone">
               {{ zone.zone }}
             </option>
           </select>
@@ -247,37 +245,13 @@ onMounted(() => {
                 <FormControl v-model="form.debut_semaine" type="date" />
                 <FormControl v-model="form.fin_semaine" type="date" />
               </FormField>
-              <!-- <FormField label="Sites">
-                <select
-                  v-model="form.site"
-                  class="form-select bg-white dark:bg-slate-800"
-                  @change="extractDates(form.site)"
-                >
-                  <option value="">Sélectionnez le site</option>
-                  <option v-for="(site, index) in sites.list" :key="index" :value="site.nom_site">
-                    {{ site.nom_site }}
-                  </option>
-                </select>
-              </FormField> -->
             </FormField>
           </div>
 
-          <!-- <BaseButton color="info" :icon="mdiEye" small @click="showSite(site._id)" /> -->
-          <BaseButton color="info" small label="Submit" @click="submit()" />
+          <BaseButton color="info" small label="Soumettre" @click="submit()" :disabled="!form.zone || !form.weeks" />
         </FormField>
         <BaseDivider />
-        <template #footer>
-          <!-- <BaseButtons>
-            <BaseButton type="reset" color="info" outline label="Reset" />
-          </BaseButtons> -->
-        </template>
       </CardBox>
     </SectionMain>
-
-    <!-- <SectionMain>
-      <CardBox has-table>
-        <PlannifieList />
-      </CardBox>
-    </SectionMain> -->
   </LayoutAuthenticated>
 </template>

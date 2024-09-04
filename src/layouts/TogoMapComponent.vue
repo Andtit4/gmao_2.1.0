@@ -1,143 +1,200 @@
 <script setup>
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-import { onMounted, reactive } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
 
-const togoCoordinates = reactive({
-  latitude: 8,
-  longitude: 1
+const map = ref(null)
+const cardSiteList = ref([])
+const cardSiteDoneList = ref([])
+const cardWaitingList = ref([])
+const searchQuery = ref('')
+
+const togoCoordinates = { latitude: 8.619543, longitude: 0.824782 }
+
+const createMarkerIcon = (url, size) => L.icon({
+  iconUrl: url,
+  iconSize: size,
+  iconAnchor: [size[0] / 2, size[1]],
+  popupAnchor: [0, -size[1]]
 })
 
-// Icône de marqueur rouge
-const redMarkerIcon = new L.Icon({
-  iconUrl:
-    'https://cdn2.iconfinder.com/data/icons/color-svg-vector-icons-2/512/map_marker_base-512.png',
-  iconSize: [6, 6],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  tooltipAnchor: [16, -28],
-  shadowSize: [41, 41]
-})
+const redMarkerIcon = createMarkerIcon('https://cdn2.iconfinder.com/data/icons/color-svg-vector-icons-2/512/map_marker_base-512.png', [12, 12])
+const greenMarkerIcon = createMarkerIcon('https://www.clipartmax.com/png/full/117-1179307_filemap-pin-icon-green-map-marker-png-green.png', [12, 12])
+const warningMarkerIcon = createMarkerIcon('https://www.pngall.com/wp-content/uploads/2017/05/Map-Marker-Free-Download-PNG.png', [16, 16])
 
-
-const greenMarkerIcon = new L.Icon({
-  iconUrl:
-    'https://www.clipartmax.com/png/full/117-1179307_filemap-pin-icon-green-map-marker-png-green.png',
-  iconSize: [6, 6],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  tooltipAnchor: [0, 0],
-  shadowSize: [8, 8]
-})
-
-const warningMarkerIcon = new L.Icon({
-  iconUrl:
-    'https://www.pngall.com/wp-content/uploads/2017/05/Map-Marker-Free-Download-PNG.png',
-  iconSize: [10, 10],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  tooltipAnchor: [16, -28],
-  shadowSize: [41, 41]
-})
-
-const cardSiteList = reactive({ list: [] })
-const cardSiteDoneList = reactive({ list: [] })
-const cardWaitingList = reactive({ list: [] })
-
-// Fait
-const siteNonFait = async () => {
-  // fait
-  axios({
-    url: apiService.getUrl() + '/plannifie/nonfait/for-map',
-    method: 'GET'
-  })
-    .then(async (res) => {
-      cardSiteList.list = await res.data
-      console.log('Res: ', cardSiteList.list)
-
-      // Fait
-      axios({
-        url: apiService.getUrl() + '/plannifie/all/done/for-map',
-        method: 'GET'
-      })
-        .then((r) => {
-          cardSiteDoneList.list = r.data
-
-          // Fait
-          axios({
-            url: apiService.getUrl() + '/plannifie/encours/for-map',
-            method: 'GET'
-          }).then((r) => {
-            cardWaitingList.list = r.data
-            createCard()
-          })
-        })
-        .catch((err) => {
-          console.log("Error lors de l'affichage des site fait sur la carte", err.message)
-        })
-    })
-    .catch((err) => {
-      console.log("Error lors de l'affichage des site sur la carte", err.message)
-    })
+const fetchSites = async (url) => {
+  try {
+    const response = await axios.get(apiService.getUrl() + url)
+    return response.data
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des données: ${error.message}`)
+    return []
+  }
 }
 
-const createCard = () => {
-  const map = L.map('map', {
-    center: [togoCoordinates.latitude, togoCoordinates.longitude],
-    zoom: 7
+const sitesAFaire = ref(null)
+const sitesTermines = ref(null)
+const sitesEnCours = ref(null)
+
+const initMap = async () => {
+  console.log("Initialisation de la carte...")
+  
+  try {
+    [cardSiteList.value, cardSiteDoneList.value, cardWaitingList.value] = await Promise.all([
+      fetchSites('/plannifie/nonfait/for-map'),
+      fetchSites('/plannifie/all/done/for-map'),
+      fetchSites('/plannifie/encours/for-map')
+    ])
+
+    console.log("Données récupérées:", { cardSiteList: cardSiteList.value, cardSiteDoneList: cardSiteDoneList.value, cardWaitingList: cardWaitingList.value })
+
+    map.value = L.map('map', {
+      center: [togoCoordinates.latitude, togoCoordinates.longitude],
+      zoom: 7,
+      minZoom: 7,
+      maxZoom: 10,
+      maxBounds: L.latLngBounds(L.latLng(5.5, -0.5), L.latLng(11.5, 2)),
+      maxBoundsViscosity: 1.0
+    }).setView([togoCoordinates.latitude, togoCoordinates.longitude], 7)
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map.value)
+
+    console.log("Carte créée et couche de fond ajoutée")
+
+    sitesAFaire.value = L.layerGroup().addTo(map.value)
+    sitesTermines.value = L.layerGroup().addTo(map.value)
+    sitesEnCours.value = L.layerGroup().addTo(map.value)
+
+    addMarkers(cardSiteList.value, redMarkerIcon, sitesAFaire.value)
+    addMarkers(cardSiteDoneList.value, greenMarkerIcon, sitesTermines.value)
+    addMarkers(cardWaitingList.value, warningMarkerIcon, sitesEnCours.value)
+
+    const overlayMaps = {
+      "Sites à visiter": sitesAFaire.value,
+      "Sites visités": sitesTermines.value,
+      "Sites en cours": sitesEnCours.value
+    }
+
+    L.control.layers(null, overlayMaps).addTo(map.value)
+
+    console.log("Marqueurs ajoutés")
+  } catch (error) {
+    console.error("Erreur lors de l'initialisation de la carte:", error)
+  }
+}
+
+const addMarkers = (list, icon, layerGroup) => {
+  list.forEach(data => {
+    L.marker([data.latitude, data.longitude], { icon })
+      .bindPopup(`
+        <strong>${data.nom_site}</strong><br>
+        Statut: ${data.statut || 'Non défini'}<br>
+        Date prévue: ${data.date_prevue || 'Non définie'}
+      `)
+      .addTo(layerGroup)
+  })
+  layerGroup.addTo(map.value)
+}
+
+const zoomToMarkers = () => {
+  const allLayers = [...sitesAFaire.value.getLayers(), ...sitesTermines.value.getLayers(), ...sitesEnCours.value.getLayers()]
+  const group = new L.featureGroup(allLayers)
+  map.value.fitBounds(group.getBounds().pad(0.1))
+}
+
+const filteredSites = computed(() => {
+  const query = searchQuery.value.toLowerCase()
+  return [...cardSiteList.value, ...cardSiteDoneList.value, ...cardWaitingList.value]
+    .filter(site => site.nom_site.toLowerCase().includes(query))
+})
+
+const searchSites = () => {
+  sitesAFaire.value.clearLayers()
+  sitesTermines.value.clearLayers()
+  sitesEnCours.value.clearLayers()
+
+  filteredSites.value.forEach(site => {
+    let icon, layerGroup
+    if (cardSiteList.value.includes(site)) {
+      icon = redMarkerIcon
+      layerGroup = sitesAFaire.value
+    } else if (cardSiteDoneList.value.includes(site)) {
+      icon = greenMarkerIcon
+      layerGroup = sitesTermines.value
+    } else {
+      icon = warningMarkerIcon
+      layerGroup = sitesEnCours.value
+    }
+    
+    L.marker([site.latitude, site.longitude], { icon })
+      .bindPopup(`
+        <strong>${site.nom_site}</strong><br>
+        Statut: ${site.statut || 'Non défini'}<br>
+        Date prévue: ${site.date_prevue || 'Non définie'}
+      `)
+      .addTo(layerGroup)
   })
 
-  // Ajout d'une couche de carte OpenStreetMap
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '©'
-  }).addTo(map)
-
-  // Définir les limites pour afficher uniquement le Togo
-  const southWest = L.latLng(6.1, -0.25)
-  const northEast = L.latLng(11.5, 1.8)
-  const bounds = L.latLngBounds(southWest, northEast)
-
-  // Utiliser la zone ou d'autres informations pertinentes pour la popu
-  cardSiteList.list.forEach((data) => {
-    const marker = L.marker([data.latitude, data.longitude], { icon: redMarkerIcon }).addTo(map)
-    marker.bindPopup(data.nom_site)
-  })
-
-  // var markers =  L.MarkerClusterGroup();
-  cardSiteDoneList.list.forEach((data) => {
-    // const marker = markers.addLayer(L.marker([data.latitude, data.longitude], { icon: greenMarkerIcon, maxZoom: 8 })).addTo(map)
-    const marker = L.marker([data.latitude, data.longitude], { icon: greenMarkerIcon, maxZoom: 8 }).addTo(map)
-    marker.bindPopup(data.nom_site)
-  })
-
-  // Utiliser la zone ou d'autres informations pertinentes pour la popup
-  //  warning marker
-  cardWaitingList.list.forEach((data) => {
-    const marker = L.marker([data.latitude, data.longitude], { icon: warningMarkerIcon }).addTo(map)
-    marker.bindPopup(data.nom_site)
-  })
-
-  // Limiter la carte aux frontières du Togo
-  // map.setMaxBounds(bounds)
-  map.on('drag', () => {
-    map.panInsideBounds(bounds, { animate: true })
-  })
+  if (filteredSites.value.length > 0) {
+    zoomToMarkers()
+  }
 }
 
 onMounted(() => {
-  siteNonFait()
+  console.log("Composant monté")
+  initMap().then(() => {
+    zoomToMarkers()
+  })
 })
 </script>
 
 <template>
-  <div id="map"></div>
+  <div>
+    <input v-model="searchQuery" @input="searchSites" placeholder="Rechercher un site..." class="search-input">
+    <div id="map"></div>
+    <div class="legend">
+      <div><img :src="redMarkerIcon.options.iconUrl" alt="À faire" class="legend-icon"> Sites à visiter</div>
+      <div><img :src="greenMarkerIcon.options.iconUrl" alt="Terminé" class="legend-icon"> Sites visités</div>
+      <div><img :src="warningMarkerIcon.options.iconUrl" alt="En cours" class="legend-icon"> Sites en cours</div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
 #map {
   height: 600px;
+  width: 100%;
+}
+
+.search-input {
+  position: absolute;
+  top: 10px;
+  left: 50px;
+  z-index: 1000;
+  padding: 5px;
+  width: 200px;
+}
+
+.legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: white;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+  z-index: 1000;
+}
+
+.legend-icon {
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
 }
 </style>
 

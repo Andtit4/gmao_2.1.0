@@ -1,7 +1,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { mdiAccount, mdiAsterisk } from '@mdi/js'
+import { mdiAccount, mdiAsterisk, mdiMonitorCellphone } from '@mdi/js'
 import SectionFullScreen from '@/components/SectionFullScreen.vue'
 import CardBox from '@/components/CardBox.vue'
 import FormCheckRadio from '@/components/FormCheckRadio.vue'
@@ -21,71 +21,68 @@ const isLoading = ref(false)
 const form = reactive({
   login: '',
   pass: '',
-  id: '',
-  nom: '',
-  prenom: '',
-  email: '',
   remember: true,
   err: '',
   showError: false
 })
 
 const router = useRouter()
+const mainStore = useMainStore()
 
-const submit = () => {
-  // const hash = CryptoJS.SHA256(form.pass)
-  isLoading.value = true;
-  axios({
-    url: apiService.getUrl() + `/intervenant/auth?email=${form.login}&mot_de_passe=${form.pass}`,
-    method: 'GET'
-  }).then((res) => {
-    console.log(res.data)
-    if (res.data.error) {
-      form.showError = true;
-      form.err = res.data.error
-      isLoading.value = false;
+const submit = async () => {
+  isLoading.value = true
+  form.showError = false
+  form.err = ''
+
+  try {
+    const response = await axios.get(
+      `${apiService.getUrl()}/intervenant/auth`,
+      { params: { email: form.login, mot_de_passe: form.pass } }
+    )
+
+    const { data } = response
+
+    if (data.error) {
+      form.showError = true
+      form.err = data.error
     } else {
-      console.log(res.data)
-      localStorage.setItem('token', res.data.token)
-      localStorage.setItem('pass', res.data.intervenant[0]._id)
-      localStorage.setItem('id', res.data.intervenant[0]._id)
-      localStorage.setItem('email', res.data.intervenant[0].email)
-      localStorage.setItem('nom', res.data.intervenant[0].nom)
-      localStorage.setItem('prenom', res.data.intervenant[0].prenom)
-      // localStorage.setItem('zone')
-      useMainStore().setUser(res.data.intervenant[0])
-      switch (res.data.type_utilisateur) {
-        case 'ADMIN':
-          localStorage.removeItem('type')
-          localStorage.setItem('type', 'admin')
-          return router.push({
-            name: 'Dashboard',
-            params: { type: 'admin', pass: res.data.intervenant[0]._id }
-          })
-        case 'USER':
-          // Cookies.remove('type')
-          localStorage.removeItem('type')
-          localStorage.setItem('type', 'chef_equipe')
-          localStorage.removeItem('zone')
-          localStorage.setItem('zone',res.data.intervenant[0].zone )
-          return router.push({
-            name: 'Dashboard',
-            params: { type: 'chef_equipe', pass: res.data.intervenant[0]._id }
-          })
-        case 'SUPERVISEUR':
-          localStorage.removeItem('type')
-          localStorage.setItem('type', 'superviseur')
-          return router.push({
-            name: 'Dashboard',
-            params: { type: 'superviseur', pass: res.data.intervenant[0]._id }
-          })
-        default:
-          break;
+      const { token, intervenant, type_utilisateur } = data
+      const user = intervenant[0]
+
+      localStorage.setItem('token', token)
+      localStorage.setItem('pass', user._id)
+      localStorage.setItem('id', user._id)
+      localStorage.setItem('email', user.email)
+      localStorage.setItem('nom', user.nom)
+      localStorage.setItem('prenom', user.prenom)
+
+      mainStore.setUser(user)
+
+      const routeMap = {
+        ADMIN: { type: 'admin', name: 'Dashboard' },
+        USER: { type: 'chef_equipe', name: 'Dashboard', setZone: true },
+        SUPERVISEUR: { type: 'superviseur', name: 'Dashboard' }
+      }
+
+      const route = routeMap[type_utilisateur]
+      if (route) {
+        localStorage.setItem('type', route.type)
+        if (route.setZone) {
+          localStorage.setItem('zone', user.zone)
+        }
+        router.push({
+          name: route.name,
+          params: { type: route.type, pass: user._id }
+        })
       }
     }
-  }).catch((err) => {
-    console.error('Error occured ', err.message)
-  })
+  } catch (err) {
+    console.error('Erreur survenue', err.message)
+    form.showError = true
+    form.err = "Une erreur s'est produite lors de la connexion"
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
@@ -126,3 +123,4 @@ const submit = () => {
     </SectionFullScreen>
   </LayoutGuest>
 </template>
+

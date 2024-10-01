@@ -275,23 +275,21 @@ onMounted(() => {
           </tr>
         </thead>
         <tbody>
-
-          <tr v-for="(site, index) in sitePlannifie.list" :key="index">
-            <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
-            <td class="border-b-0 lg:w-6 before:hidden">
-            </td>
-            <td data-label="Site">
-              {{ site.site }}
-            </td>
-            <td data-label="Envoyé le">
-              {{ site.date_attente }}
-            </td>
-            <BaseButton color="info" :icon="mdiPencil" small @click="showDate(site.site, site.id_plannification)" />
-            <BaseButton color="warning" :icon="mdiTools" small @click="activeMore(site.site)" />
-
-            <!-- <FormControl type="file" @change="uploadImg($event)" accept="image/*" /> -->
-          </tr>
-
+          <template v-if="sitePlannifie.list.length === 0">
+            <tr>
+              <td colspan="4" class="text-center">Aucun site plannifié</td>
+            </tr>
+          </template>
+          <template v-else>
+            <tr v-for="(site, index) in sitePlannifie.list" :key="index">
+              <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
+              <td class="border-b-0 lg:w-6 before:hidden"></td>
+              <td data-label="Site">{{ site.site }}</td>
+              <td data-label="Envoyé le">{{ site.date_attente }}</td>
+              <BaseButton color="info" :icon="mdiPencil" small @click="showDate(site.site, site.id_plannification)" />
+              <BaseButton color="warning" :icon="mdiTools" small @click="activeMore(site.site)" />
+            </tr>
+          </template>
         </tbody>
       </table>
 
@@ -310,43 +308,49 @@ onMounted(() => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(site, index) in plannifications.list.sort((a, b) => new Date(b.date_debut) - new Date(a.date_debut))" :key="index">
-          <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
-          <td class="border-b-0 lg:w-6 before:hidden">
-            <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
-          </td>
-          <td data-label="Ajouté le">
-            {{ site.date_ajoute ? formatDate(site.date_ajoute) : 'Date invalide' }}
-          </td>
-          <td data-label="Equipe">
-            {{ site.zone }}
-          </td>
-          <td data-label="Date de début">
-            {{ site.date_debut ? formatDate(site.date_debut) : 'Date invalide'}}
-          </td>
-          <td data-label="Date de fin">
-            {{ site.date_fin ? formatDate(site.date_fin) : 'Date invalide' }}
-          </td>
-          <td data-label="Quota de la semaine">
-            {{ site.quota }}
-          </td>
-          <td class="before:hidden lg:w-1 whitespace-nowrap">
-            <BaseButtons type="justify-start lg:justify-end" no-wrap>
-              <BaseButton color="info" :icon="mdiPencil" small
-                @click="show(site.zone, site.date_debut, site.date_fin, site._id)" />
-              <div v-if="form.showRestOfItem == true">
-                <BaseButton color="success" :icon="mdiFileExcel" small @click="exportxlx(site.zone)" />
-              </div>
-              <div v-else>
-                <div>
+        <template v-if="plannifications.list.length === 0">
+          <tr>
+            <td colspan="7" class="text-center">Aucune plannification initialisée</td>
+          </tr>
+        </template>
+        <template v-else>
+          <tr v-for="(site, index) in plannifications.list.sort((a, b) => new Date(b.date_debut) - new Date(a.date_debut))" :key="index">
+            <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
+            <td class="border-b-0 lg:w-6 before:hidden">
+              <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
+            </td>
+            <td data-label="Ajouté le">
+              {{ site.date_ajoute ? formatDate(site.date_ajoute) : 'Date invalide' }}
+            </td>
+            <td data-label="Equipe">
+              {{ site.zone }}
+            </td>
+            <td data-label="Date de début">
+              {{ site.date_debut ? formatDate(site.date_debut) : 'Date invalide'}}
+            </td>
+            <td data-label="Date de fin">
+              {{ site.date_fin ? formatDate(site.date_fin) : 'Date invalide' }}
+            </td>
+            <td data-label="Quota de la semaine">
+              {{ site.quota }}
+            </td>
+            <td class="before:hidden lg:w-1 whitespace-nowrap">
+              <BaseButtons type="justify-start lg:justify-end" no-wrap>
+                <BaseButton color="info" :icon="mdiPencil" small
+                  @click="show(site.zone, site.date_debut, site.date_fin, site._id)" />
+                <div v-if="form.showRestOfItem == true">
                   <BaseButton color="success" :icon="mdiFileExcel" small @click="exportxlx(site.zone)" />
                 </div>
-              </div>
-              <!-- <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteSite(site._id)" /> -->
-            </BaseButtons>
-
-          </td>
-        </tr>
+                <div v-else>
+                  <div>
+                    <BaseButton color="success" :icon="mdiFileExcel" small @click="exportxlx(site.zone)" />
+                  </div>
+                </div>
+                <!-- <BaseButton color="danger" :icon="mdiTrashCan" small @click="deleteSite(site._id)" /> -->
+              </BaseButtons>
+            </td>
+          </tr>
+        </template>
       </tbody>
     </table>
     <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">

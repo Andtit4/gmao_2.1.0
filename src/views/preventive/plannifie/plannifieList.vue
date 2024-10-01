@@ -318,6 +318,9 @@ const formatDate = (dateString) => {
   return formattedDateWithHours;
 }
 
+const sortedSites = computed(() => {
+  return sites.list.slice().sort((a, b) => new Date(b.date_debut) - new Date(a.date_debut));
+});
 
 onMounted(() => {
   // sitesByZone()
@@ -398,7 +401,7 @@ onMounted(() => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(site, index) in sites.list" :key="index">
+        <tr v-for="(site, index) in sortedSites" :key="index">
           <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
           <td class="border-b-0 lg:w-6 before:hidden">
             <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->

@@ -7,8 +7,6 @@ import CardBox from '@/components/CardBox.vue'
 import FormCheckRadio from '@/components/FormCheckRadio.vue'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import BaseButtons from '@/components/BaseButtons.vue'
 import LayoutGuest from '@/layouts/LayoutGuest.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
@@ -123,4 +121,3 @@ const submit = async () => {
     </SectionFullScreen>
   </LayoutGuest>
 </template>
-

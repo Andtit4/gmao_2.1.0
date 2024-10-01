@@ -50,17 +50,14 @@ const plannifications = reactive({ list: [] })
 
 const getUserInfo = async () => {
   form.currentEmail = localStorage.getItem('email')
+  console.log('\nEmail ', form.currentEmail)
   axios({
     url: apiService.getUrl() + '/intervenant/get/' + form.currentEmail,
     method: 'GET'
   }).then(async (res) => {
     form.currentZone = await res.data[0].zone;
-    console.log('Zone = ', form.currentZone);
-    if (form.isAdmin) {
-      getPlannification()
-    } else {
-      getPlannificationByZone(form.currentZone)
-    }
+    console.log('Responses: intervenant ', res.data);
+    getPlannificationByZone(form.currentZone)
   })
 }
 
@@ -76,7 +73,7 @@ const getPlannificationByZone = async (zone: string) => {
   })
 }
 
-const getPlannification = async () => {
+/* const getPlannification = async () => {
   axios({
     url: apiService.getUrl() + '/mission',
     method: 'GET'
@@ -86,7 +83,7 @@ const getPlannification = async () => {
   }).catch((err) => {
     console.log('An occured while getting plannifications ', err.message)
   })
-}
+} */
 
 const isModalActive = ref(false)
 const treatModal = ref(false)
@@ -208,6 +205,7 @@ const formatDate = (dateString) => {
 onMounted(() => {
   getTypeUser(),
     getUserInfo()
+    // getPlannificationByZone()
 })
 
 
@@ -312,7 +310,7 @@ onMounted(() => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(site, index) in plannifications.list" :key="index">
+        <tr v-for="(site, index) in plannifications.list.sort((a, b) => new Date(b.date_debut) - new Date(a.date_debut))" :key="index">
           <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
           <td class="border-b-0 lg:w-6 before:hidden">
             <!-- <UserAvatar :username="site.nom" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->

@@ -64,8 +64,13 @@ const getAllZone = () => {
     })
 }
 
+let isSubmitting = false; // Ajout d'un drapeau pour vérifier l'état de soumission
+
 const submit = () => {
-  const gen = generatePassword.generatePassword()
+  if (isSubmitting) return; // Si déjà en cours, sortir de la fonction
+  isSubmitting = true; // Définir le drapeau à vrai
+
+  const gen = generatePassword.generatePassword();
   // console.log(gen)
   axios({
     url: apiService.getUrl() + '/intervenant/create',
@@ -80,12 +85,14 @@ const submit = () => {
       telephone: form.telephone,
       type_utilisateur: form.type_utilisateur
     }
-  }).then((repsonse) => {
-    console.log('Success ' + repsonse)
+  }).then((response) => {
+    console.log('Success ' + response);
     setTimeout(() => {
-      location.reload()
-    }, 1000)
-  })
+      location.reload();
+    }, 1000);
+  }).finally(() => {
+    isSubmitting = false; // Réinitialiser le drapeau après la soumission
+  });
 }
 
 onMounted(() => {

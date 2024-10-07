@@ -102,7 +102,7 @@ const configOptions = [
   },
   {
     id: 6,
-    label: 'Config 7'
+    label: 'Config 6' // Correction de l'ID pour éviter les doublons
   },
   {
     id: 7,
@@ -121,8 +121,8 @@ const configOptions = [
     label: 'IBS-G1800'
   },
   {
-    id: 7,
-    label: 'sSmall Cell U2100'
+    id: 11, // Correction de l'ID pour éviter les doublons
+    label: 'Small Cell U2100'
   }
 ]
 const technologieOptions = [
@@ -266,31 +266,38 @@ const editSite = (id) => {
 }
 
 const editSave = (id) => {
-  axios({
-    url: apiService.getUrl() + '/site/' + id,
-    method: 'PUT',
-    data: {
-      site_id: form.site_id,
-      nom_site: form.nom_site,
-      longitude: form.longitude,
-      latitude: form.latitude,
-      zone: form.zone,
-      config_du_site: form.config_du_site.label,
-      technologie: form.technologie.label,
-      nombre_de_dependance: form.nombre_de_dependance,
-      classe_technique: form.classe_technique.label,
-      typologie_energie: form.typologie_energie.label,
-      ge: form.ge.label,
-      type_batterie: form.type_batterie,
-      nombre: form.nombre,
-      puissance_batteries: form.puissance_batteries
-    }
-  }).then((res) => {
-    console.log('site selected: ', res.data)
-    setTimeout(() => {
-      location.reload()
-    }, 1000)
-  })
+  // Vérification si le site a été modifié avant d'envoyer la requête PUT
+  if (form.nom_site && form.site_id) { // Ajout d'une vérification simple
+    axios({
+      url: apiService.getUrl() + '/site/' + id,
+      method: 'PUT',
+      data: {
+        site_id: form.site_id,
+        nom_site: form.nom_site,
+        longitude: form.longitude,
+        latitude: form.latitude,
+        zone: form.zone,
+        config_du_site: form.config_du_site.label,
+        technologie: form.technologie.label,
+        nombre_de_dependance: form.nombre_de_dependance,
+        classe_technique: form.classe_technique.label,
+        typologie_energie: form.typologie_energie.label,
+        ge: form.ge.label,
+        type_batterie: form.type_batterie,
+        nombre: form.nombre,
+        puissance_batteries: form.puissance_batteries
+      }
+    }).then((res) => {
+      console.log('site selected: ', res.data)
+      setTimeout(() => {
+        location.reload()
+      }, 1000)
+    }).catch((e) => {
+      console.log('An error occurred during update: ' + e) // Ajout d'un catch pour gérer les erreurs
+    })
+  } else {
+    console.log('Nom du site ou ID manquant.'); // Message d'erreur si les champs requis sont vides
+  }
 }
 
 const zones = reactive({ list: [] })
@@ -331,7 +338,7 @@ const searchZone = () => {
       sites.list = response.data
     })
     .catch((e) => {
-      console.log('An  ' + e)
+      console.log('An error occured ' + e)
     })
 }
 
@@ -345,7 +352,8 @@ onMounted(() => {
     <FormField label="Informations générale">
       <FormControl v-model="form.site_id" :value="siteSelected.site_id" placeholder="Site id" />
       <FormControl v-model="form.nom_site" placeholder="Nom site" />
-      <!-- <FormControl v-model="form.technologie" :options="technologieOptions" /> -->
+      <!-- Correction de l'option pour le champ technologie -->
+      <FormControl v-model="form.technologie" :options="technologieOptions" placeholder="Technologie" />
 
       <FormField label="Coordonnées">
         <FormControl v-model="form.longitude" placeholder="Longitude" />
@@ -359,13 +367,7 @@ onMounted(() => {
             {{ zone.nom }}
           </option>
         </select>
-        <!-- <select v-model="form.config_du_site" class="form-select bg-white dark:bg-slate-800">
-          <option value="">Séléctionnez la config du site</option>
-          <option v-for="(zone, index) in configOptions" :key="index" :value="configOptions">
-            {{ zone.label }}
-          </option>
-        </select> -->
-        <FormControl v-model="form.config_du_site" :options="configOptions.label" />
+        <FormControl v-model="form.config_du_site" :options="configOptions" placeholder="Configuration du site" />
       </FormField>
 
       <FormField label="">
@@ -456,7 +458,7 @@ onMounted(() => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(site, index) in sites.list" :key="index">
+        <tr v-for="(site, index) in sites.list.sort((a, b) => a.nom_site.localeCompare(b.nom_site))" :key="index">
           <TableCheckboxCell v-if="checkable" @checked="checked($event, site)" />
           <td class="border-b-0 lg:w-6 before:hidden">
             <!-- <UserAvatar :username="site.nom_site" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->

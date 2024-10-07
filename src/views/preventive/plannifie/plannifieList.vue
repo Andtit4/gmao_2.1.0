@@ -145,7 +145,7 @@ const sitesByZone = (zone) => {
     url: apiService.getUrl() + '/site/zone/search?zone=' + zone,
     method: 'GET'
   }).then((res) => {
-    siteDropDown.list = res.data
+    siteDropDown.list = res.data.sort((a, b) => a.nom_site.localeCompare(b.nom_site))
   })
 }
 

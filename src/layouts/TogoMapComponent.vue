@@ -39,8 +39,8 @@ const sitesTermines = ref(null)
 const sitesEnCours = ref(null)
 
 const initMap = async () => {
-  console.log("Initialisation de la carte...")
-  
+  // console.log("Initialisation de la carte...")
+
   try {
     [cardSiteList.value, cardSiteDoneList.value, cardWaitingList.value] = await Promise.all([
       fetchSites('/plannifie/nonfait/for-map'),
@@ -130,7 +130,7 @@ const searchSites = () => {
       icon = warningMarkerIcon
       layerGroup = sitesEnCours.value
     }
-    
+
     L.marker([site.latitude, site.longitude], { icon })
       .bindPopup(`
         <strong>${site.nom_site}</strong><br>

@@ -33,7 +33,10 @@ const sitesPlannifies = reactive({
   list: []
 })
 
-
+// Ajoutez cette fonction pour trier les missions
+const sortMissionsByDate = () => {
+  sitesPlannifies.list.sort((a, b) => new Date(b.date_debut) - new Date(a.date_debut));
+}
 
 // Fait
 const getAllSitePlannifie = () => {
@@ -41,8 +44,9 @@ const getAllSitePlannifie = () => {
     url: apiService.getUrl() + '/plannifie',
     method: 'GET'
   }).then((res) => {
-    sitesPlannifies.list = res.data
-  })
+    sitesPlannifies.list = res.data;
+    sortMissionsByDate(); // Trier après récupération
+  });
 }
 
 // Fait

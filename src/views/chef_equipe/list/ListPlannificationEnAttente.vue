@@ -55,7 +55,8 @@ const search = () => {
     url: apiService.getUrl() + '/plannifie/search/site/dyn?site=' + form.searchSite,
     method: 'GET'
   }).then((res) => {
-    sitesPlannifies.list = res.data
+    sitesPlannifies.list = res.data;
+    sortMissionsByDate(); // Trier après recherche
   })
 }
 
@@ -66,7 +67,8 @@ const searchEquipe = () => {
     url: apiService.getUrl() + '/plannifie/search/zone/dyn?zone=' + form.searchEquipe,
     method: 'GET'
   }).then((res) => {
-    sitesPlannifies.list = res.data
+    sitesPlannifies.list = res.data;
+    sortMissionsByDate(); // Trier après recherche
     console.log('Result ', res.data)
   }).catch((err) => {
     console.log('\nerror searching ', err.message)

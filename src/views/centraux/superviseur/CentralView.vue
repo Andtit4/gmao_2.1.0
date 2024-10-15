@@ -10,11 +10,17 @@ import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import zoneList from '@/views/centraux/superviseur/CentralList.vue'
+import EquipementCentralList from '@/views/centraux/superviseur/EquipementCentralList.vue'
+import SalleList from '@/views/centraux/superviseur/SalleList.vue'
+
+
 import apiService from '@/services/apiService'
 import axios from 'axios'
 import Stepper from '@/layouts/Stepper.vue'
+import TabBar from '@/components/TabBar.vue'
 import { mdiRefresh, mdiArrowUp } from '@mdi/js'
 import LoadingButton from '@/layouts/LoadingButton.vue'
+// const isLoading = ref(false)
 // import axios from 'axios'
 // import apiService from '@/services/apiService'
 
@@ -29,9 +35,21 @@ const form = reactive({
   date_debut: '',
   date_fin: '',
   errMessage: '',
+  referenceEquipement: '',
+  nomEquipement: '',
+  typeEquipement: '',
+  salleId: '',
+  nomSalle: '',
+  zoneSalle: '',
   showSucess: false,
   showErr: false,
   showAdd: true,
+  selectedTab: 'Equipement',
+  showAddEquipement: false,
+  showAddZone: false,
+  showAddPlanifByZone: false,
+  showAddPlanifByEquipement: false,
+  showAddSalle: false
 })
 
 const zones = reactive({ list: [] })
@@ -47,6 +65,20 @@ const getSites = async () => {
   sites.list = data.data
 }
 
+const getCentralZone = async () => {
+  axios({
+    url: apiService.getUrl() + '/zone/central',
+    method: 'GET'
+  }).then((res) => {
+    // console.log(res.data)
+    zones.list = res.data
+    // getEquipementForInterventionFunc(res.data.)
+  }).catch((err) => {
+    form.showErr = true;
+    form.errmessage = 'An error occured ' + err.message
+  })
+}
+
 const isLoading = ref(false);
 
 /* const loadData = () => {
@@ -58,31 +90,23 @@ const isLoading = ref(false);
       }, 2000);
     }; */
 
-const createZone = () => {
+const addZone = () => {
+  form.type = 'CENTRAL'
   isLoading.value = true;
   axios({
     url: apiService.getUrl() + '/zone',
     method: 'POST',
     data: {
-      nom: form.nom,
+      nom: form.zone,
       type: form.type
     }
   }).then((res) => {
     form.showSucess = true;
     isLoading.value = false;
+    location.reload()
     // editZone(res.data.insertId)
-    // console.log('\n---', res.data)
-    axios({
-      url: apiService.getUrl() + '/zone/' + res.data.insertId,
-      method: 'GET'
-    }).then(async (res) => {
-      isDetailModal.value = true
-      await getEquipementCentralList()
-      form.ajouter_par = localStorage.getItem('nom') + ' ' + localStorage.getItem('prenom')
-      console.log()
-      form.id_zone = res.data.insertId;
-      // isModalActive.value = true;
-    })
+    console.log('\n---', res.data)
+
 
   }).catch((err) => {
     form.showErr = true
@@ -109,10 +133,73 @@ const getEquipementCentralList = async () => {
 const state = reactive({
   steps: ['Step 1', 'Step 2', 'Step 3']
 });
+/* const equipements = reactive({
+  list: ['Atelier', 'Onduleur', 'Coffret AC', 'Coffret Ondulé', 'Coffret DC', 'Armoire TGBT', 'Climatiseurs', 'Système VRV', 'Splits cassettes', 'Monoblocs', 'Bancs de battéries', 'Sécurité incendie', 'Inverseurs', 'GE', 'Citernes', 'Eclairage']
+}) */
+
+const equipements = [
+  { id: 1, label: 'Atelier' },
+  { id: 2, label: 'Onduleur' },
+  { id: 3, label: 'Coffret AC' },
+  { id: 4, label: 'Coffret Ondulé' },
+  { id: 5, label: 'Coffret DC' },
+  { id: 6, label: 'Armoire TGBT' },
+  { id: 7, label: 'Climatiseurs' },
+  { id: 8, label: 'Système VRV' },
+  { id: 9, label: 'Splits cassettes' },
+  { id: 10, label: 'Monoblocs' },
+  { id: 11, label: 'Bancs de battéries' },
+  { id: 12, label: 'Sécurité incendie' },
+  { id: 13, label: 'Inverseurs' },
+  { id: 14, label: 'GE' },
+  { id: 15, label: 'Citernes' },
+  { id: 16, label: 'Eclairage' }
+
+
+]
 // steps: ['Step 1', 'Step 2', 'Step 3']
+const addEquipement = () => {
+  form.ajouter_par = localStorage.getItem('nom') + ' ' + localStorage.getItem('prenom')
+  axios({
+    url: apiService.getUrl() + '/equipement/central/',
+    method: 'POST',
+    data: {
+      reference: form.referenceEquipement,
+      nom: form.nomEquipement,
+      type: form.typeEquipement,
+      ajouter_par: form.ajouter_par
+    }
+  }).then((res) => {
+    console.log(res.insertId)
+    location.reload()
+  }).catch((err) => {
+    console.error(err.message)
+  })
+}
+
+const addSalle = () => {
+  isLoading.value = true;
+  axios({
+    url: apiService.getUrl() + '/salle',
+    method: 'POST',
+    data: {
+      salle_id: form.salleId,
+      nom: form.nomSalle,
+      zone: form.zoneSalle
+    }
+  }).then((res) => {
+    console.log(res.data)
+    location.reload()
+    isLoading.value = false
+  }).catch((err) => {
+    console.error(err.message)
+  })
+
+}
 
 onMounted(() => {
   getSites()
+  getCentralZone()
 })
 </script>
 
@@ -137,76 +224,130 @@ onMounted(() => {
 
   <LayoutAuthenticated>
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Zone" main>
+      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Intervention Centrale" main>
       </SectionTitleLineWithButton>
-      <Stepper :steps="state.steps">
-        <template v-slot:step-0>
-          <div>
-            <CardBox>
-
-              <FormField label="Informations générale">
-                <select v-model="form.nom" class="form-select bg-white dark:bg-slate-800">
-                  <option value="">Séléctionnez une zone</option>
-                  <option v-for="(site, index) in sites.list" :key="index" :value="site.nom_site">
-                    {{ site.nom_site }}
-                  </option>
-                </select>
-                <LoadingButton :buttonText="'Plannifer'" :isLoading="isLoading" @click="createZone()" />
-              </FormField>
-              <BaseDivider />
-            </CardBox>
+      <CardBox>
+        <TabBar :tabs="['Equipement', 'Zone', 'Planification', 'Salle']" v-model="form.selectedTab" />
+        {{ edit_1 }}
+        <div v-if="form.selectedTab === 'Equipement'">
+          <br>
+          <h2>Équipements</h2>
+          <br>
+          <BaseButton color="info" title="Actualiser" label="Ajouter"
+            @click="form.showAddEquipement = !form.showAddEquipement" />
+          <div v-if="form.showAddEquipement == true">
+            <FormField label="Informations générale">
+              <FormControl v-model="form.referenceEquipement" placeholder="Référence de l'équipement" />
+              <FormControl v-model="form.nomEquipement" placeholder="Nom de l'équipement" />
+              <select v-model="form.typeEquipement" class="form-select bg-white dark:bg-slate-800">
+                <option value="" disabled selected>Séléctionnez un équipement</option>
+                <option v-for="(equipement, index) in equipements" :key="index" :value="equipement.label">
+                  {{ equipement.label }}
+                </option>
+              </select>
+              <BaseButton color="info" label="Enregistrer" @click="addEquipement()" />
+            </FormField>
           </div>
-        </template>
-        <template v-slot:step-1>
-          <p>Zone : <strong>{{ oneZoneCentrale.list.nom }}</strong> </p>
-          <br />
-          <hr />
-          <br />
-          <div v-if="form.showAdd == true">
-            <BaseButton color="info" title="Actualiser" :icon="mdiRefresh" small @click="getEquipementCentralList()" />
-            <BaseButton color="info" title="Ajouter un équipement" :icon="mdiArrowUp" small
-              @click="form.showAdd = !form.showAdd" />
-            <select v-model="form.equipement" class="form-select bg-white dark:bg-slate-800">
-              <option value="">Séléctionnez une Equipement</option>
-              <option v-for="(equipement, index) in equipementCentralList.list" :key="index" :value="equipement._id">
+          <!-- Ajoutez ici le contenu pour la vue Équipement -->
+        </div>
+        {{ edit_2 }}
+        <div v-if="form.selectedTab === 'Zone'">
+          <br>
+          <h2>Zones</h2>
+          <br>
+          <BaseButton color="info" title="Actualiser" label="Ajouter" @click="form.showAddZone = !form.showAddZone" />
+          <div v-if="form.showAddZone == true">
+            <FormField label="Zone Centrale">
+              <FormControl v-model="form.zone" placeholder="Entrez le nom de la zone" />
+              <BaseButton color="info" label="Enregistrer" @click="addZone()" />
+            </FormField>
+          </div>
+          <!-- Ajoutez ici le contenu pour la vue Zone -->
+        </div>
+        {{ edit_3 }}
+        <div v-if="form.selectedTab === 'Planification'">
+          <h2>Planification par zone</h2>
+          <BaseButton color="info" title="Actualiser" label="Ajouter"
+            @click="form.showAddPlanifByZone = !form.showAddPlanifByZone" />
+          <div v-if="form.showAddPlanifByZone == true">
+            <FormField label="Intervention par zone">
+              <select v-model="form.typeEquipement" class="form-select bg-white dark:bg-slate-800">
+                <option value="" disabled selected>Séléctionnez un équipement</option>
+                <option v-for="(equipement, index) in equipements" :key="index" :value="equipement.label">
+                  {{ equipement.label }}
+                </option>
+              </select>
+              <FormField label="Date de Planification">
+                <FormControl type="date" />
+                <FormControl type="date" />
+              </FormField>
+              <BaseButton color="info" label="Enregistrer" @click="addEquipement()" />
+            </FormField>
+          </div>
+          <br>
+          <br>
+          <h2>Planification par équipement</h2>
+          <BaseButton color="info" title="Actualiser" label="Ajouter"
+            @click="form.showAddPlanifByEquipement = !form.showAddPlanifByEquipement" />
+          <br>
+          <div v-if="form.showAddPlanifByEquipement == true">
+            <FormField label="Intervention par Equipement">
+              <select v-model="form.typeEquipement" class="form-select bg-white dark:bg-slate-800">
+                <option value="" disabled selected>Séléctionnez un équipement</option>
+                <option v-for="(equipement, index) in equipements" :key="index" :value="equipement.label">
+                  {{ equipement.label }}
+                </option>
+              </select>
+              <select v-model="form.typeEquipement" class="form-select bg-white dark:bg-slate-800">
+                <option value="" disabled selected>Séléctionnez un équipement</option>
+                <option v-for="(equipement, index) in equipements" :key="index" :value="equipement.label">
+                  {{ equipement.label }}
+                </option>
+              </select>
+              <FormField label="Date de Planification">
+                <FormControl type="date" />
+                <FormControl type="date" />
+              </FormField>
+              <BaseButton color="info" label="Enregistrer" @click="addEquipement()" />
+            </FormField>
+          </div>
+          <!-- Ajoutez ici le contenu pour la vue Intervention -->
+        </div>
+        {{ edit_4 }}
+        <div v-if="form.selectedTab === 'Salle'">
+          <!-- Ajoutez ici le contenu pour la vue Intervention -->
+          <FormField label="Ajout des salles">
+            <FormControl type="text" v-model="form.salleId" placeholder="Salle Id" />
+            <FormControl type="text" v-model="form.nomSalle" placeholder="Nom de la salle" />
+            <select v-model="form.zoneSalle" class="form-select bg-white dark:bg-slate-800">
+              <option value="" disabled selected>Séléctionnez une zone</option>
+              <option v-for="(equipement, index) in zones.list" :key="index" :value="equipement.nom">
                 {{ equipement.nom }}
               </option>
             </select>
-          </div>
-
-          <div v-else>
-            <BaseButton color="info" title="Actualiser" :icon="mdiRefresh" small @click="getEquipementCentralList()" />
-            <BaseButton color="info" title="Ajouter un équipement" :icon="mdiPlus" small
-              @click="form.showAdd = !form.showAdd" />
-            <select v-model="form.equipement" class="form-select bg-white dark:bg-slate-800">
-              <option value="">Séléctionnez une Equipement</option>
-              <option v-for="(equipement, index) in equipementCentralList.list" :key="index" :value="equipement._id">
-                {{ equipement._id }} | {{ equipement.nom }} | {{ equipement.zone }}
-              </option>
-            </select>
-          </div>
-
-          <div v-if="form.showAdd == true">
-            <FormField label="Informations générale">
-              <FormControl v-model="form.nom_equipement" placeholder="Nom de l'équipement" />
-              <FormControl v-model="form.frequence" placeholder="Fréquence de maintenance" />
-              <BaseButton color="info" label="Enregistrer l'équipement" @click="addEquipement()" />
-            </FormField>
-          </div>
-          <p>Utilisateur : {{ form.ajouter_par }}</p>
-          <BaseButton color="info" title="Actualiser" label="Enregistrer l'intervention" @click="addIntervention()" />
-        </template>
-        <template v-slot:step-2>
-          <div>Content for Step 3</div>
-        </template>
-      </Stepper>
-      <CardBox>
+            <LoadingButton :button-text="'Enregistrer'" :is-loading="isLoading" @click="addSalle()" />
+          </FormField>
+        </div>
       </CardBox>
+
+
+
     </SectionMain>
 
     <SectionMain>
       <CardBox has-table>
-        <zoneList />
+        <div v-if="form.selectedTab === 'Equipement'">
+          <EquipementCentralList />
+        </div>
+        <div v-if="form.selectedTab === 'Zone'">
+          <zoneList />
+        </div>
+        <div v-if="form.selectedTab === 'Planification'">
+          <zoneList />
+        </div>
+        <div v-if="form.selectedTab === 'Salle'">
+          <SalleList />
+        </div>
       </CardBox>
     </SectionMain>
   </LayoutAuthenticated>

@@ -57,18 +57,6 @@ const getCentralZone = async () => {
 
 const zoneCentralPlanned = reactive({ list: [] })
 const getCentralZonePlanned = async () => {
-  /* axios({
-    url: apiService.getUrl() + '/zone/plannifie/central',
-    method: 'GET'
-  }).then(async (res) => {
-    zoneCentralPlanned.list = await res.data
-    console.log(zoneCentralPlanned.list)
-    // getEquipementForInterventionFunc(res.data.)
-  }).catch((err) => {
-    form.showErr = true;
-    form.errmessage = 'An error occured ' + err.message
-  }) */
-
   try {
     const response = await axios({
       url: apiService.getUrl() + '/zone/plannifie/central',
@@ -252,11 +240,11 @@ const createPlannif = () => {
   })
 }
 
-const equipementByTyupe = reactive({ list: []})
+const equipementByTyupe = reactive({ list: [] })
 const searchEquipementByType = () => {
   // console.log(apiService.getUrl() + '/equipement/central/' + form.type_equipement)
   axios({
-    url: apiService.getUrl() + '/equipement/central/search/' + form.type_equipement + '/'+ form.zone_name,
+    url: apiService.getUrl() + '/equipement/central/search/' + form.type_equipement + '/' + form.zone_name,
     method: 'GET'
   }).then((res) => {
     console.log('Search get ', res.data)
@@ -267,8 +255,18 @@ const searchEquipementByType = () => {
   })
 }
 
-const addSalle = () => {
-  
+const deleteZone = (_id) => {
+  axios({
+    url: apiService.getUrl() + '/zone/' + _id,
+    method: 'DELETE',
+   
+  }).then((res) => {
+    isShowPlannifModal.value = false
+    console.log(res.data)
+    location.reload()
+  }).catch((err) => {
+    console.error(err.message)
+  } )
 }
 
 
@@ -281,49 +279,18 @@ onMounted(() => {
 
 <template>
   <p style="padding: 10px">{{ zoneCentrale.list.length }} Zones</p>
-  <CardBoxModal v-model="isShowPlannifModal" title="Plannifier">
-    <BaseButton color="info" title="Actualiser" :icon="mdiRefresh" small @click="searchEquipementByType()" />
+  <CardBoxModal v-model="isShowPlannifModal" title="Supprimer">
+    <!-- <BaseButton color="info" title="Actualiser" :icon="mdiRefresh" small @click="searchEquipementByType()" /> -->
     - Zone {{ form.zone_name }}
-    <FormField label="Plannification">
-      <select v-model="form.type_equipement" class="form-select bg-white dark:bg-slate-800"
-        @click="searchEquipementByType()">
-        <option value="">Type d'équipement</option>
-        <option value="Climmatiseur">CLIMMATISEUR</option>
-      </select>
-      {{ equipementByTyupe.list.length }} {{ form.type_equipement }}
-      <table>
-        <thead>
-          <tr>
-            <th v-if="checkable" />
-            <th />
-            <th>Equipement</th>
-            <th>Zone</th>
-            <th>0/0</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(equipement, index) in equipementByTyupe.list" :key="index">
-            <TableCheckboxCell v-if="checkable" @checked="checked($event, zone)" />
-            <td data-label="id">
-              {{ equipement._id }}
-            </td>
-            <td data-label="Equipement">
-              {{ equipement.nom }}
-            </td>
-            <td data-label="Date fin">
-              {{ equipement.zone }}
-            </td>
-            <td class="before:hidden lg:w-1 whitespace-nowrap">
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <FormControl v-model="form.quota" placeholder="Quota" type="number" />
-      <FormControl v-model="form.date_debut" placeholder="Début" type="date" />
-      <FormControl v-model="form.date_fin" placeholder="Fin" type="date" />
-      <BaseButton color="info" label="Enregistrer" @click="createPlannif()" />
-    </FormField>
+    <br>
+    <p>Veillez confirmez la suppression</p>
+    <br>
+    <p>
+      <BaseButtons>
+        <BaseButton color="danger" label="Confirmer" small @click="deleteZone(form.zone_name)" />
+        <BaseButton color="transparent" label="Annuler" small @click="isShowPlannifModal = false" />
+      </BaseButtons>
+    </p>
   </CardBoxModal>
   <CardBoxModal v-model="isShowDetailActive" title="Détails">
     <p>{{ form.zone_name }}</p>
@@ -361,9 +328,7 @@ onMounted(() => {
     </div>
   </CardBoxModal>
   <CardBoxModal v-model="isModalActive" title="Equipements">
-    <BaseButton color="info" title="Actualiser" :icon="mdiRefresh" small @click="getEquipementCentralList()" />
-    <BaseButton color="info" title="Ajouter un équipement" :icon="mdiPlus" small
-      @click="form.showAdd = !form.showAdd" />
+
     <p>Zone : <strong>{{ oneZoneCentrale.list.nom }}</strong> </p>
     <table>
       <thead>
@@ -434,10 +399,10 @@ onMounted(() => {
 
           <td class="before:hidden lg:w-1 whitespace-nowrap">
             <BaseButtons type="justify-start lg:justify-end" no-wrap>
-              <BaseButton color="success" :icon="mdiTools" small @click="editZone(zone._id)" />
+<!--               <BaseButton color="success" :icon="mdiTools" small @click="editZone(zone._id)" />
               <BaseButton color="info" :icon="mdiEye" small @click="showDetails(zone.nom)" />
-              <BaseButton color="" :icon="mdiHome" small @click="addSalle()" />
-              <BaseButton color="warning" :icon="mdiCalendar" small @click="addPlannif(zone.nom)" />
+              <BaseButton color="" :icon="mdiHome" small @click="addSalle()" /> -->
+              <BaseButton color="danger" :icon="mdiTrashCan" small @click="addPlannif(zone._id)" />
             </BaseButtons>
           </td>
         </tr>
@@ -455,3 +420,4 @@ onMounted(() => {
     </BaseLevel>
   </div>
 </template>
+

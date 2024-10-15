@@ -4,14 +4,14 @@ import Home from '@/views/HomeView.vue'
 import Login from '@/views/LoginView.vue'
 import Zone from '@/views/sites/zone/zone.vue'
 import Site from '@/views/sites/sitesView.vue'
-import Intervenant from "@/views/intervenant/IntervenantView.vue"
+import Intervenant from '@/views/intervenant/IntervenantView.vue'
 import IntervenantList from '@/views/intervenant/intervenantList.vue'
 import Equipement from '@/views/equipement/equipementView.vue'
 import EquipementList from '@/views/equipement/equipementList.vue'
 import HistoriqueEquipement from '@/views/equipement/historique/historiqueEquipement.vue'
 import SortiEquipement from '@/views/equipement/sortis/sortiView.vue'
 import ArticleView from '@/views/equipement/article/articleView.vue'
-import SiteList from '@/views/sites/list.vue';
+import SiteList from '@/views/sites/list.vue'
 import ClassiqueView from '@/views/preventive/classique/ClassiqueView.vue'
 import PlanifieView from '@/views/preventive/plannifie/plannifieView.vue'
 import PlanifieList from '@/views/preventive/plannifie/list.vue'
@@ -23,11 +23,12 @@ import CentralView from '@/views/centraux/superviseur/CentralView.vue'
 import CentralList from '@/views/centraux/superviseur/CentralList.vue'
 import RefuelingView from '@/views/Refuelings/Refueling.vue'
 import RefuelingViewForUser from '@/views/Refuelings/User/Refueling.vue'
+import DashboardCentraux from '@/views/centraux/Dashboard.vue'
 
 const routes = [
   {
     path: '/:catchAll(.*)',
-    component: NotFound,
+    component: NotFound
   },
   {
     meta: {
@@ -36,7 +37,8 @@ const routes = [
     path: '/',
     name: 'Login',
     component: Login
-  }, {
+  },
+  {
     meta: {
       title: 'Zone Central',
       requiresAuth: true
@@ -74,8 +76,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'Liste'
-      , requiresAuth: true
+      title: 'Liste',
+      requiresAuth: true
     },
     path: '/plannification/site/:type/:pass',
     name: 'ListePlannificationSite',
@@ -90,12 +92,12 @@ const routes = [
     },
     path: '/dashboard/:type/:pass',
     name: 'Dashboard',
-    component: Home,
+    component: Home
   },
   {
     meta: {
-      title: 'Sites'
-      , requiresAuth: true
+      title: 'Sites',
+      requiresAuth: true
     },
     path: '/site/:type/:pass',
     name: 'sites',
@@ -103,8 +105,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'Zones'
-      , requiresAuth: true
+      title: 'Zones',
+      requiresAuth: true
     },
     path: '/zone/:type/:pass',
     name: 'zone',
@@ -112,8 +114,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'Sites'
-      , requiresAuth: true
+      title: 'Sites',
+      requiresAuth: true
     },
     path: '/site/list/:type/:pass',
     name: 'List',
@@ -121,8 +123,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'Intervenants'
-      , requiresAuth: true
+      title: 'Intervenants',
+      requiresAuth: true
     },
     path: '/intervenant/:type/:pass',
     name: 'intervenant',
@@ -130,8 +132,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'Intervenants'
-      , requiresAuth: true
+      title: 'Intervenants',
+      requiresAuth: true
     },
     path: '/intervenant/list/:type/:pass',
     name: 'intervenants',
@@ -139,8 +141,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'Equipements'
-      , requiresAuth: true
+      title: 'Equipements',
+      requiresAuth: true
     },
     path: '/equipement/:type/:pass',
     name: 'equipement',
@@ -148,8 +150,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'Equipements'
-      , requiresAuth: true
+      title: 'Equipements',
+      requiresAuth: true
     },
     path: '/equipement/list/:type/:pass',
     name: 'equipement list',
@@ -157,8 +159,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'Articles'
-      , requiresAuth: true
+      title: 'Articles',
+      requiresAuth: true
     },
     path: '/article/:type/:pass',
     name: 'article',
@@ -166,8 +168,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'Historiques'
-      , requiresAuth: true
+      title: 'Historiques',
+      requiresAuth: true
     },
     path: '/historique/:type/:pass',
     name: 'historique list',
@@ -175,8 +177,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'Sortie'
-      , requiresAuth: true
+      title: 'Sortie',
+      requiresAuth: true
     },
     path: '/sorti/:type/:pass',
     name: 'sorti list',
@@ -185,8 +187,8 @@ const routes = [
 
   {
     meta: {
-      title: 'MP'
-      , requiresAuth: true
+      title: 'MP',
+      requiresAuth: true
     },
     path: '/preventive/classique/:type/:pass',
     name: 'preventiveClassique',
@@ -194,8 +196,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'PLANNIFIE'
-      , requiresAuth: true
+      title: 'PLANNIFIE',
+      requiresAuth: true
     },
     path: '/preventive/plannifie/:type/:pass',
     name: 'plannifie',
@@ -203,8 +205,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'PLANNIFICATION'
-      , requiresAuth: true
+      title: 'PLANNIFICATION',
+      requiresAuth: true
     },
     path: '/preventive/plannification/:type/:pass',
     name: 'plannifications',
@@ -212,16 +214,22 @@ const routes = [
   },
   {
     meta: {
-      title: 'Profile'
-      , requiresAuth: true
+      title: 'DASHBOARD',
+      requiresAuth: true
+    },
+    path: '/dashboard/centraux/:type/:pass',
+    name: 'dashboard_centraux',
+    component: DashboardCentraux
+  },
+  {
+    meta: {
+      title: 'Profile',
+      requiresAuth: true
     },
     path: '/profile',
     name: 'profile',
     component: () => import('@/views/ProfileView.vue')
-  },
-
-
-
+  }
 ]
 
 const router = createRouter({
@@ -234,18 +242,18 @@ const router = createRouter({
 
 // Guard de navigation global
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
     // Vérifier l'authentification de l'utilisateur
     const token = localStorage.getItem('token')
     if (!token) {
       // Rediriger vers la page de connexion si non authentifié
-      next('/');
+      next('/')
     } else {
-      next();
+      next()
     }
   } else {
-    next();
+    next()
   }
-});
+})
 
 export default router

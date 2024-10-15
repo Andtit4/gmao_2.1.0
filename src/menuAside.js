@@ -1,11 +1,4 @@
-import {
-  mdiMonitor,
-  mdiLock,
-  mdiTable,
-  mdiViewList,
-  mdiOil,
-  mdiPlus
-} from '@mdi/js'
+import { mdiMonitor, mdiLock, mdiTable, mdiViewList, mdiOil, mdiPlus } from '@mdi/js'
 
 let type = localStorage.getItem('type')
 let pass = localStorage.getItem('pass')
@@ -29,41 +22,39 @@ if (type == 'superviseur') {
         {
           label: 'Plannifications',
           to: '/preventive/plannification/' + type + '/' + pass
-        },
-
+        }
       ]
     },
     {
-          label: 'Refueling',
-          icon: mdiOil,
-          menu: [
-            {
-              icon: mdiPlus,
-              label: 'Add - List',
-              to: '/refueling/' + type + '/' + pass
-            }
-          ]
+      label: 'Refueling',
+      icon: mdiOil,
+      menu: [
+        {
+          icon: mdiPlus,
+          label: 'Add - List',
+          to: '/refueling/' + type + '/' + pass
         }
+      ]
+    }
   ]
-} else if (type == "chef_equipe") {
+} else if (type == 'chef_equipe') {
   data = [
     {
       to: '/dashboard/' + type + '/' + pass,
       icon: mdiMonitor,
       label: 'Dashboard'
-    },  {
+    },
+    {
       label: 'Plannif.',
       icon: mdiLock,
-      to: '/traiter/' + type + '/' + pass,
+      to: '/traiter/' + type + '/' + pass
     },
     {
       label: 'Refueling',
       icon: mdiOil,
       to: '/refueling/user/' + type + '/' + pass
-    },
-
+    }
   ]
-
 } else {
   data = [
     {
@@ -119,7 +110,7 @@ if (type == 'superviseur') {
         {
           label: 'Mouvements',
           to: '/article/' + type + '/' + pass
-        },
+        }
       ]
     },
     {
@@ -138,13 +129,16 @@ if (type == 'superviseur') {
           label: 'Plannifications',
           to: '/preventive/plannification/' + type + '/' + pass
         }
-
       ]
     },
     {
       label: 'Centraux',
       icon: mdiMonitor,
       menu: [
+        {
+          label: 'Dashboard',
+          to: '/dashboard/centraux/' + type + '/' + pass
+        },
         {
           label: 'Central',
           to: '/central/' + type + '/' + pass

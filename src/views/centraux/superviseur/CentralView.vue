@@ -12,6 +12,7 @@ import BaseButton from '@/components/BaseButton.vue'
 import zoneList from '@/views/centraux/superviseur/CentralList.vue'
 import EquipementCentralList from '@/views/centraux/superviseur/EquipementCentralList.vue'
 import SalleList from '@/views/centraux/superviseur/SalleList.vue'
+import PlannificationList from '@/views/centraux/superviseur/PlannificationList.vue'
 
 
 import apiService from '@/services/apiService'
@@ -41,6 +42,9 @@ const form = reactive({
   salleId: '',
   nomSalle: '',
   zoneSalle: '',
+  dateDebut: '',
+  dateFin: '',
+  zoneForInterventionCentral: '',
   showSucess: false,
   showErr: false,
   showAdd: true,
@@ -197,6 +201,50 @@ const addSalle = () => {
 
 }
 
+const addInterventionByZone = () => {
+  isLoading.value = true;
+  form.ajouter_par = localStorage.getItem('nom') + ' ' + localStorage.getItem('prenom')
+  axios({
+    url: apiService.getLocal() + '/plannif/central',
+    method: 'POST',
+    data: {
+      zone: form.zoneForInterventionCentral,
+      date_debut: form.dateDebut,
+      date_fin: form.dateFin,
+      equipement: '',
+      ajouter_par: form.ajouter_par
+    }
+  }).then((res) => {
+    console.log(res.data)
+    location.reload()
+    isLoading.value = false
+  }).catch((err) => {
+    console.error(err.message)
+  })
+}
+
+const addInterventionByEquipement = () => {
+  isLoading.value = true;
+  form.ajouter_par = localStorage.getItem('nom') + ' ' + localStorage.getItem('prenom')
+  axios({
+    url: apiService.getLocal() + '/plannif/central',
+    method: 'POST',
+    data: {
+      zone: form.zoneForInterventionCentral,
+      date_debut: form.dateDebut,
+      date_fin: form.dateFin,
+      equipement: form.typeEquipement,
+      ajouter_par: form.ajouter_par
+    }
+  }).then((res) => {
+    console.log(res.data)
+    location.reload()
+    isLoading.value = false
+  }).catch((err) => {
+    console.error(err.message)
+  })
+}
+
 onMounted(() => {
   getSites()
   getCentralZone()
@@ -227,7 +275,7 @@ onMounted(() => {
       <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Intervention Centrale" main>
       </SectionTitleLineWithButton>
       <CardBox>
-        <TabBar :tabs="['Equipement', 'Zone', 'Planification', 'Salle']" v-model="form.selectedTab" />
+        <TabBar v-model="form.selectedTab" :tabs="['Equipement', 'Zone', 'Planification', 'Salle']" />
         {{ edit_1 }}
         <div v-if="form.selectedTab === 'Equipement'">
           <br>
@@ -271,17 +319,17 @@ onMounted(() => {
             @click="form.showAddPlanifByZone = !form.showAddPlanifByZone" />
           <div v-if="form.showAddPlanifByZone == true">
             <FormField label="Intervention par zone">
-              <select v-model="form.typeEquipement" class="form-select bg-white dark:bg-slate-800">
-                <option value="" disabled selected>Séléctionnez un équipement</option>
-                <option v-for="(equipement, index) in equipements" :key="index" :value="equipement.label">
-                  {{ equipement.label }}
+              <select v-model="form.zoneForInterventionCentral" class="form-select bg-white dark:bg-slate-800">
+                <option value="" disabled selected>Séléctionnez une zone</option>
+                <option v-for="(equipement, index) in zones.list" :key="index" :value="equipement.nom">
+                  {{ equipement.nom }}
                 </option>
               </select>
               <FormField label="Date de Planification">
-                <FormControl type="date" />
-                <FormControl type="date" />
+                <FormControl v-model="form.dateDebut" type="date" />
+                <FormControl v-model="form.dateFin" type="date" />
               </FormField>
-              <BaseButton color="info" label="Enregistrer" @click="addEquipement()" />
+              <LoadingButton :button-text="'Enregistrer'" :is-loading="isLoading" @click="addInterventionByZone()" />
             </FormField>
           </div>
           <br>
@@ -292,10 +340,10 @@ onMounted(() => {
           <br>
           <div v-if="form.showAddPlanifByEquipement == true">
             <FormField label="Intervention par Equipement">
-              <select v-model="form.typeEquipement" class="form-select bg-white dark:bg-slate-800">
-                <option value="" disabled selected>Séléctionnez un équipement</option>
-                <option v-for="(equipement, index) in equipements" :key="index" :value="equipement.label">
-                  {{ equipement.label }}
+              <select v-model="form.zoneForInterventionCentral" class="form-select bg-white dark:bg-slate-800">
+                <option value="" disabled selected>Séléctionnez une zone</option>
+                <option v-for="(equipement, index) in zones.list" :key="index" :value="equipement.nom">
+                  {{ equipement.nom }}
                 </option>
               </select>
               <select v-model="form.typeEquipement" class="form-select bg-white dark:bg-slate-800">
@@ -305,10 +353,10 @@ onMounted(() => {
                 </option>
               </select>
               <FormField label="Date de Planification">
-                <FormControl type="date" />
-                <FormControl type="date" />
+                <FormControl v-model="form.dateDebut" type="date" />
+                <FormControl v-model="form.dateFin" type="date" />
               </FormField>
-              <BaseButton color="info" label="Enregistrer" @click="addEquipement()" />
+              <BaseButton color="info" label="Enregistrer" @click="addInterventionByEquipement()" />
             </FormField>
           </div>
           <!-- Ajoutez ici le contenu pour la vue Intervention -->
@@ -317,8 +365,8 @@ onMounted(() => {
         <div v-if="form.selectedTab === 'Salle'">
           <!-- Ajoutez ici le contenu pour la vue Intervention -->
           <FormField label="Ajout des salles">
-            <FormControl type="text" v-model="form.salleId" placeholder="Salle Id" />
-            <FormControl type="text" v-model="form.nomSalle" placeholder="Nom de la salle" />
+            <FormControl v-model="form.salleId" type="text" placeholder="Salle Id" />
+            <FormControl v-model="form.nomSalle" type="text" placeholder="Nom de la salle" />
             <select v-model="form.zoneSalle" class="form-select bg-white dark:bg-slate-800">
               <option value="" disabled selected>Séléctionnez une zone</option>
               <option v-for="(equipement, index) in zones.list" :key="index" :value="equipement.nom">
@@ -343,7 +391,7 @@ onMounted(() => {
           <zoneList />
         </div>
         <div v-if="form.selectedTab === 'Planification'">
-          <zoneList />
+          <PlannificationList />
         </div>
         <div v-if="form.selectedTab === 'Salle'">
           <SalleList />

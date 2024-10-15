@@ -95,7 +95,7 @@ const getCentralZonePlanned = async () => {
 const getEquipementCentralList = async () => {
     try {
         const res = await axios({
-            url: apiService.getLocal() + '/plannif/central',
+            url: apiService.getUrl() + '/plannif/central',
             method: 'GET'
         });
         console.log('Equipement GET', form.zone_name);
@@ -280,7 +280,7 @@ const formatDate = (dateString) => {
 
 const deleteSalle = (_id) => {
     axios({
-        url: apiService.getLocal() + '/plannif/central/' + _id,
+        url: apiService.getUrl() + '/plannif/central/' + _id,
         method: 'DELETE'
     }).then((res) => {
         console.log(res.data)

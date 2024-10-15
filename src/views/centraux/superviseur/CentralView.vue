@@ -205,7 +205,7 @@ const addInterventionByZone = () => {
   isLoading.value = true;
   form.ajouter_par = localStorage.getItem('nom') + ' ' + localStorage.getItem('prenom')
   axios({
-    url: apiService.getLocal() + '/plannif/central',
+    url: apiService.getUrl() + '/plannif/central',
     method: 'POST',
     data: {
       zone: form.zoneForInterventionCentral,
@@ -227,7 +227,7 @@ const addInterventionByEquipement = () => {
   isLoading.value = true;
   form.ajouter_par = localStorage.getItem('nom') + ' ' + localStorage.getItem('prenom')
   axios({
-    url: apiService.getLocal() + '/plannif/central',
+    url: apiService.getUrl() + '/plannif/central',
     method: 'POST',
     data: {
       zone: form.zoneForInterventionCentral,

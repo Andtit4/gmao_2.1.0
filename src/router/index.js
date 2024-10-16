@@ -23,7 +23,7 @@ import CentralView from '@/views/centraux/superviseur/CentralView.vue'
 import CentralList from '@/views/centraux/superviseur/CentralList.vue'
 import RefuelingView from '@/views/Refuelings/Refueling.vue'
 import RefuelingViewForUser from '@/views/Refuelings/User/Refueling.vue'
-import DashboardCentraux from '@/views/centraux/Dashboard.vue'
+import DashboardCentraux from '@/views/centraux/DashboardView.vue'
 
 const routes = [
   {

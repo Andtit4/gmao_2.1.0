@@ -254,7 +254,7 @@ onMounted(() => {
 <template>
   <div v-if="form.showSucess == true">
     <NotificationBar color="success" :icon="mdiInformation" :outline="notificationsOutline">
-      <b>Plannification initialisée</b>. <i>Passez au suivant👉​</i>
+      <b>Plannification initialisée</b>. <i>Passez au suivant👉 </i>
     </NotificationBar>
   </div>
   /* <CardBoxModal v-model="isDetailModal" title="Initialisation">

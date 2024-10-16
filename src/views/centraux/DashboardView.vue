@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { mdiChartTimelineVariant, mdiReload, mdiChartPie, mdiFileExcel, mdiSitemap, mdiTools, mdiOil } from '@mdi/js'
+import { ref, onMounted, reactive } from 'vue'
+import { mdiChartTimelineVariant, mdiReload, mdiChartPie, mdiFileExcel, mdiSitemap } from '@mdi/js'
 import * as chartConfig from '@/components/Charts/chart.config.js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBoxWidget from '@/components/CardBoxWidget.vue'
@@ -11,13 +11,14 @@ import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.
 import axios from 'axios'
 import apiService from '@/services/apiService'
 import { refreshPageOnceWithDelay, getStartAndEndOfWeek } from '@/services/document'
-import TogoMap from '@/layouts/TogoMapComponent.vue'
+// import TogoMap from '@/layouts/TogoMapComponent.vue'
 import * as XLSX from 'xlsx'
-import CardZoneGrid from '@/views/CardZoneGrid.vue'
-import TimeLine from '@/layouts/TimeLine.vue'
+/* import CardZoneGrid from '@/views/CardZoneGrid.vue'
+import TimeLine from '@/layouts/TimeLine.vue' */
+
 
 const chartData = ref(null)
-const events = ref([])
+// const events = ref([])
 const sitesWeeklyPlan = ref([])
 
 const form = ref({
@@ -32,7 +33,12 @@ const form = ref({
   progession: 0,
   week: '',
   formattedEndOfWeek: '',
-  formattedStartOfWeek: ''
+  formattedStartOfWeek: '',
+
+  nbZone: 0,
+  nbEquipementsCentraux: 0,
+  nbSalle: 0,
+  nbPlanification: 0
 })
 
 const initDate = () => {
@@ -48,50 +54,38 @@ const fillChartData = () => {
 const weekNumber = () => {
   form.value.week = 'Semaine W' + apiService.getWeekNumber(Date.now())
 }
+const zones = reactive({ list: [] })
+const equipementCentraux = reactive({ list: [] })
+const salleList = reactive({ list: [] })
+const plannificationList = reactive({ list: [] })
 
 const fetchData = async () => {
   try {
     console.log('Début de fetchData')
-    const [allSites, doneSites, nonFaitSites, faitSemaine, encours, sitePlannifie, siteNonFait, weeklyPlan, shareData] = await Promise.all([
-      axios.get(`${apiService.getUrl()}/site/all/nb`),
-      axios.get(`${apiService.getUrl()}/plannifie/done/nb`),
-      axios.get(`${apiService.getUrl()}/plannifie/nonfait/nb`),
-      axios.get(`${apiService.getUrl()}/plannifie/done/week/nb/${form.value.formattedStartOfWeek}/${form.value.formattedEndOfWeek}`),
-      axios.get(`${apiService.getUrl()}/plannifie/encours/week/nb/${form.value.formattedStartOfWeek}/${form.value.formattedEndOfWeek}`),
-      axios.get(`${apiService.getUrl()}/plannifie/week/nb/${form.value.formattedStartOfWeek}/${form.value.formattedEndOfWeek}`),
-      axios.get(`${apiService.getUrl()}/plannifie/nonfait/week/nb/${form.value.formattedStartOfWeek}/${form.value.formattedEndOfWeek}`),
-      axios.get(`${apiService.getUrl()}/plannifie/week/${form.value.formattedStartOfWeek}/${form.value.formattedEndOfWeek}`),
-      // axios.get(`${apiService.getUrl()}/share`)
-    ])
+    const urls = [
+      '/zone/central',
+      '/equipement/central',
+      '/salle',
+      '/plannif/central'
+    ];
 
-    console.log('Données récupérées:', { allSites, doneSites, nonFaitSites, faitSemaine, encours, sitePlannifie, siteNonFait, weeklyPlan, shareData })
+    const [zonesRes, equipementsRes, sallesRes, planificationsRes] = await Promise.all(
+      urls.map(url => axios.get(apiService.getUrl() + url))
+    );
 
-    form.value.nbAllSite = parseInt(allSites.data[0].nb) || 0
-    form.value.nbTotalFait = parseInt(doneSites.data[0].nb) || 0
-    form.value.nbSiteTotalNonFait = parseInt(nonFaitSites.data[0].nb) || 0
-    form.value.nbFait = parseInt(faitSemaine.data[0].nb) || 0
-    form.value.nbEncours = parseInt(encours.data[0].nb) || 0
-    form.value.nbSitePlannifie = parseInt(sitePlannifie.data[0].nb) || 0
-    form.value.nbSiteNonFait = parseInt(siteNonFait.data[0].nb) || 0
-    sitesWeeklyPlan.value = weeklyPlan.data
-    // events.value = shareData.data
+    // Assignation des données
+    zones.list = zonesRes.data
+    equipementCentraux.list = equipementsRes.data
+    salleList.list = sallesRes.data
+    plannificationList.list = planificationsRes.data
 
-    // Calcul des sites restants
-    form.value.sitesRestants = Math.max(0, form.value.nbAllSite - form.value.nbTotalFait)
-
-    // Calcul de la progression
-    if (form.value.nbAllSite > 0) {
-      form.value.progession = Math.min(100, Math.ceil((form.value.nbTotalFait * 100) / form.value.nbAllSite))
-    } else {
-      form.value.progession = 0
-    }
-
-    console.log('Données mises à jour:', form.value)
-  } catch (error) {
-    console.error('Erreur lors de la récupération des données:', error)
-    if (error.response) {
-      console.error('Réponse d\'erreur:', error.response.data)
-    }
+    // Mise à jour des compteurs
+    form.value.nbZone = zones.list.length
+    form.value.nbEquipementsCentraux = equipementCentraux.list.length
+    form.value.nbSalle = salleList.list.length
+    form.value.nbPlanification = plannificationList.list.length
+  } catch (err) {
+    console.error('Erreur lors de la récupération des données:', err.message)
   }
 }
 
@@ -139,17 +133,16 @@ onMounted(async () => {
       </SectionTitleLineWithButton>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-4 mb-6">
-        <CardBoxWidget color="text-info-500" :icon="mdiChartTimelineVariant" :number="form.nbSitePlannifie"
-          label="Sites prévus" />
-        <CardBoxWidget color="text-emerald-500" :icon="mdiChartTimelineVariant" :number="form.nbFait"
-          label="Sites faits" />
-        <CardBoxWidget color="text-warning-500" :icon="mdiChartTimelineVariant" :number="form.nbEncours"
-          label="Sites en cours" />
-        <CardBoxWidget color="text-red-500" :icon="mdiChartTimelineVariant" :number="form.nbSiteNonFait"
-          label="Sites non faits" />
+        <CardBoxWidget color="text-info-500" :icon="mdiChartTimelineVariant" :number="form.nbZone"
+          label="Zone(s) totale(s)" />
+        <CardBoxWidget color="text-emerald-500" :icon="mdiChartTimelineVariant" :number="form.nbEquipementsCentraux"
+          label="Equipements" />
+        <CardBoxWidget color="text-warning-500" :icon="mdiChartTimelineVariant" :number="form.nbSalle" label="Salles" />
+        <CardBoxWidget color="text-red-500" :icon="mdiChartTimelineVariant" :number="form.nbPlanification"
+          label="Planification(s)" />
       </div>
 
-      <SectionTitleLineWithButton :icon="mdiChartPie" title="Statistiques (MP)">
+      <SectionTitleLineWithButton :icon="mdiChartPie" title="Planification par Zone">
         <BaseButton :icon="mdiReload" color="whiteDark" @click="fetchData" />
       </SectionTitleLineWithButton>
 
@@ -163,7 +156,11 @@ onMounted(async () => {
             :icon="mdiChartPie" />
         </div>
       </CardBox>
-      <CardBox class="mb-6">
+
+      <SectionTitleLineWithButton :icon="mdiChartPie" title="Planification par Equipement">
+        <BaseButton :icon="mdiReload" color="whiteDark" @click="fetchData" />
+      </SectionTitleLineWithButton>
+      <!-- <CardBox class="mb-6">
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-6">
           <CardBox class="mb-6" title="Map">
             <TogoMap></TogoMap>
@@ -184,7 +181,7 @@ onMounted(async () => {
       </SectionTitleLineWithButton>
       <CardBox class="mb-6">
         <center>Indisponible pour le moment...</center>
-      </CardBox>
+      </CardBox> -->
     </SectionMain>
   </LayoutAuthenticated>
 </template>

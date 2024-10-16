@@ -11,4 +11,8 @@ module.exports = {
   parserOptions: {
     ecmaVersion: "latest",
   },
+  rules: {
+    // Changez le niveau de gravité pour les variables non utilisées
+    'no-unused-vars': ['warn', { vars: 'all', args: 'after-used', ignoreRestSiblings: true }]
+  },
 };

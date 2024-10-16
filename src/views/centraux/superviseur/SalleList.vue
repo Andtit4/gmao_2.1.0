@@ -40,118 +40,57 @@ const form = reactive({
 const zoneCentrale = reactive({ list: [] })
 const oneZoneCentrale = reactive({ list: [] })
 const equipementCentralList = reactive({ list: [] })
-const equipementCentralForIntervention = reactive({ list: [] })
-
-
-const getCentralZone = async () => {
-  axios({
-    url: apiService.getUrl() + '/zone/central',
-    method: 'GET'
-  }).then((res) => {
-    // console.log(res.data)
-    zoneCentrale.list = res.data
-    // getEquipementForInterventionFunc(res.data.)
-  }).catch((err) => {
-    form.showErr = true;
-    form.errmessage = 'An error occured ' + err.message
-  })
-}
-
 const zoneCentralPlanned = reactive({ list: [] })
-const getCentralZonePlanned = async () => {
-  /* axios({
-    url: apiService.getUrl() + '/zone/plannifie/central',
-    method: 'GET'
-  }).then(async (res) => {
-    zoneCentralPlanned.list = await res.data
-    console.log(zoneCentralPlanned.list)
-    // getEquipementForInterventionFunc(res.data.)
-  }).catch((err) => {
-    form.showErr = true;
-    form.errmessage = 'An error occured ' + err.message
-  }) */
 
+const fetchData = async (url) => {
   try {
-    const response = await axios({
-      url: apiService.getUrl() + '/zone/plannifie/central',
-      method: 'GET'
-    });
-
-    if (Array.isArray(response.data)) {
-      zoneCentralPlanned.list = response.data;
-      console.log(zoneCentralPlanned.list);
-    } else {
-      console.error('Unexpected response format:', response.data);
-      form.showErr = true;
-      form.errmessage = 'Unexpected response format';
-    }
+    const response = await axios.get(apiService.getUrl() + url);
+    return response.data;
   } catch (err) {
     form.showErr = true;
     form.errmessage = 'An error occurred: ' + err.message;
+    return [];
   }
 }
 
+const getCentralZone = async () => {
+  zoneCentrale.list = await fetchData('/zone/central');
+}
+
+const getCentralZonePlanned = async () => {
+  zoneCentralPlanned.list = await fetchData('/zone/plannifie/central');
+}
 
 const getEquipementCentralList = async () => {
-  try {
-    const res = await axios({
-      url: apiService.getUrl() + '/salle',
-      method: 'GET'
-    });
-    console.log('Equipement GET', form.zone_name);
-    equipementCentralList.list = res.data;
-  } catch (err) {
-    form.showErr = true;
-    form.errmessage = 'An error occurred: ' + err.message; // Correction du message d'erreur
-  }
+  equipementCentralList.list = await fetchData('/salle');
 }
-/* 
-const getEquipementForInterventionFunc = async (_id) => {
-  axios({
-    url: apiService.getUrl() + '/intervention/central/intervention/' + _id,
-    method: 'GET'
-  }).then((res) => {
-    equipementCentralForIntervention.list = res.data
-  })
-}
- */
-const editZone = async (_id) => { // Changement de la fonction pour être asynchrone
-  try {
-    const res = await axios({
-      url: apiService.getUrl() + '/zone/' + _id,
-      method: 'GET'
-    });
-    await getEquipementCentralList();
-    form.ajouter_par = localStorage.getItem('nom') + ' ' + localStorage.getItem('prenom');
-    oneZoneCentrale.list = res.data[0];
+
+const editZone = async (_id) => {
+  const res = await fetchData('/zone/' + _id);
+  if (res.length) {
+    oneZoneCentrale.list = res[0];
     form.id_zone = _id;
+    form.ajouter_par = `${localStorage.getItem('nom')} ${localStorage.getItem('prenom')}`;
     isModalActive.value = true;
-  } catch (err) {
-    form.showErr = true;
-    form.errmessage = 'An error occurred: ' + err.message; // Ajout de la gestion des erreurs
   }
 }
 
-const addEquipement = async () => { // Changement de la fonction pour être asynchrone
+const addEquipement = async () => {
   try {
-    await axios({
-      url: apiService.getUrl() + '/equipement/central',
-      method: 'POST',
-      data: {
-        nom: form.nom_equipement,
-        immatriculation: form.frequence,
-        type: form.type,
-        zone: oneZoneCentrale.list.nom,
-        ajouter_par: form.ajouter_par
-      }
+    await axios.post(apiService.getUrl() + '/equipement/central', {
+      nom: form.nom_equipement,
+      immatriculation: form.frequence,
+      type: form.type,
+      zone: oneZoneCentrale.list.nom,
+      ajouter_par: form.ajouter_par
     });
     form.showAdd = false;
     form.nom_equipement = '';
     form.frequence = '';
-    await getEquipementCentralList(); // Ajout de await pour s'assurer que la liste est mise à jour
+    await getEquipementCentralList();
   } catch (err) {
     form.showErr = true;
-    form.errmessage = 'An error occurred: ' + err.message; // Ajout de la gestion des erreurs
+    form.errmessage = 'An error occurred: ' + err.message;
   }
 }
 

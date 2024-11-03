@@ -24,7 +24,10 @@ import CentralList from '@/views/centraux/superviseur/CentralList.vue'
 import RefuelingView from '@/views/Refuelings/Refueling.vue'
 import RefuelingViewForUser from '@/views/Refuelings/User/Refueling.vue'
 import DashboardCentraux from '@/views/centraux/DashboardView.vue'
-import EquipementCentral from '@/views/centraux/superviseur/site/EquipementCentral.vue'
+import EquipementCentral from '@/views/centraux/superviseur/equipement/EquipementCentral.vue'
+import zoneView from '@/views/centraux/superviseur/zone/zoneView.vue'
+import salleView from '@/views/centraux/superviseur/salle/salleView.vue'
+import plannificationView from '@/views/centraux/superviseur/plannif/plannificationView.vue'
 
 const routes = [
   {
@@ -230,6 +233,29 @@ const routes = [
     path: '/dashboard/equipement/centraux/:type/:pass',
     name: 'equipement_centraux',
     component: EquipementCentral
+  },
+  {
+    meta: {
+      title: 'ZONE CENTRALE',
+      requiresAuth: true
+    },
+    path: '/dashboard/zone/centraux/:type/:pass',
+    component: zoneView
+  },
+  {
+    meta: {
+      title: 'SALLE CENTRALE',
+      requiresAuth: true
+    },
+    path: '/dashboard/salle/centraux/:type/:pass',
+    component: salleView
+  },{
+    meta: {
+      title: 'PLANNIFICATION',
+      requiresAuth: true
+    },
+    path: '/dashboard/plannification/centraux/:type/:pass',
+    component: plannificationView
   },
   {
     meta: {

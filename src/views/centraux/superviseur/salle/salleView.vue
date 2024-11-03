@@ -9,18 +9,12 @@ import CardBox from '@/components/CardBox.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import zoneList from '@/views/centraux/superviseur/CentralList.vue'
-// import EquipementCentralList from '@/views/centraux/superviseur/EquipementCentralList.vue'
-// import SalleList from '@/views/centraux/superviseur/SalleList.vue'
-// import PlannificationList from '@/views/centraux/superviseur/PlannificationList.vue'
+import SalleList from '@/views/centraux/superviseur/SalleList.vue'
 
 
 import apiService from '@/services/apiService'
 import axios from 'axios'
-// import Stepper from '@/layouts/Stepper.vue'
-// import TabBar from '@/components/TabBar.vue'
-// import { mdiRefresh, mdiArrowUp } from '@mdi/js'
-// import LoadingButton from '@/layouts/LoadingButton.vue'
+import LoadingButton from '@/layouts/LoadingButton.vue'
 // const isLoading = ref(false)
 // import axios from 'axios'
 // import apiService from '@/services/apiService'
@@ -58,7 +52,6 @@ const form = reactive({
 const zones = reactive({ list: [] })
 const sites = reactive({ list: [] })
 const oneZoneCentrale = reactive({ list: [] })
-// const equipementCentralList = reactive({ list: [] })
 const notificationSettingsModel = ref([])
 const notificationsOutline = computed(() => notificationSettingsModel.value.indexOf('outline') > -1)
 const isDetailModal = ref(false)
@@ -85,36 +78,25 @@ const getCentralZone = async () => {
 const isLoading = ref(false);
 
 
-const addZone = () => {
-  form.type = 'CENTRAL'
+const addSalle = () => {
   isLoading.value = true;
   axios({
-    url: apiService.getUrl() + '/zone',
+    url: apiService.getUrl() + '/salle',
     method: 'POST',
     data: {
-      nom: form.zone,
-      type: form.type
+      salle_id: form.salleId,
+      nom: form.nomSalle,
+      zone: form.zoneSalle
     }
   }).then((res) => {
-    form.showSucess = true;
-    isLoading.value = false;
+    console.log(res.data)
     location.reload()
-    // editZone(res.data.insertId)
-    console.log('\n---', res.data)
-
-
+    isLoading.value = false
   }).catch((err) => {
-    form.showErr = true
-    form.errMessage = 'Une erreur est surevenue ' + err.message
+    console.error(err.message)
   })
+
 }
-
-
-
-
-
-
-
 
 onMounted(() => {
   getSites()
@@ -143,22 +125,26 @@ onMounted(() => {
 
   <LayoutAuthenticated>
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Zone Centrale" main>
+      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Intervention Centrale" main>
       </SectionTitleLineWithButton>
       <CardBox>
-        <FormField label="Zone Centrale">
-            <FormControl v-model="form.zone" placeholder="Entrez le nom de la zone" />
-            <BaseButton color="info" label="Enregistrer" @click="addZone()" />
+        <FormField label="Ajout des salles">
+            <FormControl v-model="form.salleId" type="text" placeholder="Salle Id" />
+            <FormControl v-model="form.nomSalle" type="text" placeholder="Nom de la salle" />
+            <select v-model="form.zoneSalle" class="form-select bg-white dark:bg-slate-800">
+              <option value="" disabled selected>Séléctionnez une zone</option>
+              <option v-for="(equipement, index) in zones.list" :key="index" :value="equipement.nom">
+                {{ equipement.nom }}
+              </option>
+            </select>
+            <LoadingButton :button-text="'Enregistrer'" :is-loading="isLoading" @click="addSalle()" />
           </FormField>
       </CardBox>
-
-
-
     </SectionMain>
 
     <SectionMain>
       <CardBox has-table>
-        <zoneList />
+        <SalleList />
       </CardBox>
     </SectionMain>
   </LayoutAuthenticated>

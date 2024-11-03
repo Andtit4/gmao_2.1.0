@@ -144,8 +144,16 @@ if (type == 'superviseur') {
           to: '/dashboard/equipement/centraux/' + type + '/' + pass
         },
         {
-          label: 'Central',
-          to: '/central/' + type + '/' + pass
+          label: 'Zone',
+          to: '/dashboard/zone/centraux/' + type + '/' + pass
+        },
+        {
+          label: 'Salle',
+          to: '/dashboard/salle/centraux/' + type + '/' + pass
+        },
+        {
+          label: 'Plannification',
+          to: '/dashboard/plannification/centraux/' + type + '/' + pass
         }
       ]
     },

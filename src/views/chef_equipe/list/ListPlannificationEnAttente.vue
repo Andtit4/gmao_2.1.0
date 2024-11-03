@@ -111,7 +111,7 @@ const priseEnCompte = () => {
 const priseEnCompteC = () => {
   console.log('complete')
   axios({
-    url: apiService.getUrl() + '/mission/prise_en_compte/web/' + form.date_prise_en_compte + '/' + form.zone + '/' + form.id_plannification + '/' + form.site  + '/' + form.numero_ticket,
+    url: apiService.getUrl() + '/mission/prise_en_compte/web/' + form.date_prise_en_compte + '/' + form.zone + '/' + form.id_plannification + '/' + form.site + '/' + form.numero_ticket,
     method: 'PUT'
   }).then((res) => {
     console.log(res.data)
@@ -138,10 +138,10 @@ onMounted(() => {
 
   <LayoutAuthenticated>
     <CardBoxModal v-model="showCompleteModal" title="Complèter">
-    <p>Clôturer l'intervention</p>
-    <FormControl v-model="form.date_prise_en_compte" type="date" />
-    <BaseButton label="Clôturer" color="success" @click="priseEnCompteC()" />
-  </CardBoxModal>
+      <p>Clôturer l'intervention</p>
+      <FormControl v-model="form.date_prise_en_compte" type="date" />
+      <BaseButton label="Clôturer" color="success" @click="priseEnCompteC()" />
+    </CardBoxModal>
     <div class="mx-4">
       <FormField label="Rechercher">
         <FormControl v-model="form.searchSite" placeholder="Entrez le nom du site" @input="search()" />
@@ -191,9 +191,17 @@ onMounted(() => {
                   </span>
                 </div>
                 <div v-else>
-                  <span style="color: green;">
-                    {{ mission.date_prise_en_compte ? new Date(mission.date_prise_en_compte).toISOString().split('T')[0] :
-                      '' }}
+
+                Envoyé le :  <span style="color: orange;">
+                    {{ mission.date_attente ? new Date(mission.date_attente).toISOString().split('T')[0]
+                      :
+                    '' }}
+                  </span>
+                  <br>
+                  Cloturé le : <span style="color: green;">
+                    {{ mission.date_prise_en_compte ? new Date(mission.date_prise_en_compte).toISOString().split('T')[0]
+                      :
+                    '' }}
                   </span>
                   <div v-if="mission.numero_ticket == ''">
                     <span style="color: red;">
@@ -220,13 +228,14 @@ onMounted(() => {
                 <div v-if="mission.date_prise_en_compte == ''">
                   <span style="color: orange;">
                     <BaseButton color="orange" :icon="mdiCheck"
-                    @click="showComplete(mission.zone, mission.id_plannification, mission.site)" />
+                      @click="showComplete(mission.zone, mission.id_plannification, mission.site)" />
                   </span>
                 </div>
                 <div v-else>
                   <span style="color: white; font-size: 12px;">
-                    {{ mission.date_prise_en_compte ? new Date(mission.date_prise_en_compte).toISOString().split('T')[0] :
-                      '' }}
+                    {{ mission.date_prise_en_compte ? new Date(mission.date_prise_en_compte).toISOString().split('T')[0]
+                      :
+                    '' }}
                   </span>
                   <div v-if="mission.numero_ticket == ''">
                     <span style="color: red;">

@@ -61,7 +61,7 @@ const plannificationList = reactive({ list: [] })
 
 const fetchData = async () => {
   try {
-    console.log('Début de fetchData')
+    // console.log('Début de fetchData')
     const urls = [
       '/zone/central',
       '/equipement/central',

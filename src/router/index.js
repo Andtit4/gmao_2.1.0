@@ -24,6 +24,7 @@ import CentralList from '@/views/centraux/superviseur/CentralList.vue'
 import RefuelingView from '@/views/Refuelings/Refueling.vue'
 import RefuelingViewForUser from '@/views/Refuelings/User/Refueling.vue'
 import DashboardCentraux from '@/views/centraux/DashboardView.vue'
+import EquipementCentral from '@/views/centraux/superviseur/site/EquipementCentral.vue'
 
 const routes = [
   {
@@ -220,6 +221,15 @@ const routes = [
     path: '/dashboard/centraux/:type/:pass',
     name: 'dashboard_centraux',
     component: DashboardCentraux
+  },
+  {
+    meta: {
+      title: 'EQUIPEMENT CENTRAL',
+      requiresAuth: true
+    },
+    path: '/dashboard/equipement/centraux/:type/:pass',
+    name: 'equipement_centraux',
+    component: EquipementCentral
   },
   {
     meta: {

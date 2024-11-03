@@ -140,6 +140,10 @@ if (type == 'superviseur') {
           to: '/dashboard/centraux/' + type + '/' + pass
         },
         {
+          label: 'Equipement',
+          to: '/dashboard/equipement/centraux/' + type + '/' + pass
+        },
+        {
           label: 'Central',
           to: '/central/' + type + '/' + pass
         }

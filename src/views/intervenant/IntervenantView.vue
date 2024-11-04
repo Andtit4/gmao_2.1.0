@@ -15,7 +15,7 @@ import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
 import axios from 'axios'
 import apiService from '@/services/apiService'
 import generatePassword from '@/services/generatePassword.js'
-
+import emailjs from 'emailjs-com'
 const form = reactive({
   matricule: '',
   nom: '',
@@ -23,7 +23,8 @@ const form = reactive({
   telephone: '',
   email: '',
   type_utilisateur: '',
-  zone: ''
+  zone: '',
+  refresh: false
 })
 
 const zones = reactive({ list: [] })
@@ -66,6 +67,22 @@ const getAllZone = () => {
 
 let isSubmitting = false; // Ajout d'un drapeau pour vérifier l'état de soumission
 
+const sendEmail = async (email, mot_de_passe, type) => {
+  const templateParams = {
+    from_email: email,
+    to_email: email,
+    subject: `IDENTIFIANT CONNEXION COMPTE ${type} ENERGY EYE`,
+    message: `Identifiants de connexion:\nEmail: ${email}\nMot de passe: ${mot_de_passe} \n [Lien ici](http://example.com) `,
+  };
+
+  try {
+    const response = await emailjs.send('service_r93bhos', 'template_03kfmva', templateParams, 'KL8xusAZLqk9BOjrX');
+    console.log("Email envoyé: ", response);
+  } catch (error) {
+    console.log("Erreur lors de l'envoi de l'email: ", error);
+  }
+};
+
 const submit = () => {
   if (isSubmitting) return; // Si déjà en cours, sortir de la fonction
   isSubmitting = true; // Définir le drapeau à vrai
@@ -87,9 +104,11 @@ const submit = () => {
     }
   }).then((response) => {
     console.log('Success ' + response);
+    sendEmail(form.email, gen, form.type_utilisateur);
     setTimeout(() => {
       location.reload();
     }, 1000);
+    
   }).finally(() => {
     isSubmitting = false; // Réinitialiser le drapeau après la soumission
   });

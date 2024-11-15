@@ -3,6 +3,8 @@ import {
   mdiLogout,
   mdiThemeLightDark,
 } from '@mdi/js'
+let type = localStorage.getItem('type_utilisateur')
+let pass = localStorage.getItem('pass')
 
 export default [
   {
@@ -11,7 +13,7 @@ export default [
       {
         icon: mdiAccount,
         label: 'My Profile',
-        to: '/profile'
+        to: '/profile/' + type + '/' + pass
       },
       {
         isDivider: true

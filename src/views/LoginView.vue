@@ -53,13 +53,16 @@ const submit = async () => {
       localStorage.setItem('email', user.email)
       localStorage.setItem('nom', user.nom)
       localStorage.setItem('prenom', user.prenom)
+      localStorage.setItem('zone', user.zone)
+      localStorage.setItem('type_utilisateur', user.type_utilisateur)
 
       mainStore.setUser(user)
 
       const routeMap = {
         ADMIN: { type: 'admin', name: 'Dashboard' },
         USER: { type: 'chef_equipe', name: 'Dashboard', setZone: true },
-        SUPERVISEUR: { type: 'superviseur', name: 'Dashboard' }
+        SUPERVISEUR: { type: 'superviseur', name: 'Dashboard' },
+        CENTRAUX: {type: 'centraux', name: 'InterventionCentral', setZone: true}
       }
 
       const route = routeMap[type_utilisateur]

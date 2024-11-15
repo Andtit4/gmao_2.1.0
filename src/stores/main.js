@@ -7,18 +7,29 @@ import apiService from '@/services/apiService'
 export const useMainStore = defineStore('main', () => {
   let userName = ref([])
   const userEmail = ref([])
+  const userZone = ref([])
+  const userType = ref([])
   const input = ref([])
   const inputview = ref([])
+  const idUser = ref([])
 
 
 
   let name = localStorage.getItem('nom')
   let firstname = localStorage.getItem('prenom')
   let email = localStorage.getItem('email')
+  let zone = localStorage.getItem('zone')
+  let typeUtilisateur = localStorage.getItem('type_utilisateur')
+  let id = localStorage.getItem('id')
+
 
 
   userName.value = name + ' ' + firstname
   userEmail.value = email
+  userZone.value = zone
+  userType.value = typeUtilisateur
+  idUser.value = id;
+
 
 
   const userAvatar = computed(
@@ -32,8 +43,6 @@ export const useMainStore = defineStore('main', () => {
   const generateIdPrefix = () => {
     const shortenedInput = input.value.substring(0, 3);
     inputview.value = `${shortenedInput}-STOCK-`;
-
-
   }
 
   const isFieldFocusRegistered = ref(false)
@@ -88,6 +97,9 @@ export const useMainStore = defineStore('main', () => {
   return {
     userName,
     userEmail,
+    userZone,
+    userType,
+    idUser,
     input,
     inputview,
     userAvatar,

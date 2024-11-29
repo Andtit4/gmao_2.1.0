@@ -67,7 +67,7 @@ const entrepots = reactive({ list: [] })
 const getAllEntrepot = async () => {
   try {
     const res = await apiService.getEntrepot();
-    entrepots.list = res.data;
+    entrepots.list = res.data
   } catch (error) {
     form.showError = true;
     form.errMessage = 'Une erreur liée à la capture des stocks ' + error;

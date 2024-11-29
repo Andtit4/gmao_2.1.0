@@ -104,11 +104,11 @@ const submit = () => {
     }
   }).then((response) => {
     console.log('Success ' + response);
-    sendEmail(form.email, gen, form.type_utilisateur);
+    // sendEmail(form.email, gen, form.type_utilisateur);
     setTimeout(() => {
       location.reload();
     }, 1000);
-    
+
   }).finally(() => {
     isSubmitting = false; // Réinitialiser le drapeau après la soumission
   });
@@ -144,6 +144,7 @@ onMounted(() => {
               <option value="USER">CHEF DE ZONE</option>
               <option value="SUPERVISEUR">SUPERVISEUR</option>
               <option value="CHAUFFEUR">CHAUFFEUR</option>
+              <option value="CENTRAUX">INTERVENANT CENTRAUX</option>
               <option value="SUPERVISEUR-CENTRAUX">SUPERVISEUR-CENTRAUX</option>
             </select>
           </FormField>

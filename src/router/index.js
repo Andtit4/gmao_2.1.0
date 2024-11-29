@@ -28,6 +28,7 @@ import EquipementCentral from '@/views/centraux/superviseur/equipement/Equipemen
 import zoneView from '@/views/centraux/superviseur/zone/zoneView.vue'
 import salleView from '@/views/centraux/superviseur/salle/salleView.vue'
 import plannificationView from '@/views/centraux/superviseur/plannif/plannificationView.vue'
+import plannificationList from '@/views/centraux/intervention/plannificationList.vue'
 
 const routes = [
   {
@@ -259,10 +260,20 @@ const routes = [
   },
   {
     meta: {
+      title: 'Intervention',
+
+      requiresAuth: true
+    },
+    path: '/dashboard/intervention/centraux/:type/:pass',
+    name: 'InterventionCentral',
+    component: plannificationList
+  },
+  {
+    meta: {
       title: 'Profile',
       requiresAuth: true
     },
-    path: '/profile',
+    path: '/profile/:type/:pass',
     name: 'profile',
     component: () => import('@/views/ProfileView.vue')
   }

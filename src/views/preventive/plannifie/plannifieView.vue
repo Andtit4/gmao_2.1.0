@@ -93,7 +93,7 @@ const getDate = (zone) => {
 }
 
 const getNbWeek = (date_debut, date_fin) => {
-  const debut = moment(date_debut)
+  const debut = moment(date_debut).day(4)
   const fin = moment(date_fin)
 
   semaines.list = []

@@ -9,6 +9,8 @@ import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import FormControl from '@/components/FormControl.vue'
 import FormField from '@/components/FormField.vue'
+import LoadingButton from '@/layouts/LoadingButton.vue'
+
 
 // import UserAvatar from '@/components/UserAvatar.vue'
 import axios from 'axios'
@@ -34,7 +36,13 @@ const form = reactive({
     date_fin: '',
     type: '',
     type_equipement: '',
-    quota: 0
+    quota: 0,
+    id_plannification: 0,
+    zone: '',
+    equipement: '',
+    date_debut: '',
+    date_fin: '',
+
 })
 
 const zoneCentrale = reactive({ list: [] })
@@ -291,6 +299,102 @@ const deleteSalle = (_id) => {
 
 }
 
+const isLoading = ref(false)
+const showModalForConfirmPlanif = ref(false)
+const initPlan = (plan) => {
+    showModalForConfirmPlanif.value = true
+    form.id_plannification = plan._id;
+    form.zone = plan.zone;
+    form.equipement = plan.equipement
+    form.date_debut = plan.date_debut
+    form.date_fin = plan.date_fin
+    getPlannificationItems();
+}
+
+const equipementsList = reactive({ list: [] })
+const getEquipementByZone = async (zone) => {
+    await axios({
+        url: apiService.getUrl() + '/equipement/central/' + zone,
+        method: 'GET',
+    }).then((res) => {
+        equipementsList.list = res.data
+        // console.log("equi ", equipementsList.list.length)
+    }).catch((err) => {
+        console.error('an error occured  equi list')
+        isLoading.value = false;
+    })
+}
+
+const getEquipementByTypeZone = async (type, zone) => {
+    await axios({
+        url: apiService.getUrl() + '/equipement/central/search/'+ type + '/' + zone,
+        method: 'GET',
+    }).then((res) => {
+        equipementsList.list = res.data
+        // console.log("equi ", equipementsList.list.length)
+    }).catch((err) => {
+        console.error('an error occured  equi list')
+        isLoading.value = false;
+    })
+}
+
+const addEquipementToTable = (equipement) => {
+    axios({
+        url: apiService.getUrl() + '/equipement/plannif/central',
+        method: 'POST',
+        data: {
+            zone: form.zone,
+            date_debut: form.date_debut,
+            date_fin: form.date_fin,
+            equipement: equipement,
+            id_planification: form.id_plannification
+        }
+    }).then((res) => {
+        console.log(res.data)
+        location.reload()
+        isLoading.value = false
+    }).catch((err) => {
+        console.error(err.message)
+    })
+}
+
+const getPlannificationItemsList = reactive({ list: [] })
+const getPlannificationItems = () => {
+    axios({
+        url: apiService.getUrl() + '/equipement/plannif/central/' + form.id_plannification,
+        method: 'GET'
+    }).then((res) => {
+        getPlannificationItemsList.list = res.data;
+    }).catch((err) => {
+        console.error(err.message)
+    })
+}
+
+const addPlannification = async () => {
+    if (form.equipement == '') {
+        isLoading.value = true;
+        // console.log('true')
+        await getEquipementByZone(form.zone);
+        if (equipementsList.list && equipementsList.list.length > 0) {
+            equipementsList.list.forEach(equipement => {
+                addEquipementToTable(equipement.nom)
+            })
+            isLoading.value = false
+            // location.reload()
+        }
+    } else {
+        isLoading.value = true;
+        await getEquipementByTypeZone(form.equipement, form.zone);
+        if (equipementsList.list && equipementsList.list.length > 0) {
+            equipementsList.list.forEach(equipement => {
+                addEquipementToTable(equipement.nom)
+            })
+            isLoading.value = false
+            // location.reload()
+        }
+    }
+}
+
 
 
 onMounted(() => {
@@ -301,7 +405,27 @@ onMounted(() => {
 </script>
 
 <template>
-    <p style="padding: 10px">{{ equipementCentralList.list.length }} Salles</p>
+    <CardBoxModal v-model="showModalForConfirmPlanif" title="Confirmer la Plannification">
+        <div v-if="getPlannificationItemsList.list.length == 0">
+            <p>Veuillez confirmer la plannification {{ form.id_plannification }} zone <strong>{{ form.zone }}</strong>
+            </p>
+            <br>
+            <p>
+                <BaseButtons>
+                    <LoadingButton :button-text="'Confirmer'" :is-loading="isLoading" @click="addPlannification()" />
+                    <!-- <BaseButton color="success" label="Confirmer" small @click="deleteSalle(form.idEquipementSelect)" /> -->
+                    <BaseButton color="transparent" label="Annuler" small @click="showModalForDelete = false" />
+                </BaseButtons>
+            </p>
+        </div>
+        <div v-else>
+            <p> Plannification déjà initialisée</p>
+            <BaseButton color="transparent" label="Retour" small @click="showModalForDelete = false" />
+        </div>
+
+    </CardBoxModal>
+
+    <p style="padding: 10px">{{ equipementCentralList.list.length }} Plannifications</p>
     <CardBoxModal v-model="showModalForDelete" title="Suppression">
         <p>Veuillez confirmer la suppression de <strong> {{ form.nomEquipementSelect }} </strong></p>
         <br>
@@ -352,6 +476,7 @@ onMounted(() => {
                     </td>
                     <td class="before:hidden lg:w-1 whitespace-nowrap">
                         <BaseButtons type="justify-start lg:justify-end" no-wrap>
+                            <BaseButton color="info" :icon="mdiPlus" small @click="initPlan(equipement)" />
                             <BaseButton color="danger" :icon="mdiTrashCan" small @click="addPlannif(equipement)" />
                         </BaseButtons>
                     </td>

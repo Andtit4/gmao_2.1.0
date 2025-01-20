@@ -44,10 +44,12 @@ const form = reactive({
     zoneSalle: '',
     dateDebut: '',
     dateFin: '',
+    zone_name: "",
     zoneForInterventionCentral: '',
     showSucess: false,
     showErr: false,
     showAdd: true,
+    errorMessage: "",
     selectedTab: 'Equipement',
     showAddEquipement: false,
     showAddZone: false,
@@ -136,22 +138,30 @@ const equipements = [
 ]
 // steps: ['Step 1', 'Step 2', 'Step 3']
 const addEquipement = () => {
+    console.log('form', form.zone_name)
     form.ajouter_par = localStorage.getItem('nom') + ' ' + localStorage.getItem('prenom')
-    axios({
-        url: apiService.getUrl() + '/equipement/central/',
-        method: 'POST',
-        data: {
-            reference: form.referenceEquipement,
-            nom: form.nomEquipement,
-            type: form.typeEquipement,
-            ajouter_par: form.ajouter_par
-        }
-    }).then((res) => {
-        console.log(res.insertId)
-        location.reload()
-    }).catch((err) => {
-        console.error(err.message)
-    })
+    if (!form.referenceEquipement || !form.nomEquipement || !form.zone_name) {
+        form.showErr = true
+        form.errMessage = 'Veillez remplir tous les champs'
+    } else {
+        axios({
+            url: apiService.getLocal() + '/equipement/central/',
+            method: 'POST',
+            data: {
+                reference: form.referenceEquipement,
+                nom: form.nomEquipement,
+                type: form.typeEquipement,
+                zone: form.zone_name,
+                ajouter_par: form.ajouter_par
+            }
+        }).then((res) => {
+            console.log(res.insertId)
+            location.reload()
+        }).catch((err) => {
+            console.error(err.message)
+        })
+    }
+
 }
 
 
@@ -169,10 +179,17 @@ onMounted(() => {
         </NotificationBar>
     </div>
 
+
+
     <LayoutAuthenticated>
         <SectionMain>
             <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Equipement Central" main>
             </SectionTitleLineWithButton>
+            <div v-if="form.showErr == true">
+                <NotificationBar color="danger" :icon="mdiInformation" :outline="notificationsOutline">
+                    {{ form.errMessage }}
+                </NotificationBar>
+            </div>
             <CardBox>
                 <h2>Équipements</h2>
                 <br>
@@ -183,6 +200,12 @@ onMounted(() => {
                         <option value="" disabled selected>Séléctionnez un équipement</option>
                         <option v-for="(equipement, index) in equipements" :key="index" :value="equipement.label">
                             {{ equipement.label }}
+                        </option>
+                    </select>
+                    <select v-model="form.zone_name" class="form-select bg-white dark:bg-slate-800">
+                        <option value="" disabled selected>Séléctionnez une zone</option>
+                        <option v-for="(zone, index) in zones.list" :key="index" :value="zone.nom">
+                            {{ zone.nom }}
                         </option>
                     </select>
                     <BaseButton color="info" label="Enregistrer" @click="addEquipement()" />

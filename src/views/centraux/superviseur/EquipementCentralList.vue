@@ -245,7 +245,7 @@ const showModalForDelete = ref(false)
 
 // const equipementSelect = reactive({ list: []});
 
-const addPlannif = (nom) => {
+const openDeleteConfirmBox = (nom) => {
   showModalForDelete.value = true
   form.idEquipementSelect = nom._id
   form.nomEquipementSelect = nom.nom
@@ -302,6 +302,8 @@ onMounted(() => {
           <th>Référence</th>
           <th>Type</th>
           <th>Action</th>
+          <th>Zone</th>
+          <th>Ajouté par</th>
           <th />
         </tr>
       </thead>
@@ -320,12 +322,18 @@ onMounted(() => {
           <td data-label="Type">
             {{ equipement.type }}
           </td>
+          <td data-label="Zone">
+            {{ equipement.zone }}
+          </td>
+          <td data-label="Ajouté par">
+            {{ equipement.ajouter_par }}
+          </td>
           <td class="before:hidden lg:w-1 whitespace-nowrap">
             <BaseButtons type="justify-start lg:justify-end" no-wrap>
               <BaseButton color="success" :icon="mdiTools" small @click="editZone(equipement._id)" />
-              <BaseButton color="info" :icon="mdiEye" small @click="showDetails(equipement.nom)" />
-              <BaseButton color="" :icon="mdiHome" small @click="addSalle()" />
-              <BaseButton color="danger" :icon="mdiTrashCan" small @click="addPlannif(equipement)" />
+<!--               <BaseButton color="info" :icon="mdiEye" small @click="showDetails(equipement.nom)" />
+              <BaseButton color="" :icon="mdiHome" small @click="addSalle()" /> -->
+              <BaseButton color="danger" :icon="mdiTrashCan" small @click="openDeleteConfirmBox(equipement)" />
             </BaseButtons>
           </td>
         </tr>

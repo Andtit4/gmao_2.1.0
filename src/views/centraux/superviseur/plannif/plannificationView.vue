@@ -1,7 +1,7 @@
 <script setup>
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
-import { onMounted, reactive, ref, computed } from 'vue'
+import { onMounted, reactive, ref, computed, watch } from 'vue'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import SectionMain from '@/components/SectionMain.vue'
 import NotificationBar from '@/components/NotificationBar.vue'
@@ -126,27 +126,52 @@ const addEquipement = () => {
 }
 
 
-const addInterventionByEquipement = () => {
+const addInterventionByEquipement = async () => {
   isLoading.value = true;
   form.ajouter_par = localStorage.getItem('nom') + ' ' + localStorage.getItem('prenom')
-  axios({
-    url: apiService.getUrl() + '/plannif/central',
-    method: 'POST',
-    data: {
-      zone: form.zoneForInterventionCentral,
-      date_debut: form.dateDebut,
-      date_fin: form.dateFin,
-      equipement: form.typeEquipement,
-      ajouter_par: form.ajouter_par
-    }
+  // await getEquipementByZone(form.zoneForInterventionCentral)
+
+  if (equipementsList.list) {
+    axios({
+      url: apiService.getUrl() + '/plannif/central',
+      method: 'POST',
+      data: {
+        zone: form.zoneForInterventionCentral,
+        date_debut: form.dateDebut,
+        date_fin: form.dateFin,
+        equipement: form.typeEquipement,
+        ajouter_par: form.ajouter_par,
+        nombre_equipement: equipementsList.list.length
+      }
+    }).then((res) => {
+      console.log(res.data)
+      location.reload()
+      isLoading.value = false
+    }).catch((err) => {
+      console.error(err.message)
+    })
+  }
+
+}
+
+const equipementsList = reactive({ list: [] })
+const getEquipementByZone = async (zone) => {
+  await axios({
+    url: apiService.getUrl() + '/equipement/central/' + zone,
+    method: 'GET',
   }).then((res) => {
-    console.log(res.data)
-    location.reload()
-    isLoading.value = false
+    equipementsList.list = res.data
+    // console.log("equi ", equipementsList.list.length)
   }).catch((err) => {
-    console.error(err.message)
+    console.error('an error occured ', err.message)
   })
 }
+
+watch(() => form.zoneForInterventionCentral, (newZone) => {
+  if (newZone) {
+    getEquipementByZone(newZone)
+  }
+})
 
 onMounted(() => {
   getSites()
@@ -179,24 +204,24 @@ onMounted(() => {
       </SectionTitleLineWithButton>
       <CardBox>
         <FormField label="Intervention par Equipement">
-            <select v-model="form.zoneForInterventionCentral" class="form-select bg-white dark:bg-slate-800">
-              <option value="" disabled selected>Séléctionnez une zone</option>
-              <option v-for="(equipement, index) in zones.list" :key="index" :value="equipement.nom">
-                {{ equipement.nom }}
-              </option>
-            </select>
-            <select v-model="form.typeEquipement" class="form-select bg-white dark:bg-slate-800">
-              <option value="" disabled selected>Séléctionnez un équipement</option>
-              <option v-for="(equipement, index) in equipements" :key="index" :value="equipement.label">
-                {{ equipement.label }}
-              </option>
-            </select>
-            <FormField label="Date de Planification">
-              <FormControl v-model="form.dateDebut" type="date" />
-              <FormControl v-model="form.dateFin" type="date" />
-            </FormField>
-            <BaseButton color="info" label="Enregistrer" @click="addInterventionByEquipement()" />
+          <select v-model="form.zoneForInterventionCentral" class="form-select bg-white dark:bg-slate-800">
+            <option value="" disabled selected>Séléctionnez une zone</option>
+            <option v-for="(equipement, index) in zones.list" :key="index" :value="equipement.nom">
+              {{ equipement.nom }}
+            </option>
+          </select>
+          <select v-model="form.typeEquipement" class="form-select bg-white dark:bg-slate-800">
+            <option value="" disabled selected>Séléctionnez un équipement</option>
+            <option v-for="(equipement, index) in equipements" :key="index" :value="equipement.label">
+              {{ equipement.label }}
+            </option>
+          </select>
+          <FormField label="Date de Planification">
+            <FormControl v-model="form.dateDebut" type="date" />
+            <FormControl v-model="form.dateFin" type="date" />
           </FormField>
+          <BaseButton color="info" label="Enregistrer" @click="addInterventionByEquipement()" />
+        </FormField>
       </CardBox>
 
 

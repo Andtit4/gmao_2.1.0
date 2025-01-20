@@ -130,30 +130,27 @@ const treat = () => {
 }
 
 const uploadImg = async () => {
-  let img = (<HTMLInputElement>document.getElementById('file')).files[0]
+  const fileInput = document.getElementById('file') as HTMLInputElement;
+  if (!fileInput.files.length) {
+    console.error("Aucun fichier sélectionné");
+    return; // Ajout d'une vérification pour s'assurer qu'un fichier est sélectionné
+  }
 
-  /* const head3 = {
-    method: 'POST',
-    body: JSON.stringify({ 'imageUrl1': bigFile, 'imageUrl2': smallFile }),
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionStorage.token}` }
-  } */
-  console.log(img)
-  const newFileName = form.site_selected + Date.now() + '.png';
-  var formData = new FormData()
-  formData.append('file', img, newFileName)
-  console.log(formData)
+  let img = fileInput.files[0];
+  const newFileName = `${form.site_selected}_${Date.now()}.png`; // Utilisation d'un underscore pour le nom de fichier
+  const formData = new FormData();
+  formData.append('file', img, newFileName);
 
-  await axios.post('http://localhost:3000/upload', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  })
-    .then((resp) => {
-      console.log(resp)
-    })
-    .catch((err) => {
-      console.log(err.response)
-    })
+  try {
+    const resp = await axios.post('http://localhost:3000/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    console.log(resp);
+  } catch (err) {
+    console.error("Erreur lors de l'envoi de l'image: ", err.response);
+  }
 }
 
 

@@ -42,6 +42,7 @@ const form = reactive({
     equipement: '',
     date_debut: '',
     date_fin: '',
+    intervenant: '',
 
 })
 
@@ -61,6 +62,19 @@ const getCentralZone = async () => {
         // getEquipementForInterventionFunc(res.data.)
     }).catch((err) => {
         form.showErr = true;
+        form.errmessage = 'An error occured ' + err.message
+    })
+}
+
+const intervenants = reactive({ list: [] })
+const getIntervenant = async () => {
+    axios({
+        url: apiService.getUrl() + '/intervenant/one/CENTRAUX',
+        method: 'GET'
+    }).then((res) => {
+        intervenants.list = res.data
+    }).catch((err) => {
+        form.showErr = true
         form.errmessage = 'An error occured ' + err.message
     })
 }
@@ -327,7 +341,7 @@ const getEquipementByZone = async (zone) => {
 
 const getEquipementByTypeZone = async (type, zone) => {
     await axios({
-        url: apiService.getUrl() + '/equipement/central/search/'+ type + '/' + zone,
+        url: apiService.getUrl() + '/equipement/central/search/' + type + '/' + zone,
         method: 'GET',
     }).then((res) => {
         equipementsList.list = res.data
@@ -347,7 +361,8 @@ const addEquipementToTable = (equipement) => {
             date_debut: form.date_debut,
             date_fin: form.date_fin,
             equipement: equipement,
-            id_planification: form.id_plannification
+            id_planification: form.id_plannification, 
+            assigner: form.intervenant
         }
     }).then((res) => {
         console.log(res.data)
@@ -377,7 +392,7 @@ const addPlannification = async () => {
         await getEquipementByZone(form.zone);
         if (equipementsList.list && equipementsList.list.length > 0) {
             equipementsList.list.forEach(equipement => {
-                addEquipementToTable(equipement.nom)
+                addEquipementToTable(equipement._id)
             })
             isLoading.value = false
             // location.reload()
@@ -387,7 +402,7 @@ const addPlannification = async () => {
         await getEquipementByTypeZone(form.equipement, form.zone);
         if (equipementsList.list && equipementsList.list.length > 0) {
             equipementsList.list.forEach(equipement => {
-                addEquipementToTable(equipement.nom)
+                addEquipementToTable(equipement._id)
             })
             isLoading.value = false
             // location.reload()
@@ -401,15 +416,27 @@ onMounted(() => {
     getCentralZone()
     getCentralZonePlanned()
     getEquipementCentralList()
+    getIntervenant()
 })
 </script>
 
 <template>
     <CardBoxModal v-model="showModalForConfirmPlanif" title="Confirmer la Plannification">
         <div v-if="getPlannificationItemsList.list.length == 0">
-            <p>Veuillez confirmer la plannification {{ form.id_plannification }} zone <strong>{{ form.zone }}</strong>
+            <p>Plannification N°{{ form.id_plannification }}
             </p>
+            Zone <strong>{{ form.zone }}</strong>
             <br>
+            <br>
+            <FormField label="Assigner cette planification">
+                <select v-model="form.intervenant" class="form-select bg-white dark:bg-slate-800">
+                    <option value="" disabled selected>Séléctionnez un intervenant</option>
+                    <option v-for="(intervenant, index) in intervenants.list" :key="index" :value="intervenant._id">
+                        {{ intervenant.nom }}  {{ intervenant.prenom }} -- {{ intervenant.zone }}
+                    </option>
+                </select>
+
+            </FormField>
             <p>
                 <BaseButtons>
                     <LoadingButton :button-text="'Confirmer'" :is-loading="isLoading" @click="addPlannification()" />

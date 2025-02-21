@@ -34,8 +34,8 @@ const submit = async () => {
 
   try {
     const response = await axios.get(
-      `${apiService.getUrl()}/intervenant/auth`,
-      { params: { email: form.login, mot_de_passe: form.pass } }
+      `${apiService.getUrl()}/intervenant/auth?email=${form.login}&mot_de_passe=${form.pass}`,
+      // { params: { email: form.login, mot_de_passe: form.pass } }
     )
 
     const { data } = response

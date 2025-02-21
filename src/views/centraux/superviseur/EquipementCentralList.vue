@@ -9,6 +9,7 @@ import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import FormControl from '@/components/FormControl.vue'
 import FormField from '@/components/FormField.vue'
+import * as XLSX from 'xlsx'
 
 // import UserAvatar from '@/components/UserAvatar.vue'
 import axios from 'axios'
@@ -34,7 +35,9 @@ const form = reactive({
   date_fin: '',
   type: '',
   type_equipement: '',
-  quota: 0
+  quota: 0,
+  showAddPiece: false,
+  intitule: '',
 })
 
 const zoneCentrale = reactive({ list: [] })
@@ -105,6 +108,75 @@ const getEquipementCentralList = async () => {
     form.errmessage = 'An error occurred: ' + err.message; // Correction du message d'erreur
   }
 }
+
+
+const pieces = reactive({ list: [] })
+
+const getPieceOfEquipement = async () => {
+  try {
+    const res = await axios({
+      url: apiService.getUrl() + '/equipement/central/all/piece',
+      method: 'GET'
+    });
+    console.log('Equipement GET', form.zone_name);
+    pieces.list = res.data;
+  } catch (err) {
+    form.showErr = true;
+    form.errmessage = 'An error occurred: ' + err.message; // Correction du message d'erreur
+  }
+}
+
+
+
+const exportToExcel = () => {
+  // Créer un nouveau classeur Excel
+  const workbook = XLSX.utils.book_new();
+
+  // Récupérer les données des équipements et des pièces
+  Promise.all([
+    axios({
+      url: apiService.getUrl() + '/equipement/central/',
+      method: 'GET'
+    }),
+    axios({
+      url: apiService.getUrl() + '/equipement/central/all/piece', 
+      method: 'GET'
+    })
+  ])
+  .then(([equipementsRes, piecesRes]) => {
+    // Créer la feuille des équipements
+    const equipementsData = equipementsRes.data.map(item => ({
+      Reference: item.reference,
+      Intitule: item.nom,
+      Type: item.type,
+      Site: item.site,
+      Zone: item.zone,
+      'Ajouté par': item.ajouter_par
+    }));
+    const equipementsSheet = XLSX.utils.json_to_sheet(equipementsData);
+    XLSX.utils.book_append_sheet(workbook, equipementsSheet, "Equipements");
+
+    // Créer la feuille des pièces
+    const piecesData = piecesRes.data.map(item => ({
+      'Référence equipement': item.referenceEquipement || '',
+      'Nom Equipement': item.nomEquipement || '',
+      'Type Equipement': item.typeEquipement || '',
+      Site: item.site || '',
+      Zone : item.zone || '',
+      'Pièce': item.piece || ''
+    }));
+    const piecesSheet = XLSX.utils.json_to_sheet(piecesData);
+    XLSX.utils.book_append_sheet(workbook, piecesSheet, "Pieces");
+
+    // Générer et télécharger le fichier Excel
+    XLSX.writeFile(workbook, "equipements_et_pieces.xlsx");
+  })
+  .catch(err => {
+    form.showErr = true;
+    form.errmessage = 'Une erreur est survenue lors de l\'export: ' + err.message;
+  });
+
+}
 /* 
 const getEquipementForInterventionFunc = async (_id) => {
   axios({
@@ -115,8 +187,10 @@ const getEquipementForInterventionFunc = async (_id) => {
   })
 }
  */
-const editZone = async (_id) => { // Changement de la fonction pour être asynchrone
-  try {
+const editZone = async (equipement) => { // Changement de la fonction pour être asynchrone
+  form.showAddPiece = true;
+  form.id_equipement = equipement._id;
+  /* try {
     const res = await axios({
       url: apiService.getUrl() + '/zone/' + _id,
       method: 'GET'
@@ -126,6 +200,27 @@ const editZone = async (_id) => { // Changement de la fonction pour être asynch
     oneZoneCentrale.list = res.data[0];
     form.id_zone = _id;
     isModalActive.value = true;
+  } catch (err) {
+    form.showErr = true;
+    form.errmessage = 'An error occurred: ' + err.message; // Ajout de la gestion des erreurs
+  } */
+}
+
+const addPiece = async () => {
+  try {
+    await axios({
+      url: apiService.getUrl() + '/piece',
+      method: 'POST',
+      data: {
+        id_equipement: form.id_equipement,
+        intitule: form.intitule,
+      }
+    });
+    form.showAdd = false;
+    form.nom_equipement = '';
+    form.frequence = '';
+    await getEquipementCentralList(); // Ajout de await pour s'assurer que la liste est mise à jour
+    location.reload()
   } catch (err) {
     form.showErr = true;
     form.errmessage = 'An error occurred: ' + err.message; // Ajout de la gestion des erreurs
@@ -152,22 +247,6 @@ const addEquipement = async () => { // Changement de la fonction pour être asyn
   } catch (err) {
     form.showErr = true;
     form.errmessage = 'An error occurred: ' + err.message; // Ajout de la gestion des erreurs
-  }
-}
-
-const addIntervention = async () => { // Changement de la fonction pour être asynchrone
-  try {
-    await axios({
-      url: apiService.getUrl() + '/intervention/central',
-      method: 'POST',
-      data: {
-        equipement: form.equipement,
-        zone_central: form.id_zone
-      }
-    });
-    isModalActive.value = false;
-  } catch (err) {
-    console.log('err ', err.message); // Ajout de la gestion des erreurs
   }
 }
 
@@ -277,6 +356,20 @@ onMounted(() => {
 
 <template>
   <p style="padding: 10px">{{ equipementCentralList.list.length }} Equipements</p>
+
+  <!-- Ajouter une piece -->
+  <CardBoxModal v-model="form.showAddPiece" title="Ajouter une pièce">
+    <FormField label="Information générale"> 
+      <FormControl v-model="form.intitule" placeholder="Intitulé" />
+    </FormField>
+    <p>
+      <BaseButtons>
+        <BaseButton color="info" label="Valider" small @click="addPiece()" />
+      </BaseButtons>
+    </p>
+  </CardBoxModal>
+
+  
   <CardBoxModal v-model="showModalForDelete" title="Suppression">
     <p>Veuillez confirmer la suppression de <strong> {{ form.nomEquipementSelect }} </strong></p>
     <br>
@@ -294,14 +387,17 @@ onMounted(() => {
     </span>
   </div>
   <div class="max-h-[32rem] overflow-x-auto">
+    <BaseButton color="success" label="Export" @click="exportToExcel()" />
+
     <table>
       <thead>
         <tr>
           <th v-if="checkable" />
           <th />
           <th>Référence</th>
+          <th>Intitulé</th>
           <th>Type</th>
-          <th>Action</th>
+          <th>Site</th>
           <th>Zone</th>
           <th>Ajouté par</th>
           <th />
@@ -316,11 +412,14 @@ onMounted(() => {
           <td data-label="Référence">
             {{ equipement.reference }}
           </td>
-          <td data-label="Nom">
+          <td data-label="Intitulé">
             {{ equipement.nom }}
           </td>
           <td data-label="Type">
             {{ equipement.type }}
+          </td>
+          <td data-label="Site">
+            {{ equipement.site }}
           </td>
           <td data-label="Zone">
             {{ equipement.zone }}
@@ -330,7 +429,7 @@ onMounted(() => {
           </td>
           <td class="before:hidden lg:w-1 whitespace-nowrap">
             <BaseButtons type="justify-start lg:justify-end" no-wrap>
-              <BaseButton color="success" :icon="mdiTools" small @click="editZone(equipement._id)" />
+              <BaseButton color="success" :icon="mdiTools" small @click="editZone(equipement)" />
 <!--               <BaseButton color="info" :icon="mdiEye" small @click="showDetails(equipement.nom)" />
               <BaseButton color="" :icon="mdiHome" small @click="addSalle()" /> -->
               <BaseButton color="danger" :icon="mdiTrashCan" small @click="openDeleteConfirmBox(equipement)" />

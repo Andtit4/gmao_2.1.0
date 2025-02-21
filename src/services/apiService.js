@@ -124,8 +124,8 @@ export default {
   },
    getWeekNumber(uneDate) {
 		var d = new Date(uneDate);
-		var DoW = d.getDay();
-		d.setDate(d.getDate() - (DoW + 6) % 7 + 3);
+		var DoW = d.getDay(); // 0 = dimanche, 1 = lundi, ..., 6 = samedi
+		d.setDate(d.getDate() - (DoW + 3) % 7); // Ajustement pour que la semaine commence le jeudi
 		var ms = d.valueOf(); // GMT
 		d.setMonth(0);
 		d.setDate(4); 

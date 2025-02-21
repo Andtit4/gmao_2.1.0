@@ -64,7 +64,9 @@ const fetchData = async () => {
       // axios.get(`${apiService.getUrl()}/share`)
     ])
 
-    console.log('Données récupérées:', { allSites, doneSites, nonFaitSites, faitSemaine, encours, sitePlannifie, siteNonFait, weeklyPlan, shareData })
+    console.log(`,y${form.value.formattedStartOfWeek}${form.value.formattedEndOfWeek}`)
+
+    console.log('Données récupérées:', { allSites, doneSites, nonFaitSites, faitSemaine, encours, sitePlannifie, siteNonFait, weeklyPlan, shareData }, )
 
     form.value.nbAllSite = parseInt(allSites.data[0].nb) || 0
     form.value.nbTotalFait = parseInt(doneSites.data[0].nb) || 0

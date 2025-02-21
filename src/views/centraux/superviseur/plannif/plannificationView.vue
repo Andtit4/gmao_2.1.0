@@ -185,6 +185,11 @@ onMounted(() => {
       <b>Plannification initialisée</b>. <i>Passez au suivant👉 </i>
     </NotificationBar>
   </div>
+  <div v-if="form.showErr == true">
+    <NotificationBar color="danger" :icon="mdiInformation" :outline="notificationsOutline">
+      <b>Erreur : </b>.
+    </NotificationBar>
+  </div>
   /* <CardBoxModal v-model="isDetailModal" title="Initialisation">
     <p>Zone : <strong>{{ oneZoneCentrale.list.nom }}</strong> </p>
     <div v-if="form.showAdd == true">

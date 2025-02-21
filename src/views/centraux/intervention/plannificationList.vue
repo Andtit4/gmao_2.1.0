@@ -52,7 +52,11 @@ const form = reactive({
   date_fait: '',
   remarque: '',
   panne: '',
-  selectedPlannif: ''
+  selectedPlannif: '',
+  idEquipement: '',
+  autre_panne: '',
+  maintenance_state: true,
+  raison: '',
 })
 
 const zones = reactive({ list: [] })
@@ -85,7 +89,7 @@ const getEquipementCentralList = async () => {
   // console.info(mainStore.userZone)
   try {
     const res = await axios({
-      url: apiService.getUrl() + '/plannif/central/zone/' + mainStore.userZone,
+      url: apiService.getUrl() + '/plannif/central/',
       method: 'GET'
     });
     // console.log('Equipement GET', form.zone_name);
@@ -151,6 +155,7 @@ const getPlannificationItems = () => {
     method: 'GET'
   }).then((res) => {
     getPlannificationItemsList.list = res.data;
+    // console.info('ree ',res.data)
   }).catch((err) => {
     console.error(err.message)
   })
@@ -170,7 +175,7 @@ const showPlanifItems = (equipement) => {
 
 const finishIntervention = () => {
   axios({
-    url: apiService.getUrl() + '/equipement/plannif/central/' ,
+    url: apiService.getUrl() + '/equipement/plannif/central/',
     method: 'PUT',
     data: {
       _id: form.selectedPlannif,
@@ -181,7 +186,7 @@ const finishIntervention = () => {
   }).then((res) => {
     // getPlannificationItemsList.list = res.data;
     getPlannificationItems()
-    form.showDatePicker  = false
+    form.showDatePicker = false
   }).catch((err) => {
     console.error(err.message)
   })
@@ -196,10 +201,39 @@ const handleDateSelect = (date) => {
   showDatePicker.value = false
 }
 
+const pieces = reactive({ list: [] })
+
+const getPieceForEquipement = () => {
+  axios({
+    url: apiService.getUrl() + '/piece/' + form.idEquipement,
+    method: 'GET'
+  }).then((res) => {
+    pieces.list = res.data
+  }).catch((err) => {
+    form.showErr = true
+    form.errmessage = 'Une erreur est survenue: ' + err.message
+  })
+}
+
+const pannes = reactive({ list: [] })
+
+const getPannes = () => {
+  axios({
+    url: apiService.getUrl() + '/panne',
+    method: 'GET'
+  }).then((res) => {
+    pannes.list = res.data
+  }).catch((err) => {
+    form.showErr = true;
+    form.errMessage = 'Une erreur est survenue: ' + err.message
+  })
+}
+
 onMounted(() => {
   getSites()
   getCentralZone()
   getEquipementCentralList()
+  getPannes()
 })
 </script>
 
@@ -227,7 +261,6 @@ onMounted(() => {
           <tr>
             <th v-if="checkable" />
             <th />
-
             <th>Equipements</th>
             <th>Etat</th>
             <th>Action</th>
@@ -235,48 +268,110 @@ onMounted(() => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(plannif, index) in getPlannificationItemsList.list" :key="index">
-            <TableCheckboxCell v-if="checkable" @checked="checked($event, zone)" />
-            <td class="border-b-0 lg:w-6 before:hidden">
-              <!-- <UserAvatar :username="zone._id" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
-            </td>
-
-            <!-- <td data-label="Date début">
-              {{ plannif.date_debut ? formatDate(plannif.date_debut) : 'Date invalide' }}
-            </td>
-            <td data-label="Date fin">
-              {{ plannif.date_fin ? formatDate(plannif.date_fin) : 'Date invalide' }}
-            </td> -->
-            <td data-label="Equipement">
-              {{ plannif.equipement == '' ? 'Tous les équipements' : plannif.equipement }}
-            </td>
-            <td data-label="Date Fait">
-              {{ plannif.date_fait == '0000-00-00 00:00:00' ? 'En attente de validation' : plannif.date_fait ? formatDate(plannif.date_fait) : 'Date invalide' }}
-            </td>
-            <td class="before:hidden lg:w-1 whitespace-nowrap">
-              <BaseButtons type="justify-start lg:justify-end" no-wrap>
-                <BaseButton color="info" :icon="mdiPencil" small @click="() => {
-                  form.showDatePicker = true;
-                  form.selectedPlannif = plannif._id;
-                }" />
-                <!-- <BaseButton color="danger" :icon="mdiTools" small @click="addPlannif(equipement)" /> -->
-              </BaseButtons>
-            </td>
-          </tr>
+          <template v-if="getPlannificationItemsList.list.length > 0">
+            <tr v-for="(plannif, index) in getPlannificationItemsList.list" :key="index">
+              <TableCheckboxCell v-if="checkable" @checked="checked($event, zone)" />
+              <td class="border-b-0 lg:w-6 before:hidden">
+                <!-- <UserAvatar :username="zone._id" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
+              </td>
+              <td data-label="Equipement">
+                {{ plannif.referenceEquipement }} / {{ plannif.nomEquipement }}
+              </td>
+              <td data-label="Date Fait">
+                {{ plannif.date_fait == '0000-00-00 00:00:00' ? 'En attente de validation' : plannif.date_fait ?
+                  formatDate(plannif.date_fait) : 'Date invalide' }}
+              </td>
+              <td class="before:hidden lg:w-1 whitespace-nowrap">
+                <BaseButtons type="justify-start lg:justify-end" no-wrap>
+                  <BaseButton color="info" :icon="mdiPencil" small @click="() => {
+                    form.showDatePicker = true;
+                    form.selectedPlannif = plannif;
+                    form.idEquipement = plannif.idEquipement;
+                    getPieceForEquipement();
+                  }" />
+                  <!-- <BaseButton color="danger" :icon="mdiTools" small @click="addPlannif(equipement)" /> -->
+                </BaseButtons>
+              </td>
+            </tr>
+          </template>
+          <template v-else>
+            <tr>
+              <td colspan="5" class="text-center">Aucun équipement entré ou en cours de chargement...</td>
+            </tr>
+          </template>
         </tbody>
       </table>
       <p>
         <BaseButtons>
-          <BaseButton color="info" label="Confirmer" small @click="" />
+          <!-- <BaseButton color="info" label="Confirmer" small @click="" /> -->
           <BaseButton color="transparent" label="Fermer" small @click="showModalForPlanif = false" />
         </BaseButtons>
       </p>
 
       <CardBoxModal v-model="form.showDatePicker" title="Clôturer le ticket">
+
         <FormField label="Informations complémentaires">
           <FormControl v-model="form.date_fait" type="date" />
-          <FormControl v-model="form.remarque" placeholder="Remarque" />
-          <FormControl v-model="form.panne" placeholder="Panne ?" />
+          <FormField label="Etat des pièces">
+            <template v-for="(piece, index) in pieces.list" :key="index">
+              <div class="flex items-center gap-4">
+                <select v-model="form.piece" class="form-select bg-white dark:bg-slate-800" placeholder="Pièce">
+                  <option value="">Sélectionnez la Pièce</option>
+                  <option v-for="piece in pieces.list" :value="piece.intitule" :key="piece.intitule">{{ piece.intitule
+                    }}</option>
+                </select>
+                <select v-model="form.remarque" class="form-select bg-white dark:bg-slate-800" placeholder="Etat">
+                  <option value="">Etat</option>
+                  <option value="BON">BON</option>
+                  <option value="MAUVAIS">MAUVAIS</option>
+                </select>
+              </div>
+              <template v-if="form.remarque === 'MAUVAIS'">
+                <div class="flex items-center w-full">
+                  <FormField label="Dite nous plus sur le souci" class="w-full">
+                    <select v-model="form.panne" class="form-select bg-white dark:bg-slate-800 w-full"
+                      placeholder="Sélectionnez la panne">
+                      <option value="">Sélectionnez la panne</option>
+                      <option v-for="(panne, index) in pannes.list" :key="index" :value="panne.code">{{ panne.code }}
+                      </option>
+                    </select>
+                    <FormControl v-model="form.autre_panne" placeholder="Panne Non répertorié ? " class="w-full" />
+                  </FormField>
+                </div>
+              </template>
+              <br>
+
+            </template>
+            <p>Maintenance terminée ?</p>
+            <div class="flex items-center gap-4">
+              <label for="oui" class="inline-flex items-center cursor-pointer">
+                <div class="relative">
+                  <input id="oui" type="radio"
+                    class="form-radio h-5 w-5 text-blue-600 transition duration-150 ease-in-out  dark:bg-slate-800"
+                    v-model="form.maintenance_state" value="true">
+                  <div class="checkmark"></div>
+                </div>
+                <div class="ml-3 text-gray-700 font-medium">
+                  Oui
+                </div>
+              </label>
+              <label for="non" class="inline-flex items-center cursor-pointer">
+                <div class="relative">
+                  <input id="non" type="radio"
+                    class="form-radio h-5 w-5 text-blue-600 transition duration-150 ease-in-out  dark:bg-slate-800"
+                    v-model="form.maintenance_state" value="false">
+                  <div class="checkmark"></div>
+                </div>
+                <div class="ml-3 text-gray-700 font-medium">
+                  Non
+                </div>
+              </label>
+            </div>
+            <template v-if="form.maintenance_state === 'false'">
+              <textarea v-model="form.raison" placeholder="Motif suspens de l'intervention"
+                class="w-full bg-white dark:bg-slate-800"></textarea>
+            </template>
+          </FormField>
 
           <BaseButton color="info" label="Enregistrer" @click="finishIntervention()" />
         </FormField>
@@ -326,7 +421,6 @@ onMounted(() => {
             </tr>
           </tbody>
         </table>
-
       </CardBox>
     </SectionMain>
     <SectionMain>

@@ -96,7 +96,7 @@ const getEquipementCentralList = async () => {
   // console.info(mainStore.userZone)
   try {
     const res = await axios({
-      url: apiService.getUrl() + '/plannif/central/zone/' +  mainStore.userZone,
+      url: apiService.getUrl() + '/plannif/central/' +  mainStore.userZone,
       method: 'GET'
     });
     console.log('Equipement GET', form.zone_name);
@@ -220,6 +220,7 @@ onMounted(() => {
   <p style="padding: 10px">{{ equipementCentralList.list.length }} Plannification(s)</p>
 
   <div v-if="checkedRows.length" class="p-3 bg-gray-100/50 dark:bg-slate-800">
+    <!-- Plannifications  -->
     <span v-for="checkedRow in checkedRows" :key="checkedRow.id"
       class="inline-block px-2 py-1 rounded-sm mr-2 text-sm bg-gray-100 dark:bg-slate-700">
       {{ checkedRow.name }}

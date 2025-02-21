@@ -11,13 +11,17 @@ export function refreshPageOnceWithDelay(delay) {
   }
 }
 
+// TODO: fixe state issue
 export function getStartAndEndOfWeek() {
   const today = new Date()
   const currentDay = today.getDay() // Jour de la semaine (0 pour dimanche, 1 pour lundi, ..., 6 pour samedi)
-  const diff = today.getDate() - currentDay + (currentDay === 0 ? -6 : 1) // Différence pour obtenir le début de la semaine
+  // Cette ligne calcule le nombre de jours à ajouter ou à soustraire à la date actuelle pour obtenir le jeudi de la semaine courante.
+  // Si le jour actuel est avant le jeudi (c'est-à-dire si currentDay est inférieur à 4), on soustrait 6 jours pour obtenir le jeudi précédent.
+  // Sinon, on ajoute 4 jours pour obtenir le jeudi suivant.
+  const diff = today.getDate() - currentDay + (currentDay < 4 ? -6 : 4)
   const startOfWeek = new Date(today.setDate(diff))
   const endOfWeek = new Date(startOfWeek)
-  endOfWeek.setDate(endOfWeek.getDate() + 6) // Ajouter 6 jours pour obtenir la fin de la semaine
+  endOfWeek.setDate(endOfWeek.getDate() + 6) // Fin de la semaine (mercredi de la semaine suivante)
 
   // Fixer heures, minutes, secondes et millisecondes à zéro
   startOfWeek.setUTCHours(0, 0, 0, 0)

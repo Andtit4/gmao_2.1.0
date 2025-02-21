@@ -45,6 +45,7 @@ const form = reactive({
     dateDebut: '',
     dateFin: '',
     zone_name: "",
+    nom_site: "",
     zoneForInterventionCentral: '',
     showSucess: false,
     showErr: false,
@@ -84,6 +85,7 @@ const getCentralZone = async () => {
         form.errmessage = 'An error occured ' + err.message
     })
 }
+
 
 const isLoading = ref(false);
 
@@ -145,13 +147,14 @@ const addEquipement = () => {
         form.errMessage = 'Veillez remplir tous les champs'
     } else {
         axios({
-            url: apiService.getLocal() + '/equipement/central/',
+            url: apiService.getUrl() + '/equipement/central/',
             method: 'POST',
             data: {
                 reference: form.referenceEquipement,
                 nom: form.nomEquipement,
                 type: form.typeEquipement,
                 zone: form.zone_name,
+                site: form.nom_site,
                 ajouter_par: form.ajouter_par
             }
         }).then((res) => {
@@ -200,6 +203,12 @@ onMounted(() => {
                         <option value="" disabled selected>Séléctionnez un équipement</option>
                         <option v-for="(equipement, index) in equipements" :key="index" :value="equipement.label">
                             {{ equipement.label }}
+                        </option>
+                    </select>
+                    <select v-model="form.nom_site" class="form-select bg-white dark:bg-slate-800">
+                        <option value="" disabled selected>Séléctionnez un site</option>
+                        <option v-for="(site, index) in sites.list" :key="index" :value="site.nom_site">
+                            {{ site.nom_site }}
                         </option>
                     </select>
                     <select v-model="form.zone_name" class="form-select bg-white dark:bg-slate-800">

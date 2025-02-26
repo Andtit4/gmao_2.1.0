@@ -13,12 +13,11 @@ import PlannificationList from '@/views/centraux/user/plannificationListByZone.v
 import apiService from '@/services/apiService'
 import axios from 'axios'
 import { useMainStore } from '@/stores/main'
-import { mdiPencil, mdiTools, mdiFileExcel } from "@mdi/js"
+import { mdiPencil, mdiTools } from "@mdi/js"
 import { icon } from 'leaflet'
 import BaseButtons from '@/components/BaseButtons.vue'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
-import data from '@/menuAside'
 import * as XLSX from 'xlsx'
 
 
@@ -58,11 +57,7 @@ const form = reactive({
   idEquipement: '',
   autre_panne: '',
   maintenance_state: true,
-  panne_state: false,
   raison: '',
-  showPanneAddNotif: false,
-  site1: '',
-  _id: '',
 })
 
 const zones = reactive({ list: [] })
@@ -78,8 +73,6 @@ const getSites = async () => {
   const data = await apiService.getAllSites();
   sites.list = data.data
 }
-
-const selectedPlannif = reactive({ list: [] })
 
 const getCentralZone = async () => {
   axios({
@@ -102,6 +95,21 @@ const getEquipementCentralList = async () => {
     });
     // console.log('Equipement GET', form.zone_name);
     equipementCentralList.list = res.data;
+  } catch (err) {
+    form.showErr = true;
+    form.errmessage = 'An error occurred: ' + err.message;
+  }
+}
+
+const interventionList = reactive({ list: [] })
+
+const getAllInterventions = async () => {
+  try {
+    const res = await axios({
+      url: apiService.getUrl() + '/rapport/central/interventions',
+      method: 'GET'
+    });
+    interventionList.list = res.data;
   } catch (err) {
     form.showErr = true;
     form.errmessage = 'An error occurred: ' + err.message;
@@ -169,26 +177,9 @@ const getPlannificationItems = () => {
   })
 }
 
-const clotureEquipementPlanifie = (id_planification, date_fait) => {
-  axios({
-    url: apiService.getUrl() + '/equipement/plannif/central/cloture/',
-    method: 'PUT',
-    data: {
-      date_fait: date_fait,
-      id_planification: id_planification
-    }
-  }).then((res) => {
-    console.info('ree ', res.data)
-  }).catch((err) => {
-    console.error(err.message)
-  })
-}
-
 const showModalForPlanif = ref(false)
 const showPlanifItems = (equipement) => {
   showModalForPlanif.value = true
-  form.zone = equipement.zone;
-  // form.site1 = equipement.site
   form.id_plannification = equipement._id;
   form.nomEquipement = equipement.nom ? equipement.nom : 'Tous les équipements'
   form.date_debut = equipement.date_debut
@@ -198,7 +189,24 @@ const showPlanifItems = (equipement) => {
   getPlannificationItems()
 }
 
-
+const finishIntervention = () => {
+  axios({
+    url: apiService.getUrl() + '/equipement/plannif/central/',
+    method: 'PUT',
+    data: {
+      _id: form.selectedPlannif,
+      date_fait: form.date_fait,
+      remarque: form.remarque,
+      panne: form.panne,
+    }
+  }).then((res) => {
+    // getPlannificationItemsList.list = res.data;
+    getPlannificationItems()
+    form.showDatePicker = false
+  }).catch((err) => {
+    console.error(err.message)
+  })
+}
 
 const mainStore = useMainStore()
 
@@ -237,115 +245,34 @@ const getPannes = () => {
   })
 }
 
-const Signaler = () => {
-  axios({
-    url: apiService.getLocal() + '/rapport/central',
-    method: 'POST',
-    data: {
-      site: '',
-      zone: '',
-      piece: '',
-      etat_piece: '',
-      date_debut: form.dateDebut,
-      date_fin: form.dateFin,
-      panne: form.panne === '' ? 'AUCUNE PANNE' : form.panne,
-      id_planification: form.id_plannification,
-      date_fait: form.date_fait,
-      suspendu: '',
-      motif: '',
-    }
-  }).then((res) => {
-    form.showPanneAddNotif = true;
-    form.panne = ''
-  })
-}
-
-const finishIntervention = async () => {
-
-  console.log('ref ', selectedPlannif.list.referenceEquipement)
-  console.log('planification ', form.id_plannification)
-  console.log('Site ', form.panne_state)
-
-  if (form.panne_state === false) {
-    await Signaler()
-  }
-
-  await axios({
-    url: apiService.getLocal() + '/equipement/plannif/central/cloture',
-    method: 'PUT',
-    data: {
-      date_fait: form.date_fait,
-      _id: form._id
-    }
-  }).then(async (res) => {
-    console.info('ree ', res.data)
-
-    await axios({
-      url: apiService.getLocal() + '/rapport/central/complete',
-      method: 'PUT',
-      data: {
-        site: form.site1,
-        zone: form.zone,
-        suspendu: form.maintenance_state === 'true' ? 'OUI' : 'NON',
-        motif: form.maintenance_state === 'false' ? form.raison : 'FINALISE',
-        id_planification: form.id_plannification,
-        date_debut: form.dateDebut,
-        date_fin: form.dateFin,
-        ref_equipement: selectedPlannif.list.referenceEquipement,
-        nom_equipement: selectedPlannif.list.nomEquipement,
-      }
-    }).then(async (res) => {
-      // clotureEquipementPlanifie(form.id_plannification, form.date_fait)
-      // await exportxlx(form.id_plannification)
-      location.reload()
-    })
-  }).catch((err) => {
-    console.error(err.message)
-  })
-
-
-
-}
-
-const exportxlx = async (id) => {
+const exportToExcel = async () => {
   try {
-    const response = await axios.get(apiService.getLocal() + `/rapport/central/plannifs/${id}`);
+    console.log('export')
+    const response = await axios.get(apiService.getUrl() + `/rapport/central/interventions`);
     const data = response.data;
 
-    // Formatage des données pour la première feuille
-    const feuille1Data = data.map(item => ({
-      'Date début': item.date_debut || '',
-      'Date fin': item.date_fin || '',
-      'Date fait': item.date_fait || 'Non réalisé',
-      'ID Planification': item.id_planification || '',
+    const feuilleData = data.map(item => ({
       'Zone': item.zone || '',
+      'Date début': item.date_debut || '',
+      'Date fin': item.date_fin || 'Non réalisé',
+      'Date fait': item.date_fait || '',
+      'Panne': item.panne || '',
       'Equipement': item.nomEquipement,
-      'Référence Equipement': item.refEquipement
-    }));
-
-    // Formatage des données pour la deuxième feuille
-    const feuille2Data = data.map(item => ({
-      'Code Panne': item.panne || 'Aucun',
+      'Référence Equipement': item.refEquipement,
+      'Nom equipement': item.nomEquipement,
+      'Code Panne': item.panne_code || 'Aucun',
       'Description': item.description || '',
-      'Equipement': item.equipement,
-      'Reference Equipement': selectedPlannif.list.referenceEquipement
-      // 'Description Panne': item.autre_panne || ''
+      'Intervenant': item.nom == NULL ? 'Non assigné' : item.nom + ' ' + item.prenom
     }));
 
     const wb = XLSX.utils.book_new();
 
     // Première feuille - Informations de base
-    const ws1 = XLSX.utils.json_to_sheet(feuille1Data, {
-      header: ['Date début', 'Date fin', 'Date fait', 'ID Planification', 'Zone', 'Equipement', 'Référence Equipement']
+    const ws1 = XLSX.utils.json_to_sheet(feuilleData, {
+      header: ['Zone', 'Date début', 'Date fin', 'Date fait', 'Panne', 'Equipement', 'Référence Equipement', 'Nom equipement', 'Code Panne', 'Description']
     });
 
-    // Deuxième feuille - Détails des pannes
-    const ws2 = XLSX.utils.json_to_sheet(feuille2Data, {
-      header: ['Code Panne', 'Description Panne',]
-    });
-
-    XLSX.utils.book_append_sheet(wb, ws1, "Informations");
-    XLSX.utils.book_append_sheet(wb, ws2, "Pannes");
+    XLSX.utils.book_append_sheet(wb, ws1, "Rapport");
 
     // Générer le fichier Excel
     const wbout = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
@@ -354,7 +281,7 @@ const exportxlx = async (id) => {
     const blob = new Blob([wbout], { type: 'application/octet-stream' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `${mainStore.userName}_Rapport_Planif${id}.xlsx`;
+    link.download = `Rapport_Planif.xlsx`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -363,13 +290,14 @@ const exportxlx = async (id) => {
     form.showErr = true;
     form.errmessage = 'Erreur lors de la génération du fichier Excel: ' + err.message;
   }
-};
+}
 
 onMounted(() => {
   getSites()
   getCentralZone()
   getEquipementCentralList()
   getPannes()
+  getAllInterventions()
 })
 </script>
 
@@ -418,22 +346,15 @@ onMounted(() => {
                   formatDate(plannif.date_fait) : 'Date invalide' }}
               </td>
               <td class="before:hidden lg:w-1 whitespace-nowrap">
-                <div v-if="plannif.date_fait == '0000-00-00 00:00:00'">
-
-                  <BaseButtons type="justify-start lg:justify-end" no-wrap>
-                    <BaseButton color="info" :icon="mdiPencil" small @click="() => {
-                      form.showDatePicker = true;
-                      selectedPlannif.list = plannif;
-                      form.idEquipement = plannif.idEquipement;
-                      form._id = plannif._id;
-                      getPieceForEquipement();
-                    }" />
-                  </BaseButtons>
-                </div>
-                <div v-else>
-                  Terminé
-                </div>
-                <!-- <BaseButton color="danger" :icon="mdiTools" small @click="addPlannif(equipement)" /> -->
+                <BaseButtons type="justify-start lg:justify-end" no-wrap>
+                  <BaseButton color="info" :icon="mdiPencil" small @click="() => {
+                    form.showDatePicker = true;
+                    form.selectedPlannif = plannif;
+                    form.idEquipement = plannif.idEquipement;
+                    getPieceForEquipement();
+                  }" />
+                  <!-- <BaseButton color="danger" :icon="mdiTools" small @click="addPlannif(equipement)" /> -->
+                </BaseButtons>
               </td>
             </tr>
           </template>
@@ -455,82 +376,7 @@ onMounted(() => {
 
         <FormField label="Informations complémentaires">
           <FormControl v-model="form.date_fait" type="date" />
-          <p>Une panne en instance ?</p>
-          <div class="flex items-center gap-4">
-            <div v-if="form.showPanneAddNotif == true">
-              <NotificationBar color="success" :icon="mdiInformation" :outline="notificationsOutline">
-                <b>Panne ajouté avec succès</b>. <i>Passez au suivant👉 s'il y'en a.</i>
-              </NotificationBar>
-            </div>
-            <label for="oui" class="inline-flex items-center cursor-pointer">
-              <div class="relative">
-                <input id="oui" type="radio"
-                  class="form-radio h-5 w-5 text-blue-600 transition duration-150 ease-in-out  dark:bg-slate-800"
-                  v-model="form.panne_state" value="true">
-                <div class="checkmark"></div>
-              </div>
-              <div class="ml-3 text-gray-700 font-medium">
-                Oui
-              </div>
-            </label>
-            <label for="non" class="inline-flex items-center cursor-pointer">
-              <div class="relative">
-                <input id="non" type="radio"
-                  class="form-radio h-5 w-5 text-blue-600 transition duration-150 ease-in-out  dark:bg-slate-800"
-                  v-model="form.panne_state" value="false">
-                <div class="checkmark"></div>
-              </div>
-              <div class="ml-3 text-gray-700 font-medium">
-                Non
-              </div>
-            </label>
-          </div>
-
-          <template v-if="form.panne_state === 'true'">
-            <div class="flex items-center w-full">
-              <FormField label="Dite nous plus sur le souci" class="w-full">
-                <select v-model="form.panne" class="form-select bg-white dark:bg-slate-800 w-full"
-                  placeholder="Sélectionnez la panne">
-                  <option value="">Sélectionnez la panne</option>
-                  <option v-for="(panne, index) in pannes.list" :key="index" :value="panne.code">{{ panne.code }}
-                  </option>
-                </select>
-                <FormControl v-model="form.autre_panne" placeholder="Panne Non répertorié ? " class="w-full" />
-              </FormField>
-            </div>
-            <BaseButton color="warning" label="Signaler la panne" @click="Signaler()" />
-          </template>
-
-          <p>Maintenance terminée ?</p>
-          <div class="flex items-center gap-4">
-            <label for="oui" class="inline-flex items-center cursor-pointer">
-              <div class="relative">
-                <input id="oui" type="radio"
-                  class="form-radio h-5 w-5 text-blue-600 transition duration-150 ease-in-out  dark:bg-slate-800"
-                  v-model="form.maintenance_state" value="true">
-                <div class="checkmark"></div>
-              </div>
-              <div class="ml-3 text-gray-700 font-medium">
-                Oui
-              </div>
-            </label>
-            <label for="non" class="inline-flex items-center cursor-pointer">
-              <div class="relative">
-                <input id="non" type="radio"
-                  class="form-radio h-5 w-5 text-blue-600 transition duration-150 ease-in-out  dark:bg-slate-800"
-                  v-model="form.maintenance_state" value="false">
-                <div class="checkmark"></div>
-              </div>
-              <div class="ml-3 text-gray-700 font-medium">
-                Non
-              </div>
-            </label>
-          </div>
-          <template v-if="form.maintenance_state === 'false'">
-            <textarea v-model="form.raison" placeholder="Motif suspens de l'intervention"
-              class="w-full bg-white dark:bg-slate-800"></textarea>
-          </template>
-          <!-- <FormField label="Etat des pièces">
+          <FormField label="Etat des pièces">
             <template v-for="(piece, index) in pieces.list" :key="index">
               <div class="flex items-center gap-4">
                 <select v-model="form.piece" class="form-select bg-white dark:bg-slate-800" placeholder="Pièce">
@@ -589,7 +435,7 @@ onMounted(() => {
               <textarea v-model="form.raison" placeholder="Motif suspens de l'intervention"
                 class="w-full bg-white dark:bg-slate-800"></textarea>
             </template>
-          </FormField> -->
+          </FormField>
 
           <BaseButton color="info" label="Enregistrer" @click="finishIntervention()" />
         </FormField>
@@ -633,7 +479,6 @@ onMounted(() => {
               </td>
               <td class="before:hidden lg:w-1 whitespace-nowrap">
                 <BaseButtons type="justify-start lg:justify-end" no-wrap>
-                  <BaseButton color="success" :icon="mdiFileExcel" small @click="exportxlx(equipement._id)" />
                   <BaseButton color="success" :icon="mdiPencil" small @click="showPlanifItems(equipement)" />
                 </BaseButtons>
               </td>
@@ -643,7 +488,62 @@ onMounted(() => {
       </CardBox>
     </SectionMain>
     <SectionMain>
+      <div class="flex justify-end">
+        <BaseButton color="info" label="Exporter excel" @click="exportToExcel()" />
+      </div>
 
+      <CardBox>
+        <table>
+          <thead>
+            <tr>
+              <th v-if="checkable" />
+              <th />
+              <th>Zone</th>
+              <th>Début</th>
+              <th>Fin</th>
+              <th>Date fait</th>
+              <th>Panne</th>
+              <th>PaEquipement</th>
+              <th>Suspendu</th>
+              <th>Intervenant</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(intervention, index) in interventionList.list" :key="index">
+              <TableCheckboxCell v-if="checkable" @checked="checked($event, zone)" />
+              <td class="border-b-0 lg:w-6 before:hidden">
+                <!-- <UserAvatar :username="zone._id" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
+              </td>
+              <td data-label="Zone">
+                {{ intervention.zone }}
+              </td>
+              <td data-label="Date début">
+                {{ intervention.date_debut ? formatDate(intervention.date_debut) : 'Date invalide' }}
+              </td>
+              <td data-label="Date fin">
+                {{ intervention.date_fin ? formatDate(intervention.date_fin) : 'Date invalide' }}
+              </td>
+              <td data-label="Date fait">
+                {{ intervention.date_fait ? formatDate(intervention.date_fait) : 'Date invalide' }}
+              </td>
+              <td data-label="Panne">
+                {{ intervention.panne_code }}
+              </td>
+              <td data-label="Equipement">
+                {{ intervention.refEquipement }} / {{  intervention.nomEquipement }}
+              </td>
+              <td data-label="Suspendu">
+                {{ intervention.suspendu }} 
+              </td>
+              <td data-label="Intervenant">
+                {{ intervention.nom == NULL ? 'Non assigné' : intervention.nom }}
+                {{ intervention.nom }} {{ intervention.prenom }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </CardBox>
     </SectionMain>
   </LayoutAuthenticated>
 </template>

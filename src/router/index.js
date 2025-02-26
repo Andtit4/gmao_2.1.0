@@ -29,278 +29,287 @@ import zoneView from '@/views/centraux/superviseur/zone/zoneView.vue'
 import salleView from '@/views/centraux/superviseur/salle/salleView.vue'
 import plannificationView from '@/views/centraux/superviseur/plannif/plannificationView.vue'
 import plannificationList from '@/views/centraux/intervention/plannificationList.vue'
+import plannificationListForCentraux from '@/views/centraux/plannifications/ListPlannification.vue'
 
-const routes = [
-  {
-    path: '/:catchAll(.*)',
-    component: NotFound
-  },
-  {
-    meta: {
-      title: 'Login'
+const routes = [{
+        path: '/:catchAll(.*)',
+        component: NotFound
     },
-    path: '/',
-    name: 'Login',
-    component: Login
-  },
-  {
-    meta: {
-      title: 'Zone Central',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Login'
+        },
+        path: '/',
+        name: 'Login',
+        component: Login
     },
-    path: '/central/:type/:pass',
-    name: 'CentralZone',
-    component: CentralView
-  },
-  {
-    meta: {
-      title: 'Refueling',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Zone Central',
+            requiresAuth: true
+        },
+        path: '/central/:type/:pass',
+        name: 'CentralZone',
+        component: CentralView
     },
-    path: '/refueling/user/:type/:pass',
-    name: 'RefuelingUser',
-    component: RefuelingViewForUser
-  },
-  {
-    meta: {
-      title: 'Refueling',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Refueling',
+            requiresAuth: true
+        },
+        path: '/refueling/user/:type/:pass',
+        name: 'RefuelingUser',
+        component: RefuelingViewForUser
     },
-    path: '/refueling/:type/:pass',
-    name: 'RefuelingView',
-    component: RefuelingView
-  },
-  {
-    meta: {
-      title: 'Traiter',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Refueling',
+            requiresAuth: true
+        },
+        path: '/refueling/:type/:pass',
+        name: 'RefuelingView',
+        component: RefuelingView
     },
-    path: '/traiter/:type/:pass',
-    name: 'Traiter',
-    component: TraiterPlannif
-  },
-  {
-    meta: {
-      title: 'Liste',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Traiter',
+            requiresAuth: true
+        },
+        path: '/traiter/:type/:pass',
+        name: 'Traiter',
+        component: TraiterPlannif
     },
-    path: '/plannification/site/:type/:pass',
-    name: 'ListePlannificationSite',
-    component: ListPlannificationBySite
-  },
-  {
-    // Document title tag
-    // We combine it with defaultDocumentTitle set in `src/main.js` on router.afterEach hook
-    meta: {
-      title: 'Dashboard',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Liste',
+            requiresAuth: true
+        },
+        path: '/plannification/site/:type/:pass',
+        name: 'ListePlannificationSite',
+        component: ListPlannificationBySite
     },
-    path: '/dashboard/:type/:pass',
-    name: 'Dashboard',
-    component: Home
-  },
-  {
-    meta: {
-      title: 'Sites',
-      requiresAuth: true
+    {
+        // Document title tag
+        // We combine it with defaultDocumentTitle set in `src/main.js` on router.afterEach hook
+        meta: {
+            title: 'Dashboard',
+            requiresAuth: true
+        },
+        path: '/dashboard/:type/:pass',
+        name: 'Dashboard',
+        component: Home
     },
-    path: '/site/:type/:pass',
-    name: 'sites',
-    component: Site
-  },
-  {
-    meta: {
-      title: 'Zones',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Sites',
+            requiresAuth: true
+        },
+        path: '/site/:type/:pass',
+        name: 'sites',
+        component: Site
     },
-    path: '/zone/:type/:pass',
-    name: 'zone',
-    component: Zone
-  },
-  {
-    meta: {
-      title: 'Sites',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Zones',
+            requiresAuth: true
+        },
+        path: '/zone/:type/:pass',
+        name: 'zone',
+        component: Zone
     },
-    path: '/site/list/:type/:pass',
-    name: 'List',
-    component: SiteList
-  },
-  {
-    meta: {
-      title: 'Intervenants',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Sites',
+            requiresAuth: true
+        },
+        path: '/site/list/:type/:pass',
+        name: 'List',
+        component: SiteList
     },
-    path: '/intervenant/:type/:pass',
-    name: 'intervenant',
-    component: Intervenant
-  },
-  {
-    meta: {
-      title: 'Intervenants',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Intervenants',
+            requiresAuth: true
+        },
+        path: '/intervenant/:type/:pass',
+        name: 'intervenant',
+        component: Intervenant
     },
-    path: '/intervenant/list/:type/:pass',
-    name: 'intervenants',
-    component: IntervenantList
-  },
-  {
-    meta: {
-      title: 'Equipements',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Intervenants',
+            requiresAuth: true
+        },
+        path: '/intervenant/list/:type/:pass',
+        name: 'intervenants',
+        component: IntervenantList
     },
-    path: '/equipement/:type/:pass',
-    name: 'equipement',
-    component: Equipement
-  },
-  {
-    meta: {
-      title: 'Equipements',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Equipements',
+            requiresAuth: true
+        },
+        path: '/equipement/:type/:pass',
+        name: 'equipement',
+        component: Equipement
     },
-    path: '/equipement/list/:type/:pass',
-    name: 'equipement list',
-    component: EquipementList
-  },
-  {
-    meta: {
-      title: 'Articles',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Equipements',
+            requiresAuth: true
+        },
+        path: '/equipement/list/:type/:pass',
+        name: 'equipement list',
+        component: EquipementList
     },
-    path: '/article/:type/:pass',
-    name: 'article',
-    component: ArticleView
-  },
-  {
-    meta: {
-      title: 'Historiques',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Articles',
+            requiresAuth: true
+        },
+        path: '/article/:type/:pass',
+        name: 'article',
+        component: ArticleView
     },
-    path: '/historique/:type/:pass',
-    name: 'historique list',
-    component: HistoriqueEquipement
-  },
-  {
-    meta: {
-      title: 'Sortie',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Historiques',
+            requiresAuth: true
+        },
+        path: '/historique/:type/:pass',
+        name: 'historique list',
+        component: HistoriqueEquipement
     },
-    path: '/sorti/:type/:pass',
-    name: 'sorti list',
-    component: SortiEquipement
-  },
+    {
+        meta: {
+            title: 'Sortie',
+            requiresAuth: true
+        },
+        path: '/sorti/:type/:pass',
+        name: 'sorti list',
+        component: SortiEquipement
+    },
 
-  {
-    meta: {
-      title: 'MP',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'MP',
+            requiresAuth: true
+        },
+        path: '/preventive/classique/:type/:pass',
+        name: 'preventiveClassique',
+        component: ClassiqueView
     },
-    path: '/preventive/classique/:type/:pass',
-    name: 'preventiveClassique',
-    component: ClassiqueView
-  },
-  {
-    meta: {
-      title: 'PLANNIFIE',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'PLANNIFIE',
+            requiresAuth: true
+        },
+        path: '/preventive/plannifie/:type/:pass',
+        name: 'plannifie',
+        component: PlanifieView
     },
-    path: '/preventive/plannifie/:type/:pass',
-    name: 'plannifie',
-    component: PlanifieView
-  },
-  {
-    meta: {
-      title: 'PLANNIFICATION',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'PLANNIFICATION',
+            requiresAuth: true
+        },
+        path: '/preventive/plannification/:type/:pass',
+        name: 'plannifications',
+        component: PlanifieList
     },
-    path: '/preventive/plannification/:type/:pass',
-    name: 'plannifications',
-    component: PlanifieList
-  },
-  {
-    meta: {
-      title: 'DASHBOARD',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'DASHBOARD',
+            requiresAuth: true
+        },
+        path: '/dashboard/centraux/:type/:pass',
+        name: 'dashboard_centraux',
+        component: DashboardCentraux
     },
-    path: '/dashboard/centraux/:type/:pass',
-    name: 'dashboard_centraux',
-    component: DashboardCentraux
-  },
-  {
-    meta: {
-      title: 'EQUIPEMENT CENTRAL',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'EQUIPEMENT CENTRAL',
+            requiresAuth: true
+        },
+        path: '/dashboard/equipement/centraux/:type/:pass',
+        name: 'equipement_centraux',
+        component: EquipementCentral
     },
-    path: '/dashboard/equipement/centraux/:type/:pass',
-    name: 'equipement_centraux',
-    component: EquipementCentral
-  },
-  {
-    meta: {
-      title: 'ZONE CENTRALE',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'ZONE CENTRALE',
+            requiresAuth: true
+        },
+        path: '/dashboard/zone/centraux/:type/:pass',
+        component: zoneView
     },
-    path: '/dashboard/zone/centraux/:type/:pass',
-    component: zoneView
-  },
-  {
-    meta: {
-      title: 'SALLE CENTRALE',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'SALLE CENTRALE',
+            requiresAuth: true
+        },
+        path: '/dashboard/salle/centraux/:type/:pass',
+        component: salleView
+    }, {
+        meta: {
+            title: 'PLANNIFICATION',
+            requiresAuth: true
+        },
+        path: '/dashboard/plannification/centraux/:type/:pass',
+        component: plannificationView
     },
-    path: '/dashboard/salle/centraux/:type/:pass',
-    component: salleView
-  },{
-    meta: {
-      title: 'PLANNIFICATION',
-      requiresAuth: true
-    },
-    path: '/dashboard/plannification/centraux/:type/:pass',
-    component: plannificationView
-  },
-  {
-    meta: {
-      title: 'Intervention',
+    {
+        meta: {
+            title: 'PLANNIFICATION CENTRAUX',
+            requiresAuth: true
+        },
+        path: '/dashboard/plannification/centraux/list/:type/:pass',
+        component: plannificationListForCentraux
 
-      requiresAuth: true
+    }, {
+        meta: {
+            title: 'Intervention',
+
+            requiresAuth: true
+        },
+        path: '/dashboard/intervention/centraux/:type/:pass',
+        name: 'InterventionCentral',
+        component: plannificationList
     },
-    path: '/dashboard/intervention/centraux/:type/:pass',
-    name: 'InterventionCentral',
-    component: plannificationList
-  },
-  {
-    meta: {
-      title: 'Profile',
-      requiresAuth: true
-    },
-    path: '/profile/:type/:pass',
-    name: 'profile',
-    component: () => import('@/views/ProfileView.vue')
-  }
+    {
+        meta: {
+            title: 'Profile',
+            requiresAuth: true
+        },
+        path: '/profile/:type/:pass',
+        name: 'profile',
+        component: () =>
+            import ('@/views/ProfileView.vue')
+    }
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
-  routes,
-  scrollBehavior(to, from, savedPosition) {
-    return savedPosition || { top: 0 }
-  }
+    history: createWebHashHistory(),
+    routes,
+    scrollBehavior(to, from, savedPosition) {
+        return savedPosition || { top: 0 }
+    }
 })
 
 // Guard de navigation global
 router.beforeEach((to, from, next) => {
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
-    // Vérifier l'authentification de l'utilisateur
-    const token = localStorage.getItem('token')
-    if (!token) {
-      // Rediriger vers la page de connexion si non authentifié
-      next('/')
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
+        // Vérifier l'authentification de l'utilisateur
+        const token = localStorage.getItem('token')
+        if (!token) {
+            // Rediriger vers la page de connexion si non authentifié
+            next('/')
+        } else {
+            next()
+        }
     } else {
-      next()
+        next()
     }
-  } else {
-    next()
-  }
 })
 
 export default router

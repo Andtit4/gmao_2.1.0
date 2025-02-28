@@ -297,6 +297,8 @@ onMounted(initializeData)
         <FormControl v-model="form.date_releve" placeholder="Date de relevé" type="date" />
       </FormField>
       <LoadingButton :button-text="'Enregistrer'" :is-loading="isLoading" @click="createIndex()" />
+      <LoadingButton   :button-text="'Fermer'" 
+      @click="location.reload()" />
     </CardBoxModal>
 
     <SectionMain>

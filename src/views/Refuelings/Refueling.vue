@@ -37,7 +37,7 @@ const form = reactive({
 const sites = reactive({ list: [] })
 const sitesIndexed = reactive({ list: [] })
 const oneSite = reactive({ list: [] })
-const onSiteForGraph = reactive({ list: []})
+const onSiteForGraph = reactive({ list: [] })
 // const nonCommonIndex = reactive({ list: [] })
 
 const isModalActive = ref(false)
@@ -279,7 +279,7 @@ const showGraph = async (siteId, nomSite) => {
           },
           tooltip: {
             callbacks: {
-              label: function(context) {
+              label: function (context) {
                 let label = context.dataset.label || '';
                 if (label) {
                   label += ': ';
@@ -289,7 +289,7 @@ const showGraph = async (siteId, nomSite) => {
                 }
                 return label;
               },
-              afterLabel: function(context) {
+              afterLabel: function (context) {
                 const index = context.dataIndex;
                 const startDate = new Date(sortedData[index].date_releve);
                 const endDate = new Date(sortedData[index + 1].date_releve);
@@ -333,7 +333,7 @@ const getSiteIndexed = async () => {
   }
 }
 
-const getSiteIndexedByName = async (site)  => {
+const getSiteIndexedByName = async (site) => {
   try {
     const response = await axios.get(`${apiService.getUrl()}/refueling/search?site=${site}`)
     onSiteForGraph.list = response.data
@@ -359,7 +359,7 @@ const getAllSiteIndex = async () => {
 
 const exportxlx = async () => {
   const apiData = await getAllSiteIndex()
-  
+
   // Trier les données par site et date
   apiData.sort((a, b) => {
     if (a.site !== b.site) return a.site.localeCompare(b.site)
@@ -434,7 +434,7 @@ const exportxlx = async () => {
 
 const exportxlxLatest = async () => {
   const apiData = await getAllSiteIndex()
-  
+
   // Vérifier si les données sont récupérées correctement
   if (!apiData || apiData.length === 0) {
     console.error('Aucune donnée récupérée')
@@ -541,6 +541,8 @@ const exportxlxLatest = async () => {
 
 const createIndex = async () => {
   isLoading.value = true
+  form.showError = false
+  form.errMessage = ''
   if (form.index === "" || form.index === " ") {
     form.showError = true
     isLoading.value = false
@@ -573,6 +575,10 @@ const createIndex = async () => {
       form.showError = true
       isLoading.value = false
       form.errMessage = 'Index déjà enregistré pour ce site'
+      setTimeout(() => {
+        location.reload();
+      }, 5000);
+      // location.reload();
     }
   } catch (error) {
     console.error('Une erreur est survenue:', error)
@@ -618,7 +624,7 @@ onMounted(initializeData)
 
 <template>
   <LayoutAuthenticated>
-    <CardBoxModal v-model="isGraphModalActive" title="Fonctionnement" >
+    <CardBoxModal v-model="isGraphModalActive" title="Fonctionnement">
       <div style="height: 300px; ">
         <canvas ref="chartCanvas"></canvas>
       </div>
@@ -637,12 +643,13 @@ onMounted(initializeData)
         <FormControl v-model="form.date_releve" placeholder="Date de relevé" type="date" />
       </FormField>
       <LoadingButton :button-text="'Enregistrer'" :is-loading="isLoading" @click="createIndex()" />
+      <BaseButton label="Fermer" color="success" small @click="location.reload()" />
     </CardBoxModal>
 
     <SectionMain>
       <BaseButton target="_blank" :icon="mdiPlus" label="Export" color="success" rounded-full small
         @click="exportxlx()" />
-        <BaseButton target="_blank" :icon="mdiPlus" label="Export Latest" color="success" rounded-full small
+      <BaseButton target="_blank" :icon="mdiPlus" label="Export Latest" color="success" rounded-full small
         @click="exportxlxLatest()" />
       <CardBox>
         <FormField label="Rechercher">

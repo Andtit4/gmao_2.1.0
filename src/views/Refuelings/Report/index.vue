@@ -144,6 +144,7 @@ const exportxlx = async () => {
 
 const createIndex = () => {
   isLoading.value = true
+
   if (form.index === "" || form.index === " ") {
     form.showError = true
     isLoading.value = false
@@ -186,6 +187,8 @@ const createIndex = () => {
         form.showError = true
         isLoading.value = false
         form.errMessage = 'Index déjà enregistré pour ce site'
+        // oneSite.list.nom_site = '';
+        
       }
     })
   }
@@ -229,6 +232,8 @@ onMounted(() => {
         <FormControl v-model="form.date_releve" placeholder="Date de relevé" type="date" />
       </FormField>
       <LoadingButton :button-text="'Enregister'" :is-loading="isLoading" @click="createIndex()" />
+      <LoadingButton   :button-text="'Fermer'" 
+        @click="location.reload()" />
     </CardBoxModal>
     <SectionMain>
       <BaseButton target="_blank" :icon="midExcel" label="Export" color="success" rounded-full small

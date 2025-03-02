@@ -21,7 +21,7 @@ let type = Cookies.get('type')
 
 // Fait
 const getAllsite = async () => {
-  const response = await axios.get(apiService.getUrl() + '/plannifie/all/done')
+  const response = await axios.get(apiService.getUrl() + '/plannifie/all/done/for-map')
   return response.data
 }
 // Fait
@@ -50,6 +50,10 @@ const exportxlx = async () => {
         s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
       },
       {
+        v: 'SITE ID',
+        s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
+      },
+      {
         v: 'SITE',
         s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
       },
@@ -67,6 +71,7 @@ const exportxlx = async () => {
     ...apiData.map((item) => [
       item.numero_ticket,
       item.zone,
+      item.site_id,
       item.site,
       item.date_attente,
       item.date_prise_en_compte,

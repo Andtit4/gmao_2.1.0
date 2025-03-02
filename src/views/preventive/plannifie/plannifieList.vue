@@ -248,7 +248,7 @@ const exportxlx = async (zone) => {
     [
       'ZONE',
       'SITE',
-      'DATE EN ATTENTE',
+      'DATE DE REALISATION',
       'DATE DE PRISE EN COMPTE',
       'DATE AJOUT PAR LE SUPERVISEUR',
       'SEMAINE'

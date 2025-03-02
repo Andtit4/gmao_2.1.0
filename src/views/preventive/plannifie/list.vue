@@ -54,7 +54,7 @@ const exportxlx = async () => {
         s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
       },
       {
-        v: 'DATE EN ATTENTE',
+        v: 'DATE EN REALISATION',
         s: { fill: { fgColor: { rgb: '000080' } }, font: { color: { rgb: 'FFFFFF' } } }
       },
       {

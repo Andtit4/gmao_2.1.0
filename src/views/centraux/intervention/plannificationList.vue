@@ -239,7 +239,7 @@ const getPannes = () => {
 
 const Signaler = () => {
   axios({
-    url: apiService.getLocal() + '/rapport/central',
+    url: apiService.getUrl() + '/rapport/central',
     method: 'POST',
     data: {
       site: '',
@@ -271,7 +271,7 @@ const finishIntervention = async () => {
   }
 
   await axios({
-    url: apiService.getLocal() + '/equipement/plannif/central/cloture',
+    url: apiService.getUrl() + '/equipement/plannif/central/cloture',
     method: 'PUT',
     data: {
       date_fait: form.date_fait,
@@ -281,7 +281,7 @@ const finishIntervention = async () => {
     console.info('ree ', res.data)
 
     await axios({
-      url: apiService.getLocal() + '/rapport/central/complete',
+      url: apiService.getUrl() + '/rapport/central/complete',
       method: 'PUT',
       data: {
         site: form.site1,
@@ -309,7 +309,7 @@ const finishIntervention = async () => {
 
 const exportxlx = async (id) => {
   try {
-    const response = await axios.get(apiService.getLocal() + `/rapport/central/plannifs/${id}`);
+    const response = await axios.get(apiService.getUrl() + `/rapport/central/plannifs/${id}`);
     const data = response.data;
 
     // Formatage des données pour la première feuille

@@ -99,14 +99,17 @@ const getCentralZonePlanned = async () => {
             method: 'GET'
         });
 
-        if (Array.isArray(response.data)) {
-            zoneCentralPlanned.list = response.data;
-            console.log(zoneCentralPlanned.list);
+        // const data = response.data;
+        const data = response.data;
+        console.log("data ", data);
+
+        /* if (Array.isArray(response.data)) {
+            
         } else {
             console.error('Unexpected response format:', response.data);
             form.showErr = true;
             form.errmessage = 'Unexpected response format';
-        }
+        } */
     } catch (err) {
         form.showErr = true;
         form.errmessage = 'An error occurred: ' + err.message;
@@ -332,7 +335,13 @@ const getEquipementByZone = async (zone) => {
         method: 'GET',
     }).then((res) => {
         equipementsList.list = res.data
-        // console.log("equi ", equipementsList.list.length)
+        console.log("equi ", equipementsList.list.length)
+        if (equipementsList.list.length == 0) {
+            console.log("error showing")
+            form.showErr == true
+            form.errmessage = "Veuillez ajouter un equipement à cette zone"
+            isLoading.value == false
+        }
     }).catch((err) => {
         console.error('an error occured  equi list')
         isLoading.value = false;
@@ -361,7 +370,7 @@ const addEquipementToTable = (equipement) => {
             date_debut: form.date_debut,
             date_fin: form.date_fin,
             equipement: equipement,
-            id_planification: form.id_plannification, 
+            id_planification: form.id_plannification,
             assigner: form.intervenant
         }
     }).then((res) => {
@@ -380,6 +389,8 @@ const getPlannificationItems = () => {
         method: 'GET'
     }).then((res) => {
         getPlannificationItemsList.list = res.data;
+        console.log('plannif item ', getPlannificationItemsList.list.length)
+        
     }).catch((err) => {
         console.error(err.message)
     })
@@ -388,8 +399,9 @@ const getPlannificationItems = () => {
 const addPlannification = async () => {
     if (form.equipement == '') {
         isLoading.value = true;
-        // console.log('true')
+        console.log('true')
         await getEquipementByZone(form.zone);
+        // console.log(getEquipementByZone(form.zone))
         if (equipementsList.list && equipementsList.list.length > 0) {
             equipementsList.list.forEach(equipement => {
                 addEquipementToTable(equipement._id)
@@ -425,6 +437,9 @@ onMounted(() => {
         <div v-if="getPlannificationItemsList.list.length == 0">
             <p>Plannification N°{{ form.id_plannification }}
             </p>
+            <div v-if="equipementsList.list.length == 0">
+                {{ form.errmessage }}
+            </div>
             Zone <strong>{{ form.zone }}</strong>
             <br>
             <br>
@@ -432,7 +447,7 @@ onMounted(() => {
                 <select v-model="form.intervenant" class="form-select bg-white dark:bg-slate-800">
                     <option value="" disabled selected>Séléctionnez un intervenant</option>
                     <option v-for="(intervenant, index) in intervenants.list" :key="index" :value="intervenant._id">
-                        {{ intervenant.nom }}  {{ intervenant.prenom }} -- {{ intervenant.zone }}
+                        {{ intervenant.nom }} {{ intervenant.prenom }} -- {{ intervenant.zone }}
                     </option>
                 </select>
 

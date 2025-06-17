@@ -438,7 +438,7 @@ onMounted(() => {
             <p>Plannification N°{{ form.id_plannification }}
             </p>
             <div v-if="equipementsList.list.length == 0">
-                {{ form.errmessage }}
+                <span style="color: red;">{{ form.errmessage }}</span> 
             </div>
             Zone <strong>{{ form.zone }}</strong>
             <br>

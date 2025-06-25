@@ -338,9 +338,7 @@ const getEquipementByZone = async (zone) => {
         console.log("equi ", equipementsList.list.length)
         if (equipementsList.list.length == 0) {
             console.log("error showing")
-            form.showErr == true
-            form.errmessage = "Veuillez ajouter un equipement à cette zone"
-            isLoading.value == false
+           
         }
     }).catch((err) => {
         console.error('an error occured  equi list')
@@ -390,6 +388,13 @@ const getPlannificationItems = () => {
     }).then((res) => {
         getPlannificationItemsList.list = res.data;
         console.log('plannif item ', getPlannificationItemsList.list.length)
+
+        if (getPlannificationItemsList.list.length == 0) {
+             form.showErr == true
+            form.errmessage = "Veuillez ajouter un equipement à cette zone, pour "
+            isLoading.value == false
+        }
+
         
     }).catch((err) => {
         console.error(err.message)

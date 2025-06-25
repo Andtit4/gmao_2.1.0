@@ -1,7 +1,7 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useMainStore } from '@/stores/main'
-import { mdiEye, mdiPencil, mdiTrashCan, mdiPlus, mdiArrowUp, mdiRefresh, mdiCalendar, mdiTools, mdiHome } from '@mdi/js'
+import { mdiEye, mdiPencil, mdiTrashCan, mdiPlus, mdiArrowUp, mdiRefresh, mdiCalendar, mdiTools, mdiHome, mdiMagnify, mdiLock, mdiAlertCircle } from '@mdi/js'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
@@ -10,6 +10,7 @@ import BaseButton from '@/components/BaseButton.vue'
 import FormControl from '@/components/FormControl.vue'
 import FormField from '@/components/FormField.vue'
 import LoadingButton from '@/layouts/LoadingButton.vue'
+import BaseIcon from '@/components/BaseIcon.vue'
 
 
 // import UserAvatar from '@/components/UserAvatar.vue'
@@ -39,11 +40,8 @@ const form = reactive({
     quota: 0,
     id_plannification: 0,
     zone: '',
-    equipement: '',
-    date_debut: '',
-    date_fin: '',
     intervenant: '',
-
+    searchTerm: ''
 })
 
 const zoneCentrale = reactive({ list: [] })
@@ -230,9 +228,34 @@ const numPages = computed(() => Math.ceil(equipementCentralList.list.length / pe
 
 const currentPageHuman = computed(() => currentPage.value + 1)
 
+// Filtrage des planifications basé sur le terme de recherche
+const filteredPlannifications = computed(() => {
+    if (!form.searchTerm) {
+        return equipementCentralList.list
+    }
+    
+    const searchLower = form.searchTerm.toLowerCase()
+    return equipementCentralList.list.filter(plannification => {
+        return (
+            plannification.zone?.toLowerCase().includes(searchLower) ||
+            plannification.equipement?.toLowerCase().includes(searchLower) ||
+            formatDate(plannification.date_debut)?.toLowerCase().includes(searchLower) ||
+            formatDate(plannification.date_fin)?.toLowerCase().includes(searchLower)
+        )
+    })
+})
+
+const numPagesFiltered = computed(() => Math.ceil(filteredPlannifications.value.length / perPage.value))
+
+const paginatedPlannifications = computed(() => {
+    const start = currentPage.value * perPage.value
+    const end = start + perPage.value
+    return filteredPlannifications.value.slice(start, end)
+})
+
 const pagesList = computed(() => {
     const pagesList = []
-    for (let i = 0; i < numPages.value; i++) {
+    for (let i = 0; i < numPagesFiltered.value; i++) {
         pagesList.push(i)
     }
 
@@ -393,12 +416,55 @@ const getPlannificationItems = () => {
              form.showErr == true
             form.errmessage = "Veuillez ajouter un equipement à cette zone, pour pouvoir clôturer l'assignation"
             isLoading.value == false
+        } else {
+            // Si la planification existe, récupérer l'intervenant assigné
+            if (getPlannificationItemsList.list.length > 0 && getPlannificationItemsList.list[0].assigner) {
+                form.intervenant = getPlannificationItemsList.list[0].assigner
+            }
         }
 
         
     }).catch((err) => {
         console.error(err.message)
     })
+}
+
+// Fonction pour mettre à jour l'assignation d'une planification existante
+const updateAssignation = async () => {
+    try {
+        isLoading.value = true;
+        await axios({
+            url: apiService.getUrl() + '/equipement/plannif/central/update-assigner/' + form.id_plannification,
+            method: 'PUT',
+            data: {
+                assigner: form.intervenant
+            }
+        });
+        showModalForConfirmPlanif.value = false;
+        isLoading.value = false;
+        location.reload(); // Recharger pour voir les changements
+    } catch (err) {
+        console.error('Erreur lors de la mise à jour de l\'assignation:', err.message);
+        isLoading.value = false;
+    }
+}
+
+// Fonction pour obtenir le nom de l'intervenant à partir de son ID
+const getIntervenantName = (intervenantId) => {
+    if (!intervenantId) return 'Intervenant inconnu';
+    
+    const intervenant = intervenants.list.find(int => int._id === intervenantId);
+    if (intervenant) {
+        return `${intervenant.nom} ${intervenant.prenom} (${intervenant.zone})`;
+    }
+    return 'Intervenant non trouvé';
+}
+
+// Fonction pour vérifier si une planification est assignée
+const isPlannificationAssigned = (plannificationId) => {
+    // Pour l'instant, on utilise une logique simple basée sur les propriétés de l'objet planification
+    const plannification = equipementCentralList.list.find(p => p._id === plannificationId);
+    return plannification && (plannification.assignedTo || plannification.intervenant || plannification.assigner);
 }
 
 const addPlannification = async () => {
@@ -435,6 +501,11 @@ onMounted(() => {
     getEquipementCentralList()
     getIntervenant()
 })
+
+// Réinitialiser la page courante quand le terme de recherche change
+watch(() => form.searchTerm, () => {
+    currentPage.value = 0
+})
 </script>
 
 <template>
@@ -467,12 +538,25 @@ onMounted(() => {
         </div>
         <div v-else>
             <p> Plannification déjà initialisée</p>
-            <BaseButton color="transparent" label="Retour" small @click="showModalForDelete = false" />
+            <BaseButton color="transparent" label="Retour" small @click="showModalForConfirmPlanif = false" />
         </div>
 
     </CardBoxModal>
 
-    <p style="padding: 10px">{{ equipementCentralList.list.length }} Plannifications</p>
+    <p style="padding: 10px">{{ filteredPlannifications.length }} Plannifications{{ form.searchTerm ? ' (filtrées)' : '' }}</p>
+    
+    <!-- Barre de recherche -->
+    <div class="p-3 lg:px-6 border-b border-gray-100 dark:border-slate-800">
+        <FormField label="Rechercher une plannification">
+            <FormControl 
+                v-model="form.searchTerm" 
+                :icon="mdiMagnify"
+                placeholder="Rechercher par zone, équipement ou date..."
+                transparent
+            />
+        </FormField>
+    </div>
+    
     <CardBoxModal v-model="showModalForDelete" title="Suppression">
         <p>Veuillez confirmer la suppression de <strong> {{ form.nomEquipementSelect }} </strong></p>
         <br>
@@ -499,12 +583,13 @@ onMounted(() => {
                     <th>Début</th>
                     <th>Fin</th>
                     <th>Equipements</th>
+                    <th>Statut</th>
                     <th>Action</th>
                     <th />
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(equipement, index) in equipementCentralList.list" :key="index">
+                <tr v-for="(equipement, index) in paginatedPlannifications" :key="index">
                     <TableCheckboxCell v-if="checkable" @checked="checked($event, zone)" />
                     <td class="border-b-0 lg:w-6 before:hidden">
                         <!-- <UserAvatar :username="zone._id" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> -->
@@ -520,6 +605,18 @@ onMounted(() => {
                     </td>
                     <td data-label="Equipement">
                         {{ equipement.equipement == '' ? 'Tous les équipements' : equipement.equipement }}
+                    </td>
+                    <td data-label="Statut">
+                        <div class="flex justify-center">
+                            <BaseIcon 
+                                v-if="isPlannificationAssigned(equipement._id)" 
+                                :path="mdiLock" 
+                                class="text-green-600 dark:text-green-400" 
+                                size="18"
+                                :title="`Planification assignée`"
+                            />
+                            <span v-else class="text-gray-400 text-sm">Non assignée</span>
+                        </div>
                     </td>
                     <td class="before:hidden lg:w-1 whitespace-nowrap">
                         <BaseButtons type="justify-start lg:justify-end" no-wrap>
@@ -538,7 +635,7 @@ onMounted(() => {
                 <BaseButton v-for="page in pagesList" :key="page" :active="page === currentPage" :label="page + 1"
                     :color="page === currentPage ? 'lightDark' : 'whiteDark'" small @click="currentPage = page" />
             </BaseButtons>
-            <small>Page {{ currentPageHuman }} of {{ numPages }}</small>
+            <small>Page {{ currentPageHuman }} of {{ numPagesFiltered }}</small>
         </BaseLevel>
     </div>
 </template>

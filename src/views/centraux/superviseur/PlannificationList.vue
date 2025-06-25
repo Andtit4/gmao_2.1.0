@@ -391,7 +391,7 @@ const getPlannificationItems = () => {
 
         if (getPlannificationItemsList.list.length == 0) {
              form.showErr == true
-            form.errmessage = "Veuillez ajouter un equipement à cette zone, pour "
+            form.errmessage = "Veuillez ajouter un equipement à cette zone, pour pouvoir clôturer l'assignation"
             isLoading.value == false
         }
 

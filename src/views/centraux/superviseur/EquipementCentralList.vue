@@ -139,7 +139,7 @@ const exportToExcel = () => {
       method: 'GET'
     }),
     axios({
-      url: apiService.getUrl() + '/equipement/central/all/piece', 
+      url: apiService.getUrl() + '/equipement/central/all/piece',
       method: 'GET'
     })
   ])
@@ -177,7 +177,7 @@ const exportToExcel = () => {
   });
 
 }
-/* 
+/*
 const getEquipementForInterventionFunc = async (_id) => {
   axios({
     url: apiService.getUrl() + '/intervention/central/intervention/' + _id,
@@ -359,7 +359,7 @@ onMounted(() => {
 
   <!-- Ajouter une piece -->
   <CardBoxModal v-model="form.showAddPiece" title="Ajouter une pièce">
-    <FormField label="Information générale"> 
+    <FormField label="Information générale">
       <FormControl v-model="form.intitule" placeholder="Intitulé" />
     </FormField>
     <p>
@@ -369,7 +369,7 @@ onMounted(() => {
     </p>
   </CardBoxModal>
 
-  
+
   <CardBoxModal v-model="showModalForDelete" title="Suppression">
     <p>Veuillez confirmer la suppression de <strong> {{ form.nomEquipementSelect }} </strong></p>
     <br>
@@ -397,7 +397,7 @@ onMounted(() => {
           <th>Référence</th>
           <th>Intitulé</th>
           <th>Type</th>
-          <th>Site</th>
+          <th>Salle</th>
           <th>Zone</th>
           <th>Ajouté par</th>
           <th />

@@ -31,6 +31,16 @@ export default {
     })
   },
 
+  getAllSalles() {
+    return axios({
+      url: this.getUrl() + '/salle',
+      method: 'GET',
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      }
+    })
+  },
+
   getEntrepot() {
     return axios({
       url: this.getUrl() + '/entrepot',
@@ -128,7 +138,7 @@ export default {
 		d.setDate(d.getDate() - (DoW + 3) % 7); // Ajustement pour que la semaine commence le jeudi
 		var ms = d.valueOf(); // GMT
 		d.setMonth(0);
-		d.setDate(4); 
+		d.setDate(4);
 		return Math.round((ms - d.valueOf()) / (7 * 864e5)) + 1;
 	}
 

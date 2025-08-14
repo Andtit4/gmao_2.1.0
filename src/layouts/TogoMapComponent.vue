@@ -20,23 +20,19 @@ const geojsonData = ref(null);
 const selectedFeature = ref(null);
 const showInfo = ref(true);
 
-// Données des sites depuis la base de données
 const cardSiteList = ref([]);
 const cardSiteDoneList = ref([]);
 const cardWaitingList = ref([]);
 const searchQuery = ref('');
 
-// Coordonnées du Togo
 const togoCoordinates = { latitude: 8.619543, longitude: 0.824782 };
 
-// Configuration de la légende
 const legendItems = ref([
   /* { color: '#dc3545', label: 'Sites à visiter' },
   { color: '#28a745', label: 'Sites visités' },
   { color: '#ffc107', label: 'Sites en cours' } */
 ]);
 
-// Fonction pour récupérer les sites depuis l'API
 const fetchSites = async (url) => {
   try {
     const response = await axios.get(apiService.getUrl() + url);
@@ -47,7 +43,6 @@ const fetchSites = async (url) => {
   }
 };
 
-// Charger les données des sites
 const loadSitesData = async () => {
   try {
     [cardSiteList.value, cardSiteDoneList.value, cardWaitingList.value] = await Promise.all([
@@ -68,14 +63,13 @@ const loadSitesData = async () => {
   }
 };
 
-// Charger le fichier GeoJSON (optionnel pour les limites géographiques)
+
 const loadGeoJSON = async () => {
   try {
     const response = await axios.get('./data.geojson');
     geojsonData.value = response.data;
   } catch (error) {
     console.warn('GeoJSON non trouvé, création de données par défaut');
-    // Données de base pour le Togo si pas de GeoJSON - coordonnées plus précises
     geojsonData.value = {
       type: "FeatureCollection",
       features: [
@@ -94,42 +88,35 @@ const loadGeoJSON = async () => {
   }
 };
 
-// Fonction pour déterminer la couleur en fonction du type de site
 const getSiteColor = (siteType) => {
   switch (siteType) {
-    case 'afaire': return '#dc3545'; // Rouge pour sites à faire
-    case 'termine': return '#28a745'; // Vert pour sites terminés
-    case 'encours': return '#ffc107'; // Orange pour sites en cours
+    case 'afaire': return '#dc3545';
+    case 'termine': return '#28a745';
+    case 'encours': return '#ffc107';
     default: return '#3388ff';
   }
 };
 
-// Sites filtrés
 const filteredSites = computed(() => {
   const query = searchQuery.value.toLowerCase();
   return [...cardSiteList.value, ...cardSiteDoneList.value, ...cardWaitingList.value]
     .filter(site => site.nom_site.toLowerCase().includes(query));
 });
 
-// Rendu de la carte SVG
 const renderMap = () => {
   if (!svgMap.value) return;
 
-  // Effacer le SVG existant
   d3.select(svgMap.value).selectAll("*").remove();
 
   const svg = d3.select(svgMap.value);
 
-  // Créer la projection centrée sur le Togo avec zoom ajusté pour voir tout le pays
   const projection = d3.geoMercator()
     .center([togoCoordinates.longitude, togoCoordinates.latitude])
     .translate([svgWidth.value / 2, svgHeight.value / 2])
     .scale(5700);
 
-  // Créer le générateur de chemins
   const path = d3.geoPath().projection(projection);
 
-  // Dessiner les limites géographiques si disponibles avec couleur bleue
   if (geojsonData.value) {
     svg.selectAll("path")
       .data(geojsonData.value.features)
@@ -142,7 +129,6 @@ const renderMap = () => {
       .attr("opacity", 0.7);
   }
 
-  // Dessiner les marqueurs des sites à faire (rouge)
   svg.selectAll(".marker-afaire")
     .data(cardSiteList.value)
     .enter()
@@ -161,7 +147,6 @@ const renderMap = () => {
         .attr("r", 8)
         .attr("opacity", 1);
 
-      // Créer tooltip
       const tooltip = svg.append("g")
         .attr("class", "tooltip")
         .attr("transform", `translate(${projection([d.longitude, d.latitude])[0]}, ${projection([d.longitude, d.latitude])[1] - 20})`);
@@ -199,7 +184,6 @@ const renderMap = () => {
       };
     });
 
-  // Dessiner les marqueurs des sites terminés (vert)
   svg.selectAll(".marker-termine")
     .data(cardSiteDoneList.value)
     .enter()
@@ -312,7 +296,7 @@ const renderMap = () => {
     });
 
   // Ajouter la légende
-  addLegend(svg);
+  // addLegend(svg);
 };
 
 // Ajouter la légende à la carte

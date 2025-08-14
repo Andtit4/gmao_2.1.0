@@ -61,15 +61,16 @@ const form = reactive({
 
 const zones = reactive({ list: [] })
 const sites = reactive({ list: [] })
+const salleList = reactive({ list: [] })
 const oneZoneCentrale = reactive({ list: [] })
 const equipementCentralList = reactive({ list: [] })
 const notificationSettingsModel = ref([])
 const notificationsOutline = computed(() => notificationSettingsModel.value.indexOf('outline') > -1)
 const isDetailModal = ref(false)
 
-const getSites = async () => {
-    const data = await apiService.getAllSites();
-    sites.list = data.data
+const getSalles = async () => {
+    const data = await apiService.getAllSalles();
+    salleList.list = data.data
 }
 
 const getCentralZone = async () => {
@@ -169,7 +170,7 @@ const addEquipement = () => {
 
 
 onMounted(() => {
-    getSites()
+    getSalles()
     getCentralZone()
     getEquipementCentralList()
 })
@@ -206,9 +207,9 @@ onMounted(() => {
                         </option>
                     </select>
                     <select v-model="form.nom_site" class="form-select bg-white dark:bg-slate-800">
-                        <option value="" disabled selected>Séléctionnez un site</option>
-                        <option v-for="(site, index) in sites.list" :key="index" :value="site.nom_site">
-                            {{ site.nom_site }}
+                        <option value="" disabled selected>Séléctionnez une salle</option>
+                        <option v-for="(salle, index) in salleList.list" :key="index" :value="salle.salle_id">
+                            {{ salle.salle_id }} | {{ salle.nom }}
                         </option>
                     </select>
                     <select v-model="form.zone_name" class="form-select bg-white dark:bg-slate-800">
